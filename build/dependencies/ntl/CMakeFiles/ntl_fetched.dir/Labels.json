@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/ntl/CMakeFiles/ntl_fetched"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/ntl/CMakeFiles/ntl_fetched.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/ntl/CMakeFiles/ntl_fetched-complete.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-build.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-configure.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-download.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-install.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-mkdir.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-patch.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/ntl_fetched/ntl_fetched-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"ntl_fetched"
+		],
+		"name" : "ntl_fetched"
+	}
+}

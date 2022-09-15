@@ -1,0 +1,13 @@
+# Target labels
+ helib_external
+# Source files and their labels
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/CMakeFiles/helib_external
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/CMakeFiles/helib_external.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/CMakeFiles/helib_external-complete.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-build.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-configure.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-download.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-install.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-mkdir.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-patch.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/helib_external/helib_external-update.rule

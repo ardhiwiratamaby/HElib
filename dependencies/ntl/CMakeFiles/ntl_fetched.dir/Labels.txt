@@ -1,0 +1,13 @@
+# Target labels
+ ntl_fetched
+# Source files and their labels
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/ntl/CMakeFiles/ntl_fetched
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/ntl/CMakeFiles/ntl_fetched.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/ntl/CMakeFiles/ntl_fetched-complete.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-build.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-configure.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-download.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-install.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-mkdir.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-patch.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/ntl_fetched/ntl_fetched-update.rule

@@ -1,0 +1,1 @@
+cmd='<SOURCE_DIR>/configure;--prefix=/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/helib_pack;--enable-shared=yes;--disable-static;--with-readline=no;CXX=/usr/bin/c++ ;CC=/usr/bin/cc '

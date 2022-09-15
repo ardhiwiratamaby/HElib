@@ -31,6 +31,7 @@ if (NOT ONLY_ADD_TEST)
         "TestContext.cpp"
         "TestCtxt.cpp"
         "TestErrorHandling.cpp"
+        "TestHEXL.cpp"
         "TestLogging.cpp"
         "TestMatmulCKKS.cpp"
         "TestMatrix.cpp"
@@ -71,15 +72,25 @@ if (NOT ONLY_ADD_TEST)
     # Adding the test binary target
     add_executable(runTests main.cpp ${PORTED_LEGACY_TEST_SRC} ${GTEST_SRC})
 
+    add_library(CUDA_ACCEL STATIC IMPORTED)
+
     target_link_libraries(runTests gtest)
     target_link_libraries(runTests helib)
+    # target_link_libraries(runTests CUDA_ACCEL)
 
+    # target_link_directories(runTests PUBLIC "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib")
 
     # NOTE: Adding all PRIVATE_HELIB_CXX_FLAGS to the tests will add -fPIC too.
     # At the moment this does not affect compilation of the tests and does not
     # change their running time.
     target_compile_options(runTests PRIVATE ${PRIVATE_HELIB_CXX_FLAGS})
 
+    # set(INIT_CUDA_ACCEL_DIR "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib") #Set location of CUDA accel cmake data for linking.
+
+    # add_library(CUDA_ACCEL STATIC IMPORTED)
+  
+    # include_directories(${INIT_CUDA_ACCEL_DIR})
+    
     target_include_directories(
     runTests
     PRIVATE
@@ -149,6 +160,7 @@ set(TEST_NAMES
     "TestCtxt"
     "TestErrorHandling"
     "TestFatBootstrappingWithMultiplications"
+    "TestHEXL"
     "TestLogging"
     "TestMatmulCKKS"
     "TestMatrix"

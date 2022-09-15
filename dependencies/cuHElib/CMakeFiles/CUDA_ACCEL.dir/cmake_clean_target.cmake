@@ -1,0 +1,3 @@
+file(REMOVE_RECURSE
+  "libCUDA_ACCEL.a"
+)

@@ -1,0 +1,11 @@
+*** CompilerOutput.log ***
+*** building GenConfigInfo
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+*** checking -pthread flag
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+*** checking -march=native flag
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+*** checking -ffp-contract=off flag
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.

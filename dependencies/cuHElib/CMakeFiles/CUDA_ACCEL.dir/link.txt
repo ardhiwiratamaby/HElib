@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCUDA_ACCEL.a CMakeFiles/CUDA_ACCEL.dir/vector_add.cu.o
+/usr/bin/ranlib libCUDA_ACCEL.a

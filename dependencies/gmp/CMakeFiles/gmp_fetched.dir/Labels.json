@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/gmp/CMakeFiles/gmp_fetched"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/gmp/CMakeFiles/gmp_fetched.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/gmp/CMakeFiles/gmp_fetched-complete.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-build.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-configure.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-download.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-install.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-mkdir.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-patch.rule"
+		},
+		{
+			"file" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/Stamp/gmp_fetched/gmp_fetched-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"gmp_fetched"
+		],
+		"name" : "gmp_fetched"
+	}
+}

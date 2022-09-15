@@ -1,0 +1,3 @@
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/CMakeFiles/edit_cache.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/CMakeFiles/rebuild_cache.dir

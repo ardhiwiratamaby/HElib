@@ -1,0 +1,7 @@
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/helib.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/edit_cache.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/rebuild_cache.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/list_install_components.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/install.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/install/local.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/install/strip.dir

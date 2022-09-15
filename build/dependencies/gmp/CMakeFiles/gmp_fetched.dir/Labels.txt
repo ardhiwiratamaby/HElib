@@ -1,0 +1,13 @@
+# Target labels
+ gmp_fetched
+# Source files and their labels
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/gmp/CMakeFiles/gmp_fetched
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/gmp/CMakeFiles/gmp_fetched.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/gmp/CMakeFiles/gmp_fetched-complete.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-build.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-configure.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-download.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-install.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-mkdir.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-patch.rule
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Stamp/gmp_fetched/gmp_fetched-update.rule

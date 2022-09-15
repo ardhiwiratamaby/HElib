@@ -1,40 +1,40 @@
-gh-pages/
-build/
+# Prerequisites
+*.d
 
-__pycache__/
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-**.log
-**.sk
-**.pk
-**.out
-**.ptxt
-**.ctxt
-**/CMakeCache.txt
+# Precompiled Headers
+*.gch
+*.pch
 
-src/fhe.a
-src/*.o
-src/*_x
-src/*_x.exe
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
 
-Makefile-*
-src/makedep.d
-src/*_x.dSYM
-src/*.sh
-src/*.bin
-src/*.txt
+# Fortran module files
+*.mod
+*.smod
 
-**.bak
-**.swp
-**.DS_Store
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
 
-# Exception for CMakeLists file
-!**/CMakeLists.txt
+# Executables
+*.exe
+*.out
+*.app
 
-# Exception for sample files
-!src/misc/iotest_asciiBE.txt
-!src/misc/iotest_asciiLE.txt
-!src/misc/iotest_binBE.bin
-!src/misc/iotest_binLE.bin
-
-/html/
-/latex/
+#CUDA
+*.i
+*.ii
+*.gpu
+*.ptx
+*.cubin
+*.fatbin

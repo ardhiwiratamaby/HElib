@@ -1,0 +1,69 @@
+Performing C++ SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_d3ce0/fast && make[3]: Entering directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+/usr/bin/make  -f CMakeFiles/cmTC_d3ce0.dir/build.make CMakeFiles/cmTC_d3ce0.dir/build
+make[4]: Entering directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d3ce0.dir/src.cxx.o
+/usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -std=c++1z -o CMakeFiles/cmTC_d3ce0.dir/src.cxx.o -c /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_d3ce0
+/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d3ce0.dir/link.txt --verbose=1
+/usr/bin/c++ CMakeFiles/cmTC_d3ce0.dir/src.cxx.o -o cmTC_d3ce0 
+CMakeFiles/cmTC_d3ce0.dir/src.cxx.o: In function `main':
+src.cxx:(.text+0x3e): undefined reference to `pthread_create'
+src.cxx:(.text+0x4a): undefined reference to `pthread_detach'
+src.cxx:(.text+0x56): undefined reference to `pthread_cancel'
+src.cxx:(.text+0x67): undefined reference to `pthread_join'
+src.cxx:(.text+0x7b): undefined reference to `pthread_atfork'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_d3ce0.dir/build.make:98: recipe for target 'cmTC_d3ce0' failed
+make[4]: *** [cmTC_d3ce0] Error 1
+make[4]: Leaving directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_d3ce0/fast' failed
+make[3]: *** [cmTC_d3ce0/fast] Error 2
+make[3]: Leaving directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_122dc/fast && make[3]: Entering directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+/usr/bin/make  -f CMakeFiles/cmTC_122dc.dir/build.make CMakeFiles/cmTC_122dc.dir/build
+make[4]: Entering directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_122dc.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++   -DCHECK_FUNCTION_EXISTS=pthread_create -std=c++1z -o CMakeFiles/cmTC_122dc.dir/CheckFunctionExists.cxx.o -c /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_122dc
+/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/bin/cmake -E cmake_link_script CMakeFiles/cmTC_122dc.dir/link.txt --verbose=1
+/usr/bin/c++  -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_122dc.dir/CheckFunctionExists.cxx.o -o cmTC_122dc  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_122dc.dir/build.make:98: recipe for target 'cmTC_122dc' failed
+make[4]: *** [cmTC_122dc] Error 1
+make[4]: Leaving directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+Makefile:127: recipe for target 'cmTC_122dc/fast' failed
+make[3]: *** [cmTC_122dc/fast] Error 2
+make[3]: Leaving directory '/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/Build/helib_external/CMakeFiles/CMakeTmp'
+
+
+

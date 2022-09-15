@@ -105,6 +105,7 @@ set(HELIB_SRCS
     "fhe_stats.cpp"
     "hypercube.cpp"
     "IndexSet.cpp"
+    "intelExt.cpp"
     "intraSlot.cpp"
     "JsonWrapper.cpp"
     "keys.cpp"
@@ -285,6 +286,8 @@ set_target_properties(helib
                           SOVERSION "${PROJECT_VERSION}"
                           PUBLIC_HEADER "${HELIB_HEADERS}")
 
+
+
 # Adding gmp and ntl link file as relative/absolute depending on the
 # build/install interfaces
 target_link_libraries(
@@ -296,6 +299,52 @@ target_link_libraries(
          "$<INSTALL_INTERFACE:${GMP_LIBRARIES_EXPORTED_PATH}>"
          # Add pthread if required
          $<$<BOOL:${HELIB_REQUIRES_PTHREADS}>:Threads::Threads>)
+
+# target_include_directories(CUDA_ACCEL INTERFACE /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib)
+
+if(USE_CUDA_ACCEL)
+  set(INIT_CUDA_ACCEL_DIR "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib") #Set location of CUDA accel cmake data for linking.
+  # add_subdirectory(${INIT_CUDA_ACCEL_DIR} ${INIT_CUDA_ACCEL_DIR})
+  # add_library(CUDA_ACCEL STATIC IMPORTED)
+  # find_package(CUDA_ACCEL HINTS ${INIT_CUDA_ACCEL_DIR} REQUIRED)
+
+  include_directories(${INIT_CUDA_ACCEL_DIR})
+  add_dependencies(helib CUDA_ACCEL)
+
+  target_include_directories(helib PRIVATE ${INIT_CUDA_ACCEL_DIR})
+
+  # Manually package CUDA_ACCEL with libhelib.a
+  add_custom_command(TARGET helib POST_BUILD
+    COMMAND ar -x $<TARGET_FILE:CUDA_ACCEL>
+    COMMAND ar -x $<TARGET_FILE:helib>
+    COMMAND ar -qcs $<TARGET_FILE:helib> *.o
+    COMMAND rm -f *.o
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS helib CUDA_ACCEL
+    )
+endif(USE_CUDA_ACCEL)
+
+# Link HEXL
+if (USE_INTEL_HEXL)
+  add_dependencies(helib HEXL::hexl)
+
+  # Manually add the HEXL include directory
+  get_target_property(
+    HEXL_INCLUDE_DIR
+    HEXL::hexl
+    INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(helib PRIVATE ${HEXL_INCLUDE_DIR})
+
+  # Manually package HEXL with libhelib.a
+  add_custom_command(TARGET helib POST_BUILD
+    COMMAND ar -x $<TARGET_FILE:HEXL::hexl>
+    COMMAND ar -x $<TARGET_FILE:helib>
+    COMMAND ar -qcs $<TARGET_FILE:helib> *.o
+    COMMAND rm -f *.o
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS helib hexl
+    )
+endif()
 
 # FIX RPATH
 if (BUILD_SHARED)

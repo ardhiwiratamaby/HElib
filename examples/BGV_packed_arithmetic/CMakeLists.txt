@@ -8,6 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
+set(CMAKE_PREFIX_PATH ~/helib_install/helib_pack/share/cmake/helib)
 
 add_executable(BGV_packed_arithmetic BGV_packed_arithmetic.cpp)
 

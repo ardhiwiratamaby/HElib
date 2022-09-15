@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libCUDA_ACCEL.a CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o
+/usr/bin/ranlib ../../lib/libCUDA_ACCEL.a
