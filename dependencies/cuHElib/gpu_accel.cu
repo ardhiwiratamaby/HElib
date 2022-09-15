@@ -7,6 +7,7 @@
 #include "gpu_accel.cuh"
 #include <NTL/ZZVec.h>
 
+//device variable;
 long *d_A, *d_B, *d_C;
 
 
