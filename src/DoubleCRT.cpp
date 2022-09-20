@@ -318,6 +318,8 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
+
+  //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
     NTL::vec_long& row = map[i];
@@ -332,7 +334,18 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     current_row++;
   }
 
-  // fun.apply();
+  //cudaMemCopy+Execute Kernel
+  fun.apply();
+
+  //copy the result in contiguousMap to map
+  counter=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    for (long j : range(phim)){
+      row[j] = getMapA(counter);
+      counter++;
+    }
+  }
 
 #endif
 
@@ -386,6 +399,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
+#if 0
   // add/sub/mul the data, element by element, modulo the respective primes
   for (long i : s) {
     long pi = context.ithPrime(i);
@@ -406,6 +420,37 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
       row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
 #endif // USE_INTEL_HEXL
   }
+#else
+  // add/sub/mul the data, element by element, modulo the respective primes
+
+  //copy map to contiguousMap
+  long counter=0, current_row=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    const NTL::vec_long& other_row = (*other_map)[i];
+    setModulus(current_row, context.ithPrime(i));
+
+    for (long j : range(phim)){
+      setMapA(counter, row[j]);
+      setMapB(counter, other_row[j]);
+      counter++;
+    }
+    current_row++;
+  }
+
+  //cudaMemCopy+Execute Kernel
+  CudaEltwiseMultMod();
+
+  //copy the result in contiguousMap to map
+  counter=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    for (long j : range(phim)){
+      row[j] = getMapA(counter);
+      counter++;
+    }
+  }
+#endif
   return *this;
 }
 
@@ -418,6 +463,7 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
+#if 0
   for (long i : s) {
     long pi = context.ithPrime(i);
     long n = rem(num, pi); // n = num % pi
@@ -432,6 +478,36 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
       row[j] = fun.apply(row[j], n, pi);
 #endif
   }
+#else
+  // add/sub/mul the data, element by element, modulo the respective primes
+
+  //copy map to contiguousMap
+  long counter=0, current_row=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    long n = rem(num, pi); // n = num % pi
+    setModulus(current_row, context.ithPrime(i));
+
+    for (long j : range(phim)){
+      setMapA(counter, row[j]);
+      counter++;
+    }
+    current_row++;
+  }
+
+  //cudaMemCopy+Execute Kernel
+  CudaEltwiseMultMod(n);
+
+  //copy the result in contiguousMap to map
+  counter=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    for (long j : range(phim)){
+      row[j] = getMapA(counter);
+      counter++;
+    }
+  }
+#endif
   return *this;
 }
 

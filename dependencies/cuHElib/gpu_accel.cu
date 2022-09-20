@@ -9,6 +9,8 @@
 
 //device variable;
 long *d_A, *d_B, *d_C, *d_modulus;
+size_t bytes;
+long d_phim, d_n_rows;
 
 long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus;
 
@@ -26,16 +28,27 @@ void setMapB(long index, long data){
   contiguousHostMapB[index] = data;
 }
 
+long getMapA(long index){
+  return contiguousHostMapA[index];
+}
+
+long getMapB(long index){
+  return contiguousHostMapB[index];
+}
+
 void setModulus(long index, long data){
   contiguousModulus[index] = data;
 }
 
 void InitGPUBuffer(long phim, int n_rows){
-    size_t bytes = phim*n_rows*sizeof(long);
-    // Allocate memory for arrays d_A, d_B, and d_C on device
-    cudaMalloc(&d_A, bytes);
-    cudaMalloc(&d_B, bytes);
-    cudaMalloc(&d_C, bytes);
+  d_phim = phim;
+  d_n_rows = n_rows;
+
+  bytes = phim*n_rows*sizeof(long);
+  // Allocate memory for arrays d_A, d_B, and d_C on device
+  cudaMalloc(&d_A, bytes);
+  cudaMalloc(&d_B, bytes);
+  cudaMalloc(&d_C, bytes);
 }
 
 void DestroyGPUBuffer(){
@@ -46,66 +59,36 @@ void DestroyGPUBuffer(){
 }
 
 
-__global__ void kernel_addMod(long *a, long *b, long *result, long size, long modulus){
+__global__ void kernel_addMod(long *a, long *b, long *result, long size, long *d_modulus, long phim){
     // printf("==kernel code== Hi there, this is Ardhi\n");
     int tid = blockDim.x * blockIdx.x + threadIdx.x;
     if(tid < size){
       result[tid] = a[tid] + b[tid];
       // result[tid] %= modulus;
-      if(result[tid] >= modulus)
-        result[tid] -= modulus;
-    }
-}
-
-__global__ void kernel_addModScalar(long *a, long scalar, long *result, long size, long modulus){
-    // printf("==kernel code== Hi there, this is Ardhi\n");
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    if(tid < size){
-      result[tid] = a[tid] + scalar;
-      // result[tid] %= modulus;
-      if(result[tid] >= modulus)
-        result[tid] -= modulus;
+      if(result[tid] >= d_modulus[tid/phim])
+        result[tid] -= d_modulus[tid/phim];
     }
 }
 
 #define debug_impl 0
-void CudaEltwiseAddMod(long* result, const long* a, const long* b, long size, long modulus){
-
-    size_t bytes = size*sizeof(long);
-#if debug_impl
-    // Allocate memory for arrays A, B, and C on host
-    long *A = (long*)malloc(bytes);
-    long *B = (long*)malloc(bytes);
-    long *C = (long*)malloc(bytes);
-#endif
+void CudaEltwiseAddMod(){
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, a, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, b, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_modulus, contiguousModulus, bytes, cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(size) / thr_per_blk );
+    int blk_in_grid = ceil( float(d_phim*d_n_rows) / thr_per_blk );
 
     // Launch kernel
-    kernel_addMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, size, modulus);
+    kernel_addMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, d_phim*d_n_rows, d_modulus, d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);
-
-#if debug_impl
-    cudaMemcpy(A, d_A, bytes, cudaMemcpyDeviceToHost);
-    cudaMemcpy(B, d_B, bytes, cudaMemcpyDeviceToHost);
-
-    for (long j=0; j<size; j++){
-      if(NTL::AddMod(A[j], B[j], modulus) != result[j]){
-        std::cout<<"AddMod Missmatch Detected. j="<<j<<"/"<<size<<" CPU: "<<NTL::AddMod(A[j], B[j], modulus)<<" GPU: "<<result[j]<<" A: "<<A[j]<<" B: "<<B[j]<<" Mod: "<<modulus<<std::endl;
-      }
-    }
- #endif
-
+    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
 
 
   // //allocate data in device memory
@@ -160,25 +143,34 @@ void CudaEltwiseAddMod(long* result, const long* a, const long* b, long size, lo
 
 }
 
-void CudaEltwiseAddMod(long* result, const long* a, long scalar, long size, long modulus){
-    size_t bytes = size*sizeof(long);
+__global__ void kernel_addModScalar(long *a, long scalar, long *result, long size, long *d_modulus, long phim){
+    // printf("==kernel code== Hi there, this is Ardhi\n");
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
+    if(tid < size){
+      result[tid] = a[tid] + scalar;
+      // result[tid] %= modulus;
+      if(result[tid] >= d_modulus[tid/phim])
+        result[tid] -= d_modulus[tid/phim];
+    }
+}
 
+void CudaEltwiseAddMod(long scalar){
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, a, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
     // cudaMemcpy(d_B, &scalar, sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(size) / thr_per_blk );
+    int blk_in_grid = ceil( float(d_phim*d_n_rows) / thr_per_blk );
 
     // Launch kernel
-    kernel_addModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, scalar, d_C, size, modulus);
+    kernel_addModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, scalar, d_C, d_phim*d_n_rows, d_modulus, d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
 
 #if 0
   //allocate data in device memory
@@ -216,17 +208,6 @@ __global__ void kernel_subMod(long *a, long *b, long *result, long size, long mo
     }
 }
 
-__global__ void kernel_subModScalar(long *a, long scalar, long *result, long size, long modulus){
-    // printf("==kernel code== Hi there, this is Ardhi\n");
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    if(tid < size){
-      if (a[tid] >= scalar) {
-        result[tid] = a[tid] - scalar;
-      } else {
-        result[tid] = a[tid] + modulus - scalar;
-      }
-    }
-}
 
 void CudaEltwiseSubMod(long* result, const long* a, const long* b, long size, long modulus){
     size_t bytes = size*sizeof(long);
@@ -287,6 +268,18 @@ void CudaEltwiseSubMod(long* result, const long* a, const long* b, long size, lo
   //copy the result back to CPU
   thrust::copy(d_result.begin(), d_result.end(), result);
 #endif
+}
+
+__global__ void kernel_subModScalar(long *a, long scalar, long *result, long size, long modulus){
+    // printf("==kernel code== Hi there, this is Ardhi\n");
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
+    if(tid < size){
+      if (a[tid] >= scalar) {
+        result[tid] = a[tid] - scalar;
+      } else {
+        result[tid] = a[tid] + modulus - scalar;
+      }
+    }
 }
 
 void CudaEltwiseSubMod(long* result, const long* a, long scalar, long size, long modulus){
