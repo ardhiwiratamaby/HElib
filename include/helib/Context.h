@@ -116,6 +116,7 @@ private:
   // primes only grows and no prime is ever modified or removed.
   std::vector<Cmodulus> moduli;
 
+
   // A helper table to map required modulo-sizes to primeSets
   ModuliSizes modSizes;
 
@@ -236,12 +237,14 @@ private:
   // q The prime to add.
   void addSpecialPrime(long q);
 
+
 public:
   /**
    * @brief Class label to be added to JSON serialization as object type
    * information.
    */
   static constexpr std::string_view typeName = "Context";
+
 
   // NOTE: Parameters stored in zMStar are invariant for any computations
   // involving this Context.

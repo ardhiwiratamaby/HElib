@@ -8,11 +8,30 @@
 #include <NTL/ZZVec.h>
 
 //device variable;
-long *d_A, *d_B, *d_C;
+long *d_A, *d_B, *d_C, *d_modulus;
 
+long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus;
 
-void InitGPUBuffer(long phim){
-    size_t bytes = phim*sizeof(long);
+void InitContiguousHostMapModulus(long phim, int n_rows){
+  contiguousHostMapA = (long *)malloc(phim*n_rows*sizeof(long));
+  contiguousHostMapB = (long *)malloc(phim*n_rows*sizeof(long));
+  contiguousModulus = (long *)malloc(n_rows*sizeof(long));
+}
+
+void setMapA(long index, long data){
+  contiguousHostMapA[index] = data;
+}
+
+void setMapB(long index, long data){
+  contiguousHostMapB[index] = data;
+}
+
+void setModulus(long index, long data){
+  contiguousModulus[index] = data;
+}
+
+void InitGPUBuffer(long phim, int n_rows){
+    size_t bytes = phim*n_rows*sizeof(long);
     // Allocate memory for arrays d_A, d_B, and d_C on device
     cudaMalloc(&d_A, bytes);
     cudaMalloc(&d_B, bytes);
@@ -71,7 +90,7 @@ void CudaEltwiseAddMod(long* result, const long* a, const long* b, long size, lo
 
     // Launch kernel
     kernel_addMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, size, modulus);
-    cudaDeviceSynchronize();
+    // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
     cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);
@@ -156,7 +175,7 @@ void CudaEltwiseAddMod(long* result, const long* a, long scalar, long size, long
 
     // Launch kernel
     kernel_addModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, scalar, d_C, size, modulus);
-    cudaDeviceSynchronize();
+    // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
     cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);
@@ -230,7 +249,7 @@ void CudaEltwiseSubMod(long* result, const long* a, const long* b, long size, lo
 
     // Launch kernel
     kernel_subMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, size, modulus);
-    cudaDeviceSynchronize();
+    // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
     cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);
@@ -285,7 +304,7 @@ void CudaEltwiseSubMod(long* result, const long* a, long scalar, long size, long
 
     // Launch kernel
     kernel_subModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, scalar, d_C, size, modulus);
-    cudaDeviceSynchronize();
+    // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
     cudaMemcpy(result, d_C, bytes, cudaMemcpyDeviceToHost);

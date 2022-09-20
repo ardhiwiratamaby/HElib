@@ -2,14 +2,21 @@
 #define GPU_ACCEL_H
 
 
-void InitGPUBuffer(long phim);
+void InitGPUBuffer(long phim, int n_rows);
 void DestroyGPUBuffer();
-void CudaEltwiseAddMod(long* result, const long* a, const long* b, long size, long modulus);
-void CudaEltwiseAddMod(long* result, const long* a, long scalar, long size, long modulus);
-void CudaEltwiseSubMod(long* result, const long* a, const long* b, long size, long modulus);
-void CudaEltwiseSubMod(long* result, const long* a, long scalar, long size, long modulus);
-void CudaEltwiseMultMod(long* result, const long* a, const long* b, long size, long modulus);
-void CudaEltwiseMultMod(long* result, const long* a, long scalar, long size, long modulus);
+
+void setMapA(long index, long data);
+void setMapB(long index, long data);
+void setModulus(long index, long data);
+
+void InitContiguousHostMapModulus(long phim, int n_rows);
+
+void CudaEltwiseAddMod();
+void CudaEltwiseAddMod(long scalar);
+void CudaEltwiseSubMod();
+void CudaEltwiseSubMod(long scalar);
+void CudaEltwiseMultMod();
+void CudaEltwiseMultMod(long scalar);
 
 int cuda_add();
 

@@ -197,83 +197,43 @@ struct MulFun
   }
 };
 #elif defined(USE_CUDA_ACCEL)
+
 struct AddFun
 {
-  void apply(long* result,
-             const long* a,
-             const long* b,
-             long size,
-             long modulus) const
+  void apply() const
   {
-
-  CudaEltwiseAddMod(result, a, b, size, modulus);
-
+    CudaEltwiseAddMod();
   }
 
-  void apply(long* result,
-             const long* a,
-             long scalar,
-             long size,
-             long modulus) const
+  void apply(long scalar) const
   {  
-    CudaEltwiseAddMod(result, a, scalar, size, modulus);
+    CudaEltwiseAddMod(scalar);
   }
 };
 
 struct SubFun
 {
-  void apply(long* result,
-             const long* a,
-             const long* b,
-             long size,
-             long modulus) const
+  void apply() const
   {
-    CudaEltwiseSubMod(result, a, b, size, modulus);
-    // for (long j=0; j<size; j++){
-    //   result[j] = NTL::SubMod(a[j], b[j], modulus);
-    // }
-
+    CudaEltwiseSubMod();
   }
 
-  void apply(long* result,
-             const long* a,
-             long scalar,
-             long size,
-             long modulus) const
+  void apply(long scalar) const
   {
-    CudaEltwiseSubMod(result, a, scalar, size, modulus);
-    // for (long j=0; j<size; j++){
-    //   result[j] = NTL::SubMod(a[j], scalar, modulus);
-    // }
+    CudaEltwiseSubMod(scalar);
   }
 };
 
 struct MulFun
 {
-  void apply(long* result,
-             const long* a,
-             const long* b,
-             long size,
-             long modulus) const
+  void apply() const
   {
-    CudaEltwiseMultMod(result, a, b, size, modulus);
-
-    // for (long j=0; j<size; j++){
-    //   result[j] = NTL::MulMod(a[j], b[j], modulus);
-    // }
+    CudaEltwiseMultMod();
   }
 
-  void apply(long* result,
-             const long* a,
-             long scalar,
-             long size,
-             long modulus) const
+  void apply(long scalar) const
   {
-    CudaEltwiseMultMod(result, a, scalar, size, modulus);
-
-    // for (long j=0; j<size; j++){
-    //   result[j] = NTL::MulMod(a[j], scalar, modulus);
-    // }
+    CudaEltwiseMultMod(scalar);
   }
 };
 #else
@@ -337,6 +297,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
+#if 0
   // add/sub/mul the data, element by element, modulo the respective primes
   for (long i : s) {
     long pi = context.ithPrime(i);
@@ -355,6 +316,26 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     }
 #endif
   }
+#else
+  // add/sub/mul the data, element by element, modulo the respective primes
+  long counter=0, current_row=0;
+  for (long i : s) {
+    NTL::vec_long& row = map[i];
+    const NTL::vec_long& other_row = (*other_map)[i];
+    setModulus(current_row, context.ithPrime(i));
+
+    for (long j : range(phim)){
+      setMapA(counter, row[j]);
+      setMapB(counter, other_row[j]);
+      counter++;
+    }
+    current_row++;
+  }
+
+  // fun.apply();
+
+#endif
+
   return *this;
 }
 

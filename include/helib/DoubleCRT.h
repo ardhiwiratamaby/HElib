@@ -93,6 +93,8 @@ private:
   // of evaluations wrt this prime
   IndexMap<NTL::vec_long> map;
 
+
+
   //! a "sanity check" method, verifies consistency of the map with
   //! current moduli chain, an error is raised if they are not consistent
   void verify();
