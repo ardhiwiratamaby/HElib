@@ -80,7 +80,8 @@
 			"queue": "cpp",
 			"stack": "cpp",
 			"__config": "cpp",
-			"__locale": "cpp"
+			"__locale": "cpp",
+			"__bit_reference": "cpp"
 		}
 	}
 }

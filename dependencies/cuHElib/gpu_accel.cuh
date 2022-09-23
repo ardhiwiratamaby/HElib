@@ -8,6 +8,7 @@ void DestroyGPUBuffer();
 void setMapA(long index, long data);
 void setMapB(long index, long data);
 void setModulus(long index, long data);
+void setScalar(long index, long data);
 
 long getMapA(long index);
 long getMapB(long index);

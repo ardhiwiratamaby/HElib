@@ -480,14 +480,14 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
-
-  //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
-    NTL::vec_long& row = map[i];
+    //copy map to contiguousMap
+    long pi = context.ithPrime(i);
     long n = rem(num, pi); // n = num % pi
+    NTL::vec_long& row = map[i];
     setModulus(current_row, context.ithPrime(i));
-
+    setScalar(current_row, n);
     for (long j : range(phim)){
       setMapA(counter, row[j]);
       counter++;
@@ -496,7 +496,7 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   }
 
   //cudaMemCopy+Execute Kernel
-  CudaEltwiseMultMod(n);
+  fun.apply(1);
 
   //copy the result in contiguousMap to map
   counter=0;
