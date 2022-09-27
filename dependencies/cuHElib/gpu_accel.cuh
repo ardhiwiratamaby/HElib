@@ -5,6 +5,9 @@
 void InitGPUBuffer(long phim, int n_rows);
 void DestroyGPUBuffer();
 
+void setRowMapA(long offset, long *source);
+void setRowMapB(long offset, const long *source);
+
 void setMapA(long index, long data);
 void setMapB(long index, long data);
 void setModulus(long index, long data);

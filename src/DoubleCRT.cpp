@@ -209,6 +209,9 @@ struct AddFun
   {  
     CudaEltwiseAddMod(scalar);
   }
+
+  long apply(long a, long b, long n) const { return NTL::AddMod(a, b, n); }
+
 };
 
 struct SubFun
@@ -222,6 +225,8 @@ struct SubFun
   {
     CudaEltwiseSubMod(scalar);
   }
+
+  long apply(long a, long b, long n) const { return NTL::SubMod(a, b, n); }
 };
 
 struct MulFun
@@ -235,6 +240,8 @@ struct MulFun
   {
     CudaEltwiseMultMod(scalar);
   }
+
+  long apply(long a, long b, long n) const { return NTL::MulMod(a, b, n); }
 };
 #else
 struct AddFun
@@ -297,24 +304,33 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
-#if 0
-  // add/sub/mul the data, element by element, modulo the respective primes
+#if 1
+//   // add/sub/mul the data, element by element, modulo the respective primes
+//   for (long i : s) {
+//     long pi = context.ithPrime(i);
+//     NTL::vec_long& row = map[i];
+//     const NTL::vec_long& other_row = (*other_map)[i];
+
+// #ifdef USE_INTEL_HEXL
+//     fun.apply(row.elts(), row.elts(), other_row.elts(), phim, pi);
+// #elif defined(USE_CUDA_ACCEL)
+//     // std::cout<<"Op Accelerated on CUDA\n";
+//     fun.apply(row.elts(), row.elts(), other_row.elts(), phim, pi);
+// #else
+//     for (long j : range(phim)){
+//       row[j] = fun.apply(row[j], other_row[j], pi);
+//       // std::cout<<"row "<<row[j]<<"\n";
+//     }
+// #endif
+
   for (long i : s) {
     long pi = context.ithPrime(i);
     NTL::vec_long& row = map[i];
     const NTL::vec_long& other_row = (*other_map)[i];
-
-#ifdef USE_INTEL_HEXL
-    fun.apply(row.elts(), row.elts(), other_row.elts(), phim, pi);
-#elif defined(USE_CUDA_ACCEL)
-    // std::cout<<"Op Accelerated on CUDA\n";
-    fun.apply(row.elts(), row.elts(), other_row.elts(), phim, pi);
-#else
     for (long j : range(phim)){
       row[j] = fun.apply(row[j], other_row[j], pi);
       // std::cout<<"row "<<row[j]<<"\n";
     }
-#endif
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
@@ -345,6 +361,13 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
       row[j] = getMapA(counter);
       counter++;
     }
+
+    const NTL::vec_long& other_row = (*other_map)[i];
+    long pi = context.ithPrime(i);
+    for (long j : range(phim)){
+      std::cout<<"GPU row: "<<row[j]<<"CPU row: "<<fun.apply(row[j], other_row[j], pi)<<"\n";
+    }
+    
   }
 
 #endif
@@ -399,26 +422,63 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
-#if 0
-  // add/sub/mul the data, element by element, modulo the respective primes
+#if 1
+//   // add/sub/mul the data, element by element, modulo the respective primes
+//   for (long i : s) {
+//     long pi = context.ithPrime(i);
+//     NTL::vec_long& row = map[i];
+//     const NTL::vec_long& other_row = (*other_map)[i];
+
+// #ifdef USE_INTEL_HEXL
+//     intel::EltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
+// #elif defined(USE_CUDA_ACCEL)
+//     // std::cout<<"do_mul Accelerated on CUDA\n";
+//     CudaEltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
+//     // NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
+//     // for (long j : range(phim))
+//     //   row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
+// #else
+//     NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
+//     for (long j : range(phim))
+//       row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
+// #endif // USE_INTEL_HEXL
+  // }
+
+  //copy map to contiguousMap
+  long counter=0, current_row=0;
   for (long i : s) {
+    NTL::vec_long& row = map[i];
+    const NTL::vec_long& other_row = (*other_map)[i];
+    setModulus(current_row, context.ithPrime(i));
+    // row[0];
+    // other_row[0];
+    // for (long j : range(phim)){
+    //   long a = row[j];
+    //   long b = other_row[j];
+
+    //   setMapA(counter, a);
+    //   setMapB(counter, b);
+    //   counter++;
+    // }
+    
+    setRowMapA(counter, &row[0]);
+    setRowMapB(counter, &other_row[0]);
+
+    counter = counter+phim;
+    current_row++;
+  }
+  
+  const IndexSet& t = map.getIndexSet();
+
+  // add/sub/mul the data, element by element, modulo the respective primes
+  for (long i : t) {
     long pi = context.ithPrime(i);
     NTL::vec_long& row = map[i];
     const NTL::vec_long& other_row = (*other_map)[i];
 
-#ifdef USE_INTEL_HEXL
-    intel::EltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
-#elif defined(USE_CUDA_ACCEL)
-    // std::cout<<"do_mul Accelerated on CUDA\n";
-    CudaEltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
-    // NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
-    // for (long j : range(phim))
-    //   row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
-#else
     NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
     for (long j : range(phim))
       row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
-#endif // USE_INTEL_HEXL
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
@@ -437,6 +497,20 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     }
     current_row++;
   }
+
+  // //check map vs contiguousMap
+  // counter=0, current_row=0;
+  // for (long i : s) {
+  //   NTL::vec_long& row = map[i];
+  //   const NTL::vec_long& other_row = (*other_map)[i];
+  //   // setModulus(current_row, context.ithPrime(i));
+
+  //   for (long j : range(phim)){
+  //     if(getMapA != mp)
+  //     counter++;
+  //   }
+  //   current_row++;
+  // }
 
   //cudaMemCopy+Execute Kernel
   CudaEltwiseMultMod();
@@ -463,20 +537,27 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
 
-#if 0
+#if 1
+//   for (long i : s) {
+//     long pi = context.ithPrime(i);
+//     long n = rem(num, pi); // n = num % pi
+//     NTL::vec_long& row = map[i];
+
+// #ifdef USE_INTEL_HEXL
+//     fun.apply(row.elts(), row.elts(), n, phim, pi);
+// #elif defined(USE_CUDA_ACCEL)
+//     fun.apply(row.elts(), row.elts(), n, phim, pi);
+// #else
+//     for (long j : range(phim))
+//       row[j] = fun.apply(row[j], n, pi);
+// #endif
+
   for (long i : s) {
     long pi = context.ithPrime(i);
     long n = rem(num, pi); // n = num % pi
     NTL::vec_long& row = map[i];
-
-#ifdef USE_INTEL_HEXL
-    fun.apply(row.elts(), row.elts(), n, phim, pi);
-#elif defined(USE_CUDA_ACCEL)
-    fun.apply(row.elts(), row.elts(), n, phim, pi);
-#else
     for (long j : range(phim))
       row[j] = fun.apply(row[j], n, pi);
-#endif
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes

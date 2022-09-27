@@ -15,8 +15,8 @@ long d_phim, d_n_rows;
 long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
 void InitContiguousHostMapModulus(long phim, int n_rows){
-  contiguousHostMapA = (long *)malloc(phim*n_rows*sizeof(long));
-  contiguousHostMapB = (long *)malloc(phim*n_rows*sizeof(long));
+  contiguousHostMapA = (long *)malloc(2*phim*n_rows*sizeof(long));
+  contiguousHostMapB = (long *)malloc(2*phim*n_rows*sizeof(long));
   contiguousModulus = (long *)malloc(n_rows*sizeof(long));
   scalarPerRow = (long *)malloc(n_rows*sizeof(long));
 }
@@ -27,6 +27,16 @@ void setScalar(long index, long data){
 
 void setMapA(long index, long data){
   contiguousHostMapA[index] = data;
+}
+
+void setRowMapA(long offset, long *source)
+{
+  memcpy(contiguousHostMapA+offset, source, d_phim*sizeof(long));
+}
+
+void setRowMapB(long offset, const long *source)
+{
+  memcpy(contiguousHostMapB+offset, source, d_phim*sizeof(long));
 }
 
 void setMapB(long index, long data){
@@ -82,7 +92,7 @@ void CudaEltwiseAddMod(){
     // Copy data from host arrays A and B to device arrays d_A and d_B
     cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_modulus, contiguousModulus, d_n_rows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
@@ -219,7 +229,7 @@ void CudaEltwiseSubMod(){
     // Copy data from host arrays A and B to device arrays d_A and d_B
     cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_modulus, contiguousModulus, d_n_rows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
@@ -541,7 +551,7 @@ void CudaEltwiseMultMod(){
     // Copy data from host arrays A and B to device arrays d_A and d_B
     cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_modulus, contiguousModulus, d_n_rows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block

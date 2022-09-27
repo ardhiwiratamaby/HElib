@@ -244,6 +244,8 @@ if(CUDA_FOUND)
     list( APPEND CUDA_NVCC_FLAGS -gencode=arch=compute_52,code=sm_52 )
 endif()
 
+# add_compile_options()
+
 # Build optional CUDA library
 if(USE_CUDA_ACCEL)
   
