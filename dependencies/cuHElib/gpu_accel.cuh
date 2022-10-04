@@ -7,6 +7,8 @@ void DestroyGPUBuffer();
 
 void setRowMapA(long offset, long *source);
 void setRowMapB(long offset, const long *source);
+long *getRowMapB(long index);
+long *getRowMapA(long index);
 
 void setMapA(long index, long data);
 void setMapB(long index, long data);
@@ -18,12 +20,12 @@ long getMapB(long index);
 
 void InitContiguousHostMapModulus(long phim, int n_rows);
 
-void CudaEltwiseAddMod();
-void CudaEltwiseAddMod(long scalar);
-void CudaEltwiseSubMod();
-void CudaEltwiseSubMod(long scalar);
-void CudaEltwiseMultMod();
-void CudaEltwiseMultMod(long scalar);
+void CudaEltwiseAddMod(long n_rows);
+void CudaEltwiseAddMod(long n_rows, long scalar);
+void CudaEltwiseSubMod(long n_rows);
+void CudaEltwiseSubMod(long n_rows, long scalar);
+void CudaEltwiseMultMod(long n_rows);
+void CudaEltwiseMultMod(long n_rows, long scalar);
 
 int cuda_add();
 
