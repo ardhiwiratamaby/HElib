@@ -335,6 +335,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
 
+	HELIB_NTIMER_START(MapToContigousMap);
   //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
@@ -358,6 +359,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     counter = counter+phim;
     current_row++;
   }
+  HELIB_NTIMER_STOP(MapToContigousMap);
 
   // //check map vs contiguousMap
   // counter=0, current_row=0;
@@ -376,6 +378,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   //cudaMemCopy+Execute Kernel
   fun.apply(current_row);
 
+	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
   counter=0, current_row=0;
   for (long i : s) {
@@ -390,6 +393,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     counter += phim;
     // current_row++;
   }
+  HELIB_NTIMER_STOP(ContigousMapToMap);
 
 #endif
 
@@ -465,29 +469,29 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
 // #endif // USE_INTEL_HEXL
   // }
 
-  //copy map to contiguousMap
-  long counter=0, current_row=0;
-  for (long i : s) {
-    NTL::vec_long& row = map[i];
-    const NTL::vec_long& other_row = (*other_map)[i];
-    setModulus(current_row, context.ithPrime(i));
-    // row[0];
-    // other_row[0];
-    // for (long j : range(phim)){
-    //   long a = row[j];
-    //   long b = other_row[j];
+  // //copy map to contiguousMap
+  // long counter=0, current_row=0;
+  // for (long i : s) {
+  //   NTL::vec_long& row = map[i];
+  //   const NTL::vec_long& other_row = (*other_map)[i];
+  //   setModulus(current_row, context.ithPrime(i));
+  //   // row[0];
+  //   // other_row[0];
+  //   // for (long j : range(phim)){
+  //   //   long a = row[j];
+  //   //   long b = other_row[j];
 
-    //   setMapA(counter, a);
-    //   setMapB(counter, b);
-    //   counter++;
-    // }
+  //   //   setMapA(counter, a);
+  //   //   setMapB(counter, b);
+  //   //   counter++;
+  //   // }
     
-    setRowMapA(counter, &row[0]);
-    setRowMapB(counter, &other_row[0]);
+  //   setRowMapA(counter, &row[0]);
+  //   setRowMapB(counter, &other_row[0]);
 
-    counter = counter+phim;
-    current_row++;
-  }
+  //   counter = counter+phim;
+  //   current_row++;
+  // }
   
   // add/sub/mul the data, element by element, modulo the respective primes
   for (long i : s) {
@@ -501,7 +505,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
-
+	HELIB_NTIMER_START(MapToContigousMap);
   //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
@@ -525,6 +529,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     counter = counter+phim;
     current_row++;
   }
+	HELIB_NTIMER_STOP(MapToContigousMap);
 
   // //check map vs contiguousMap
   // counter=0, current_row=0;
@@ -543,6 +548,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   //cudaMemCopy+Execute Kernel
   CudaEltwiseMultMod(current_row);
 
+	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
   counter=0, current_row=0;
   for (long i : s) {
@@ -557,6 +563,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     counter += phim;
     // current_row++;
   }
+ 	HELIB_NTIMER_STOP(ContigousMapToMap);
 #endif
   return *this;
 }
@@ -594,6 +601,8 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
+
+	HELIB_NTIMER_START(MapToContigousMap);
     //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
@@ -608,10 +617,12 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
     counter = counter+phim;
     current_row++;
   }
+	HELIB_NTIMER_STOP(MapToContigousMap);
 
   //cudaMemCopy+Execute Kernel
   fun.apply(current_row, 1);
 
+	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
   counter=0, current_row=0;
   for (long i : s) {
@@ -626,6 +637,8 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
     counter += phim;
     // current_row++;
   }
+	HELIB_NTIMER_STOP(ContigousMapToMap);
+
 #endif
   return *this;
 }
