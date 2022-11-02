@@ -8,8 +8,7 @@
 					"build" : ".",
 					"childIndexes" : 
 					[
-						1,
-						2
+						1
 					],
 					"hasInstallRule" : true,
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
@@ -21,34 +20,19 @@
 					"source" : "."
 				},
 				{
-					"build" : "dependencies/cuHElib",
-					"jsonFile" : "directory-dependencies.cuHElib-Debug-6032d9d713f2622c2d7c.json",
-					"minimumCMakeVersion" : 
-					{
-						"string" : "3.22"
-					},
-					"parentIndex" : 0,
-					"projectIndex" : 1,
-					"source" : "dependencies/cuHElib",
-					"targetIndexes" : 
-					[
-						0
-					]
-				},
-				{
 					"build" : "src",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-src-Debug-e779bd80a6c24609391c.json",
+					"jsonFile" : "directory-src-Debug-d791923dd176930045c0.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.10.2"
 					},
 					"parentIndex" : 0,
-					"projectIndex" : 2,
+					"projectIndex" : 1,
 					"source" : "src",
 					"targetIndexes" : 
 					[
-						1
+						0
 					]
 				}
 			],
@@ -58,8 +42,7 @@
 				{
 					"childIndexes" : 
 					[
-						1,
-						2
+						1
 					],
 					"directoryIndexes" : 
 					[
@@ -72,23 +55,11 @@
 					[
 						1
 					],
-					"name" : "CUDA_ACCEL",
-					"parentIndex" : 0,
-					"targetIndexes" : 
-					[
-						0
-					]
-				},
-				{
-					"directoryIndexes" : 
-					[
-						2
-					],
 					"name" : "helib",
 					"parentIndex" : 0,
 					"targetIndexes" : 
 					[
-						1
+						0
 					]
 				}
 			],
@@ -96,17 +67,10 @@
 			[
 				{
 					"directoryIndex" : 1,
-					"id" : "CUDA_ACCEL::@24f868427c5f2945c8ab",
-					"jsonFile" : "target-CUDA_ACCEL-Debug-b7256b861defe4e9a194.json",
-					"name" : "CUDA_ACCEL",
-					"projectIndex" : 1
-				},
-				{
-					"directoryIndex" : 2,
 					"id" : "helib::@145eef247bfb46b6828c",
-					"jsonFile" : "target-helib-Debug-1e03845fdb43e5670c4b.json",
+					"jsonFile" : "target-helib-Debug-dde30775c1b2cb3ee613.json",
 					"name" : "helib",
-					"projectIndex" : 2
+					"projectIndex" : 1
 				}
 			]
 		}

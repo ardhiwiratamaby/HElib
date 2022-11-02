@@ -345,6 +345,7 @@ void Ctxt::mulIntFactor(long e)
 // have s<=primeSet. s must contain either all special primes or none of them.
 void Ctxt::modUpToSet(const IndexSet& s)
 {
+  HELIB_TIMER_START;
   IndexSet setDiff =
       s / primeSet; // set minus (primes in s but not in primeSet)
   if (empty(setDiff))
@@ -368,10 +369,13 @@ void Ctxt::modUpToSet(const IndexSet& s)
 
   // sanity-check: ensure primeSet is still valid
   assertTrue(verifyPrimeSet(), "primeSet is no longer valid");
+  HELIB_TIMER_STOP;
+
 }
 
 void Ctxt::bringToSet(const IndexSet& s)
 {
+  HELIB_TIMER_START;
   double cap = capacity();
   if (cap < 1.0) {
     Warning("Ctxt::bringToSet called with capacity=" + std::to_string(cap) +
@@ -386,6 +390,7 @@ void Ctxt::bringToSet(const IndexSet& s)
     modUpToSet(s);
     modDownToSet(s);
   }
+  HELIB_TIMER_STOP;
 }
 
 // mod-switch down to primeSet \intersect s, after this call we have
@@ -1562,6 +1567,7 @@ void Ctxt::addCtxt(const Ctxt& other, bool negative)
 // It is also assumed that *this DOES NOT alias neither c1 nor c2.
 void Ctxt::tensorProduct(const Ctxt& c1, const Ctxt& c2)
 {
+  HELIB_TIMER_START;
   clear();                // clear *this, before we start adding things to it
   primeSet = c1.primeSet; // set the correct prime-set before we begin
 
@@ -1594,6 +1600,7 @@ void Ctxt::tensorProduct(const Ctxt& c1, const Ctxt& c2)
       else
         parts.push_back(tmpPart);
     }
+
   }
 
   // Compute the noise estimate of the product
@@ -1605,6 +1612,8 @@ void Ctxt::tensorProduct(const Ctxt& c1, const Ctxt& c2)
     ptxtMag = c1.ptxtMag * c2.ptxtMag;
   } else // BGV
     noiseBound = c1.noiseBound * c2.noiseBound;
+    
+  HELIB_TIMER_STOP;
 }
 
 void computeIntervalForMul(double& lo,

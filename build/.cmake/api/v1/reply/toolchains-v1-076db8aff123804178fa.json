@@ -47,14 +47,6 @@
 		{
 			"compiler" : 
 			{
-				"implicit" : {},
-				"path" : "/usr/local/cuda/bin/nvcc"
-			},
-			"language" : "CUDA"
-		},
-		{
-			"compiler" : 
-			{
 				"id" : "GNU",
 				"implicit" : 
 				{

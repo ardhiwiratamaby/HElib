@@ -1559,6 +1559,7 @@ void DoubleCRT::scaleDownToSet(const IndexSet& s,
                                long ptxtSpace,
                                NTL::ZZX& delta)
 {
+  HELIB_TIMER_START;
   IndexSet diff = getIndexSet() / s;
   if (empty(diff))
     return; // nothing to do
@@ -1607,6 +1608,7 @@ void DoubleCRT::scaleDownToSet(const IndexSet& s,
   *this -= delta;     // convert delta to DoubleCRT, then subtract
   *this /= diffProd;  // *this is divisible by diffProd, so this operation
                       // actually scales it down
+  HELIB_TIMER_STOP;
 }
 
 std::ostream& operator<<(std::ostream& str, const DoubleCRT& d)

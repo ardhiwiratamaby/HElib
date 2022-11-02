@@ -44,11 +44,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/src/cmake_install.cmake")
 endif()
 

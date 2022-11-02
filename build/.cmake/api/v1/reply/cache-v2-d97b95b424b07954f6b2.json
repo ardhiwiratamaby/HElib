@@ -1171,7 +1171,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "3"
+			"value" : "2"
 		},
 		{
 			"name" : "CMAKE_OBJCOPY",
@@ -2566,6 +2566,18 @@
 			"value" : "0"
 		},
 		{
+			"name" : "NO_HALF_SIZE_PRIME",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "To not use half size prime"
+				}
+			],
+			"type" : "BOOL",
+			"value" : "OFF"
+		},
+		{
 			"name" : "NTL_DIR",
 			"properties" : 
 			[
@@ -2679,7 +2691,7 @@
 				}
 			],
 			"type" : "BOOL",
-			"value" : "ON"
+			"value" : "OFF"
 		},
 		{
 			"name" : "USE_INTEL_HEXL",

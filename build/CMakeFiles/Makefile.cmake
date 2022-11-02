@@ -9,20 +9,17 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
   "../CMakeLists.txt"
   "CMakeFiles/3.22.3/CMakeCCompiler.cmake"
-  "CMakeFiles/3.22.3/CMakeCUDACompiler.cmake"
   "CMakeFiles/3.22.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.22.3/CMakeSystem.cmake"
   "../cmake/FindGMP.cmake"
   "../cmake/FindNTL.cmake"
   "../cmake/get_gmp_version.c"
   "../cmake/helibConfig.cmake.in"
-  "../dependencies/cuHElib/CMakeLists.txt"
   "../include/helib/version.in.h"
   "../src/CMakeLists.txt"
   "../src/version.in.cpp"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/BasicConfigVersion-ExactVersion.cmake.in"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/CMakeCInformation.cmake"
-  "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/CMakeCUDAInformation.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/CMakeCXXInformation.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/CMakeGenericSystem.cmake"
@@ -40,8 +37,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/Compiler/GNU-C.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/Compiler/GNU.cmake"
-  "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/Compiler/NVIDIA-CUDA.cmake"
-  "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/ExternalProject.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/FindCUDA.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/FindCUDA/select_compute_arch.cmake"
   "/home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake"
@@ -66,7 +61,6 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
-  "dependencies/cuHElib/CMakeFiles/CMakeDirectoryInformation.cmake"
   "src/helib/version.h"
   "src/version.cpp"
   "src/helibConfigVersion.cmake"
@@ -76,6 +70,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/DependInfo.cmake"
   "src/CMakeFiles/helib.dir/DependInfo.cmake"
   )

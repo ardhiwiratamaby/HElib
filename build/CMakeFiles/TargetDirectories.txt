@@ -4,13 +4,6 @@
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/CMakeFiles/install.dir
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/CMakeFiles/install/local.dir
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/CMakeFiles/install/strip.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/edit_cache.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/rebuild_cache.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/list_install_components.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/install.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/install/local.dir
-/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib/CMakeFiles/install/strip.dir
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/src/CMakeFiles/helib.dir
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/src/CMakeFiles/edit_cache.dir
 /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/src/CMakeFiles/rebuild_cache.dir

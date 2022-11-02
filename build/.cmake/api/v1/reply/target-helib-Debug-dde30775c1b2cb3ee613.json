@@ -13,10 +13,8 @@
 		[
 			"add_library",
 			"install",
-			"add_custom_command",
 			"target_compile_options",
 			"target_compile_definitions",
-			"add_compile_definitions",
 			"include_directories",
 			"target_include_directories"
 		],
@@ -45,17 +43,11 @@
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 317,
-				"parent" : 0
-			},
-			{
-				"command" : 3,
-				"file" : 0,
 				"line" : 218,
 				"parent" : 0
 			},
 			{
-				"command" : 4,
+				"command" : 3,
 				"file" : 0,
 				"line" : 224,
 				"parent" : 0
@@ -64,25 +56,13 @@
 				"file" : 1
 			},
 			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 238,
+				"parent" : 5
+			},
+			{
 				"command" : 5,
-				"file" : 1,
-				"line" : 256,
-				"parent" : 6
-			},
-			{
-				"command" : 6,
-				"file" : 1,
-				"line" : 237,
-				"parent" : 6
-			},
-			{
-				"command" : 6,
-				"file" : 1,
-				"line" : 255,
-				"parent" : 6
-			},
-			{
-				"command" : 7,
 				"file" : 0,
 				"line" : 261,
 				"parent" : 0
@@ -98,23 +78,23 @@
 					"fragment" : "-g -fPIC"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-march=native"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-Wall"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-Wpedantic"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-Wextra"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-Werror"
 				},
 				{
@@ -124,38 +104,30 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 5,
+					"backtrace" : 4,
 					"define" : "HELIB_BOOT_THREADS"
 				},
 				{
-					"backtrace" : 5,
+					"backtrace" : 4,
 					"define" : "HELIB_THREADS"
-				},
-				{
-					"backtrace" : 7,
-					"define" : "USE_CUDA_ACCEL"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 8,
+					"backtrace" : 6,
 					"path" : "/usr/local/cuda/include"
 				},
 				{
-					"backtrace" : 9,
-					"path" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib"
-				},
-				{
-					"backtrace" : 10,
+					"backtrace" : 7,
 					"path" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/json"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 7,
 					"path" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include"
 				},
 				{
-					"backtrace" : 10,
+					"backtrace" : 7,
 					"path" : "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/src"
 				}
 			],
@@ -219,13 +191,6 @@
 				46,
 				47
 			]
-		}
-	],
-	"dependencies" : 
-	[
-		{
-			"backtrace" : 3,
-			"id" : "CUDA_ACCEL::@24f868427c5f2945c8ab"
 		}
 	],
 	"id" : "helib::@145eef247bfb46b6828c",

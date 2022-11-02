@@ -143,8 +143,9 @@ option(HELIB_DEBUG
        OFF)
 option(ENABLE_TEST "Enable tests" OFF)
 option(USE_INTEL_HEXL "Use Intel HEXL library" OFF)
-option(USE_CUDA_ACCEL "Use CUDA accel library" ON)
+option(USE_CUDA_ACCEL "Use CUDA accel library" OFF)
 option(PEDANTIC_BUILD "Use -Wall -Wpedantic -Wextra -Werror during build" ON)
+# option(NO_HALF_SIZE_PRIME "To not use half size prime" ON)
 
 # Add properties dependent to PACKAGE_BUILD
 if (PACKAGE_BUILD)

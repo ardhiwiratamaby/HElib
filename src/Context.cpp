@@ -627,7 +627,7 @@ Context::Context(unsigned long m,
     stdev(3.2),
     scale(10.0)
 {
-  InitGPUBuffer(zMStar.getPhiM());
+  // InitGPUBuffer(zMStar.getPhiM());
   // NOTE: pwfl_converter will be set in buildModChain (or endBuildModChain),
   // after the prime chain has been built, as it depends on the primeChain
 

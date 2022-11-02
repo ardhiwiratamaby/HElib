@@ -162,19 +162,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named CUDA_ACCEL
-
-# Build rule for target.
-CUDA_ACCEL: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CUDA_ACCEL
-.PHONY : CUDA_ACCEL
-
-# fast build rule for target.
-CUDA_ACCEL/fast:
-	$(MAKE) $(MAKESILENT) -f dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/build.make dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/build
-.PHONY : CUDA_ACCEL/fast
-
-#=============================================================================
 # Target rules for targets named helib
 
 # Build rule for target.
@@ -199,7 +186,6 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... CUDA_ACCEL"
 	@echo "... helib"
 .PHONY : help
 
