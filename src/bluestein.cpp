@@ -77,7 +77,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb)
+                   NTL::fftRep& Rb, NTL::zz_pX& RbInPoly)
 {
   long p = NTL::zz_p::modulus();
 
@@ -106,6 +106,7 @@ void BluesteinInit(long n,
   long k2 = 1L << k; // k2 = 2^k
 
   Rb.SetSize(k);
+  RbInPoly.SetLength(k);
 
   NTL::zz_pX b(NTL::INIT_SIZE, k2);
 
@@ -128,7 +129,11 @@ void BluesteinInit(long n,
     }
   }
 
+  // std::cout<<"Rb poly: "<<b<<std::endl;
   TofftRep(Rb, b, k);
+  RbInPoly = b;
+  // RbInPoly[0] = rep(b[0]);
+  // RbInPoly[0]=1;
 }
 
 void BluesteinFFT(NTL::zz_pX& x,
@@ -136,7 +141,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb)
+                  const NTL::fftRep& Rb, const NTL::zz_pX& RbInPoly)
 {
   HELIB_TIMER_START;
 
@@ -149,6 +154,7 @@ void BluesteinFFT(NTL::zz_pX& x,
 
   long p = NTL::zz_p::modulus();
 
+  std::cout<<"x: "<<x;
   long dx = deg(x);
   for (long i = 0; i <= dx; i++) {
     x[i].LoopHole() =
@@ -156,16 +162,18 @@ void BluesteinFFT(NTL::zz_pX& x,
   }
   x.normalize();
 
+  std::cout<<"x after MulModPrecon: "<<x<<std::endl;
+
   long k = NTL::NextPowerOfTwo(2 * n - 1);
   NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
-
   // Careful! we are multiplying polys of degrees 2*(n-1)
   // and (n-1) modulo x^k-1.  This gives us some
   // truncation in certain cases.
+  std::cout<<"\nmodulus: "<<p<<"\nOmega: "<<root<<"\nN: "<<n<<"\nk: "<<k<<std::endl;
 
   if (NEW_BLUE && n % 2 != 0) {
-    TofftRep_trunc(Ra, x, k, 2 * n - 1);
-
+    TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep in NTL
+    
     mul(Ra, Ra, Rb); // multiply in FFT representation
 
     FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
@@ -186,17 +194,41 @@ void BluesteinFFT(NTL::zz_pX& x,
     }
     x.normalize();
   } else {
-    TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);
+    //Ardhi: I want to replace below code with a call to GPU NTT//But I think I need to verify if I can replace this with the GPU call
+    TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);     //Requirement: Input x[0...2^k]->x[0...n...2^k], Output x_ntt[2^k]// I don't know why we need parameter (3*(n-1)+1)
+    std::cout<<"RbInPoly :"<<RbInPoly<<std::endl;
 
-    mul(Ra, Ra, Rb); // multiply in FFT representation
+    //Ardhi: get nth-root of unity for n=2^k and current modulus
+    NTL::zz_p rtp;
+    FindPrimitiveRoot(rtp, 1L << k); // NTL routine, relative to current modulus
+    if (rtp == 0)              // sanity check
+      throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
+    long root = NTL::rep(rtp);
 
-    FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back
+    //Ardhi: get psi, psi=root^(1/2)
+    long psi;
+    NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
+    NTL::conv(psi, temp);
+
+    //Ardhi: get inverse psi
+    long inv_psi = NTL::InvMod(psi, p);
+
+    unsigned int qbit = ceil(std::log2(p));
+
+    //Ardhi: I want to call GPU NTT here
+    inv_psi +=qbit;
+        
+    mul(Ra, Ra, Rb); // multiply in FFT representation //Requirement: Input Ra[2^k],Rb[2^k], Output Ra[2^k]
+
+    FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back //Requirement: Input Ra[2^k], Output x[n]// I don't know why we need parameter (2*(n-1))
+    std::cout<<"x after ntt-mul-intt: "<<x<<std::endl;
     dx = deg(x);
     for (long i = 0; i <= dx; i++) {
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
     x.normalize();
+    std::cout<<"x after ntt-mul-intt-mulmodprecon: "<<x<<std::endl;
   }
 }
 

@@ -175,9 +175,11 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   ipowers.reset(new NTL::zz_pX);
   iRb.reset(new NTL::fftRep);
   phimx.reset(new zz_pXModulus1(zms.getM(), phimx_poly));
+  RbInPoly.reset(new NTL::zz_pX);
+  iRbInPoly.reset(new NTL::zz_pX);
 
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb);
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInPoly);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInPoly);
 }
 
 Cmodulus& Cmodulus::operator=(const Cmodulus& other)
@@ -212,8 +214,10 @@ Cmodulus& Cmodulus::operator=(const Cmodulus& other)
   // copy data, not pointers in these fields
   powers = other.powers;
   Rb = other.Rb;
+  RbInPoly = other.RbInPoly;
   ipowers = other.ipowers;
   iRb = other.iRb;
+  iRbInPoly = other.iRbInPoly;
   phimx = other.phimx;
 
 #ifdef HELIB_OPENCL
@@ -431,16 +435,26 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   NTL::zz_p rt;
   conv(rt, root); // convert root to zp format
 
+  //Ardhi: I want to replace the BluesteinFFT with BluesteinGPU
+  std::cout<<"Tmp degree: "<<deg(tmp)<<"\nBefore BluesteinFFT\n";
+  for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", ";
+  std::cout<<std::endl;
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb);
+  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInPoly);
+
+  std::cout<<"\nAfter BluesteinFFT\n";
+  for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
+  std::cout<<std::endl;
 
   // copy the result to the output vector y, keeping only the
   // entries corresponding to primitive roots of unity
   y.SetLength(zMStar->getPhiM());
 
   for (long i = 0, j = 0; i < long(this->getM()); i++)
-    if (zMStar->inZmStar(i))
+    if (zMStar->inZmStar(i)){
       y[j++] = rep(coeff(tmp, i));
+      std::cout<<"y["<<j-1<<"]:"<<y[j-1]<<std::endl;
+    }
 }
 
 void Cmodulus::FFT(NTL::vec_long& y, const NTL::ZZX& x) const
@@ -563,7 +577,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInPoly); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
   {
