@@ -436,15 +436,17 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   conv(rt, root); // convert root to zp format
 
   //Ardhi: I want to replace the BluesteinFFT with BluesteinGPU
-  std::cout<<"Tmp degree: "<<deg(tmp)<<"\nBefore BluesteinFFT\n";
-  for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", ";
-  std::cout<<std::endl;
+
+  // std::cout<<"Tmp degree: "<<deg(tmp)<<"\nBefore BluesteinFFT\n";
+  // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", ";
+  // std::cout<<std::endl;
+
   // call the FFT routine
   BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInPoly);
 
-  std::cout<<"\nAfter BluesteinFFT\n";
-  for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
-  std::cout<<std::endl;
+  // std::cout<<"\nAfter BluesteinFFT\n";
+  // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
+  // std::cout<<std::endl;
 
   // copy the result to the output vector y, keeping only the
   // entries corresponding to primitive roots of unity
@@ -453,7 +455,7 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   for (long i = 0, j = 0; i < long(this->getM()); i++)
     if (zMStar->inZmStar(i)){
       y[j++] = rep(coeff(tmp, i));
-      std::cout<<"y["<<j-1<<"]:"<<y[j-1]<<std::endl;
+      // std::cout<<"y["<<j-1<<"]:"<<y[j-1]<<std::endl;
     }
 }
 

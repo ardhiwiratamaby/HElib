@@ -4,8 +4,215 @@
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
 #include <thrust/random.h>
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 #include "gpu_accel.cuh"
 #include <NTL/ZZVec.h>
+
+// __device__ __forceinline__ void singleBarrett(unsigned long long& a, unsigned& q, unsigned& mu, int& qbit)  // ??
+__device__ __forceinline__ void singleBarrett(unsigned __int128& a, unsigned long long& q, unsigned long long& mu, int& qbit)  // ??
+{  
+    // unsigned long long rx;
+    unsigned __int128 rx;
+    rx = a >> (qbit - 2);
+    rx *= mu;
+    rx >>= qbit + 2;
+    rx *= q;
+    a -= rx;
+
+    a -= q * (a >= q);
+}
+
+__global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[])
+{
+    int local_tid = threadIdx.x;
+
+    extern __shared__ unsigned long long shared_array[];
+
+    //Ardhi: To my understanding, this is just load coeffs into shared memory, one thread pickup two coeffs to shmem
+    //for ex: shared_array[tid]=a[tid]
+    #pragma unroll
+    for (int iteration_num = 0; iteration_num < 2; iteration_num++)
+    {  // copying to shared memory from global
+        int global_tid = local_tid + iteration_num * 1024;
+        shared_array[global_tid] = a[global_tid + blockIdx.x * 2048]; //Ardhi: if blockIdx.x is always zero, why this is needed??
+    }
+
+    #pragma unroll
+    for (int length = 1; length < 2048; length *= 2)
+    {  // iterations for ntt
+        int step = (2048 / length) / 2;
+        int psi_step = local_tid / step;
+        int target_index = psi_step * step * 2 + local_tid % step;
+
+        psi_step = (local_tid + blockIdx.x * 1024) / step;
+
+        unsigned long long psi = psi_powers[length + psi_step];
+
+        unsigned long long first_target_value = shared_array[target_index];
+        // unsigned long long temp_storage = shared_array[target_index + step];  // this is for eliminating the possibility of overflow
+        __extension__ unsigned __int128 temp_storage = shared_array[target_index + step];  // this is for eliminating the possibility of overflow
+
+        temp_storage *= psi;
+
+        singleBarrett(temp_storage, q, mu, qbit);
+        // temp_storage %= q;
+        unsigned long long second_target_value = temp_storage;
+
+        unsigned long long target_result = first_target_value + second_target_value;
+
+        target_result -= q * (target_result >= q);
+
+        shared_array[target_index] = target_result;
+
+        first_target_value += q * (first_target_value < second_target_value);
+
+        shared_array[target_index + step] = first_target_value - second_target_value;
+
+        __syncthreads();
+    }
+
+    #pragma unroll
+    for (int iteration_num = 0; iteration_num < 2; iteration_num++)
+    {  // copying back to global from shared
+        int global_tid = local_tid + iteration_num * 1024;
+        a[global_tid + blockIdx.x * 2048] = shared_array[global_tid];
+    }
+
+}
+
+__global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psiinv_powers[])
+{
+    int local_tid = threadIdx.x;
+
+    extern __shared__ unsigned long long shared_array[];
+
+    unsigned long q2 = (q + 1) >> 1;
+
+    #pragma unroll
+    for (int iteration_num = 0; iteration_num < 2; iteration_num++)
+    {  // copying to shared memory from global
+        int global_tid = local_tid + iteration_num * 1024;
+        shared_array[global_tid] = a[global_tid + blockIdx.x * 2048];
+    }
+
+    __syncthreads();
+
+    #pragma unroll
+    for (int length = 1024; length >= 1; length /= 2)
+    {  // iterations for intt
+        int step = (2048 / length) / 2;
+
+        int psi_step = local_tid / step;
+        int target_index = psi_step * step * 2 + local_tid % step;
+
+        psi_step = (local_tid + blockIdx.x * 1024) / step;
+
+        unsigned long long psiinv = psiinv_powers[length + psi_step];
+
+        unsigned long long first_target_value = shared_array[target_index];
+        unsigned long long second_target_value = shared_array[target_index + step];
+
+        unsigned long long target_result = first_target_value + second_target_value;
+
+        target_result -= q * (target_result >= q);
+
+        shared_array[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+
+        first_target_value += q * (first_target_value < second_target_value);
+
+        // unsigned long long temp_storage = first_target_value - second_target_value;
+        __extension__ unsigned __int128 temp_storage = first_target_value - second_target_value;
+
+        temp_storage *= psiinv;
+
+        singleBarrett(temp_storage, q, mu, qbit);
+        // temp_storage %= q;
+        
+        unsigned long long temp_storage_low = temp_storage;
+
+        shared_array[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+        
+
+        __syncthreads();
+    }
+
+    #pragma unroll
+    for (int iteration_num = 0; iteration_num < 2; iteration_num++)
+    {  // copying back to global from shared
+        int global_tid = local_tid + iteration_num * 1024;
+        a[global_tid + blockIdx.x * 2048] = shared_array[global_tid];
+    }
+}
+
+#include <stdlib.h>
+#include <random>
+
+unsigned long long modpow64(unsigned long long a, unsigned long long b, unsigned long long mod)  // calculates (<a> ** <b>) mod <mod>
+{
+    unsigned long long res = 1;
+
+    if (1 & b)
+        res = a;
+
+    while (b != 0)
+    {
+        b = b >> 1;
+        // unsigned long long t64 = (unsigned long long)a * a;
+        // a = t64 % mod;
+        __extension__ unsigned __int128 t128 = (unsigned __int128)a * a;
+        a = t128 % mod;
+
+        if (b & 1)
+        {
+            // unsigned long long r64 = (unsigned long long)a * res;
+            // res = r64 % mod;
+            __extension__ unsigned __int128 r128 = (unsigned __int128)a * res;
+            res = r128 % mod;
+        }
+
+    }
+    return res;
+}
+
+unsigned long long bitReverse(unsigned long long a, int bit_length)  // reverses the bits for twiddle factor calculation
+{
+    // cout<<"a: "<<a;
+    unsigned long long res = 0;
+
+    for (int i = 0; i < bit_length; i++)
+    {
+        res <<= 1;
+        res = (a & 1) | res;
+        a >>= 1;
+    }
+
+    // cout<<"\n reverse A: "<<res<<endl;
+    return res;
+}
+
+std::random_device dev;  // uniformly distributed integer random number generator that produces non-deterministic random numbers
+std::mt19937_64 rng(dev());  // pseudo-random generator of 64 bits with a state size of 19937 bits
+
+void randomArray64(unsigned long long a[], int n, unsigned long long q)
+{
+    std::uniform_int_distribution<unsigned long long> randnum(0, q - 1);  // uniformly distributed random integers on the closed interval [a, b] according to discrete probability
+
+    for (int i = 0; i < n; i++)
+    {
+        a[i] = randnum(rng);
+    }
+}
+
+void fillTablePsi64(unsigned long long psi, unsigned long long q, unsigned long long psiinv, unsigned long long psiTable[], unsigned long long psiinvTable[], unsigned int n)  // twiddle factors computation
+{
+    for (unsigned int i = 0; i < n; i++)
+    {
+        psiTable[i] = modpow64(psi, bitReverse(i, log2(n)), q);
+        // cout<<"\npsi: "<<psi<<" bitRev: "<<bitReverse(i, log2(n))<<" mod: "<<q<<" psi^bitRev mod q: "<<psiTable[i];
+        psiinvTable[i] = modpow64(psiinv, bitReverse(i, log2(n)), q);
+    }
+}
 
 //device variable;
 long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
@@ -734,4 +941,304 @@ int cuda_add() {
   double x = thrust::reduce(d_vec.begin(), d_vec.end(), 0, thrust::plus<int>());
 
   return 0;
+}
+
+void gpu_ntt(unsigned int n, NTL::zz_pX& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    int size = sizeof(unsigned long long);
+    bool check=true;
+//    unsigned q = 536608769, psi = 284166, psiinv = 208001377;  // parameter initialization
+    // unsigned long long q = 536608769, psi = 206332156, psiinv = 416707834;  // parameter initialization
+    // unsigned long long q = 280349076803813377, psi = 33780496399778535, psiinv = 141007519160814319;  // parameter initialization
+    unsigned int q_bit = ceil(std::log2(q));
+    // unsigned int q_bit = 29;
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    //copy powers of psi and psi inverse tables to device
+    unsigned long long* psi_powers, * psiinv_powers;
+
+    cudaMalloc(&psi_powers, size_array);
+    cudaMalloc(&psiinv_powers, size_array);
+
+    cudaMemcpy(psi_powers, psiTable, size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(psiinv_powers, psiinvTable, size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    std::cout << "n = " << n << std::endl;
+    std::cout << "q = " << q << std::endl;
+    std::cout << "Psi = " << psi << std::endl;
+    std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    // unsigned long long mu = (__float128)2^(2*bit_length) / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    // unsigned long long mu = 289881905946523498;
+
+
+    unsigned long long* a;
+    cudaMallocHost(&a, sizeof(unsigned long long) * n);
+    // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    long dx = deg(x);
+    for(int i=0; i <= dx; i++)
+      a[i] = NTL::rep(x.rep[i]);
+
+    unsigned long long* res_a;
+    cudaMallocHost(&res_a, sizeof(unsigned long long) * n);
+
+    unsigned long long* d_a;
+    cudaMalloc(&d_a, size_array);
+
+    cudaMemcpyAsync(d_a, a, size_array, cudaMemcpyHostToDevice, 0);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+    CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpyAsync(res_a, d_a, size_array, cudaMemcpyDeviceToHost, 0);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    bool correct = 1;
+    if (check) //check the correctness of results
+    {
+        for (int i = 0; i < n; i++)
+        {
+            std::cout<<"a: "<<a[i]<<" res_a: "<<res_a[i]<<std::endl;
+            if (a[i] != res_a[i])
+            {
+                correct = 0;
+                break;
+            }
+        }
+    }
+
+    if (correct)
+        std::cout << "\nNTT and INTT are working correctly." << std::endl;
+    else
+        std::cout << "\nNTT and INTT are not working correctly." << std::endl;
+
+    cudaFreeHost(a); cudaFreeHost(res_a);  
+    cudaFree(d_a);
+}
+
+//device buffers
+unsigned long long* psi_powers, * psiinv_powers;
+unsigned long long* a;
+unsigned long long* d_a;
+unsigned long long* psiTable;
+unsigned long long* psiinvTable;
+
+void init_gpu_ntt(unsigned int n){
+    int size_array = sizeof(unsigned long long) * n;
+    cudaMalloc(&psi_powers, size_array);
+    cudaMalloc(&psiinv_powers, size_array);
+    cudaMallocHost(&a, sizeof(unsigned long long) * n);
+    cudaMalloc(&d_a, size_array);
+    psiTable = (unsigned long long*)malloc(size_array);
+    psiinvTable = (unsigned long long*)malloc(size_array);
+}
+
+void gpu_ntt(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
+    int size_array = sizeof(unsigned long long) * n;
+    int size = sizeof(unsigned long long);
+    bool check=true;
+//    unsigned q = 536608769, psi = 284166, psiinv = 208001377;  // parameter initialization
+    // unsigned long long q = 536608769, psi = 206332156, psiinv = 416707834;  // parameter initialization
+    // unsigned long long q = 280349076803813377, psi = 33780496399778535, psiinv = 141007519160814319;  // parameter initialization
+    unsigned int q_bit = ceil(std::log2(q));
+    // unsigned int q_bit = 29;
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    //copy powers of psi and psi inverse tables to device
+
+    // cudaMalloc(&psi_powers, size_array);
+    // cudaMalloc(&psiinv_powers, size_array);
+
+    cudaMemcpy(psi_powers, psiTable, size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(psiinv_powers, psiinvTable, size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    // unsigned long long mu = (__float128)2^(2*bit_length) / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    // unsigned long long mu = 289881905946523498;
+
+
+
+    // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    long dx = deg(x);
+    for(int i=0; i <= dx; i++)
+      a[i] = NTL::rep(x.rep[i]);
+
+    // unsigned long long* res_a;
+    // cudaMallocHost(&res_a, sizeof(unsigned long long) * n);
+
+
+
+    cudaMemcpyAsync(d_a, a, size_array, cudaMemcpyHostToDevice, 0);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+    if(!inverse)
+      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    else
+      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpyAsync(a, d_a, size_array, cudaMemcpyDeviceToHost, 0);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+    // cudaFreeHost(a);
+    // cudaFree(d_a);
+}
+
+void gpu_ntt(unsigned long long res[], unsigned int n, unsigned long long x[], unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
+    int size_array = sizeof(unsigned long long) * n;
+    int size = sizeof(unsigned long long);
+    bool check=true;
+//    unsigned q = 536608769, psi = 284166, psiinv = 208001377;  // parameter initialization
+    // unsigned long long q = 536608769, psi = 206332156, psiinv = 416707834;  // parameter initialization
+    // unsigned long long q = 280349076803813377, psi = 33780496399778535, psiinv = 141007519160814319;  // parameter initialization
+    unsigned int q_bit = ceil(std::log2(q));
+    // unsigned int q_bit = 29;
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+    // unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    // unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    //copy powers of psi and psi inverse tables to device
+    // unsigned long long* psi_powers, * psiinv_powers;
+
+    // cudaMalloc(&psi_powers, size_array);
+    // cudaMalloc(&psiinv_powers, size_array);
+
+    cudaMemcpy(psi_powers, psiTable, size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(psiinv_powers, psiinvTable, size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    // unsigned long long mu = (__float128)2^(2*bit_length) / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    // unsigned long long mu = 289881905946523498;
+
+
+    // unsigned long long* a;
+    // cudaMallocHost(&a, sizeof(unsigned long long) * n);
+    // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    for(int i=0; i < n; i++)
+      a[i] = x[i];
+
+    // unsigned long long* res_a;
+    // cudaMallocHost(&res_a, sizeof(unsigned long long) * n);
+
+    // unsigned long long* d_a;
+    // cudaMalloc(&d_a, size_array);
+
+    cudaMemcpyAsync(d_a, a, size_array, cudaMemcpyHostToDevice, 0);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+    if(!inverse)
+      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    else
+      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpyAsync(a, d_a, size_array, cudaMemcpyDeviceToHost, 0);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+    // cudaFreeHost(a);
+    // cudaFree(d_a);
 }

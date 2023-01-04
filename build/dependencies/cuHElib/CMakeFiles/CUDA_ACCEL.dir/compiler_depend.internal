@@ -870,7 +870,27 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o
  /usr/local/cuda/include/thrust/random/detail/normal_distribution.inl
  /usr/local/cuda/include/math_constants.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
- /usr/local/include/NTL/ZZVec.h
+ /usr/local/include/helib/NumbTh.h
+ /usr/include/c++/7/algorithm
+ /usr/include/c++/7/bits/stl_algo.h
+ /usr/include/c++/7/bits/algorithmfwd.h
+ /usr/include/c++/7/bits/stl_heap.h
+ /usr/include/c++/7/bits/uniform_int_dist.h
+ /usr/include/c++/7/set
+ /usr/include/c++/7/bits/stl_tree.h
+ /usr/include/c++/7/bits/stl_set.h
+ /usr/include/c++/7/bits/stl_multiset.h
+ /usr/include/c++/7/complex
+ /usr/include/c++/7/sstream
+ /usr/include/c++/7/bits/sstream.tcc
+ /usr/include/c++/7/climits
+ /usr/include/c++/7/fstream
+ /usr/include/c++/7/bits/codecvt.h
+ /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h
+ /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h
+ /usr/include/c++/7/bits/fstream.tcc
+ /usr/include/c++/7/ctime
+ /usr/local/include/NTL/version.h
  /usr/local/include/NTL/ZZ.h
  /usr/local/include/NTL/lip.h
  /usr/local/include/NTL/ctools.h
@@ -903,8 +923,57 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o
  /usr/include/c++/7/mutex
  /usr/include/c++/7/chrono
  /usr/include/c++/7/ratio
- /usr/include/c++/7/ctime
  /usr/include/c++/7/bits/parse_numbers.h
  /usr/include/c++/7/bits/std_mutex.h
  /usr/local/include/NTL/sp_arith.h
+ /usr/local/include/NTL/ZZX.h
+ /usr/local/include/NTL/vec_ZZ.h
+ /usr/local/include/NTL/lzz_pX.h
+ /usr/local/include/NTL/lzz_p.h
+ /usr/local/include/NTL/FFT.h
+ /usr/local/include/NTL/vec_long.h
+ /usr/local/include/NTL/LazyTable.h
+ /usr/local/include/NTL/vec_lzz_p.h
+ /usr/local/include/NTL/Lazy.h
+ /usr/local/include/NTL/mat_lzz_p.h
+ /usr/local/include/NTL/matrix.h
+ /usr/local/include/NTL/vec_vec_lzz_p.h
+ /usr/local/include/NTL/ZZ_pX.h
+ /usr/local/include/NTL/ZZ_p.h
+ /usr/local/include/NTL/ZZVec.h
+ /usr/local/include/NTL/vec_ZZ_p.h
+ /usr/local/include/NTL/mat_ZZ_p.h
+ /usr/local/include/NTL/vec_vec_ZZ_p.h
+ /usr/local/include/NTL/xdouble.h
+ /usr/local/include/NTL/mat_GF2.h
+ /usr/local/include/NTL/vec_vec_GF2.h
+ /usr/local/include/NTL/vec_GF2.h
+ /usr/local/include/NTL/WordVector.h
+ /usr/local/include/NTL/GF2.h
+ /usr/local/include/NTL/mat_GF2E.h
+ /usr/local/include/NTL/vec_vec_GF2E.h
+ /usr/local/include/NTL/vec_GF2E.h
+ /usr/local/include/NTL/GF2E.h
+ /usr/local/include/NTL/GF2X.h
+ /usr/local/include/NTL/GF2XFactoring.h
+ /usr/local/include/NTL/pair_GF2X_long.h
+ /usr/local/include/NTL/pair.h
+ /usr/local/include/NTL/mat_lzz_pE.h
+ /usr/local/include/NTL/vec_vec_lzz_pE.h
+ /usr/local/include/NTL/vec_lzz_pE.h
+ /usr/local/include/NTL/lzz_pE.h
+ /usr/local/include/NTL/lzz_pXFactoring.h
+ /usr/local/include/NTL/pair_lzz_pX_long.h
+ /usr/local/include/NTL/GF2EX.h
+ /usr/local/include/NTL/GF2XVec.h
+ /usr/local/include/NTL/lzz_pEX.h
+ /usr/local/include/helib/assertions.h
+ /usr/local/include/helib/exceptions.h
+ /usr/local/include/helib/apiAttributes.h
+ /usr/include/c++/7/random
+ /usr/include/c++/7/bits/random.h
+ /usr/include/x86_64-linux-gnu/c++/7/bits/opt_random.h
+ /usr/include/c++/7/bits/random.tcc
+ /usr/include/c++/7/numeric
+ /usr/include/c++/7/bits/stl_numeric.h
 

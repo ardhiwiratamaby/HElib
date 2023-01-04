@@ -8018,6 +8018,7 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
+ /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
 
 src/CMakeFiles/helib.dir/debugging.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/src/debugging.cpp

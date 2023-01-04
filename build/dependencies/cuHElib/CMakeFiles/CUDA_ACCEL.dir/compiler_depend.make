@@ -869,7 +869,27 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
   /usr/local/cuda/include/thrust/random/detail/normal_distribution.inl \
   /usr/local/cuda/include/math_constants.h \
   ../dependencies/cuHElib/gpu_accel.cuh \
-  /usr/local/include/NTL/ZZVec.h \
+  /usr/local/include/helib/NumbTh.h \
+  /usr/include/c++/7/algorithm \
+  /usr/include/c++/7/bits/stl_algo.h \
+  /usr/include/c++/7/bits/algorithmfwd.h \
+  /usr/include/c++/7/bits/stl_heap.h \
+  /usr/include/c++/7/bits/uniform_int_dist.h \
+  /usr/include/c++/7/set \
+  /usr/include/c++/7/bits/stl_tree.h \
+  /usr/include/c++/7/bits/stl_set.h \
+  /usr/include/c++/7/bits/stl_multiset.h \
+  /usr/include/c++/7/complex \
+  /usr/include/c++/7/sstream \
+  /usr/include/c++/7/bits/sstream.tcc \
+  /usr/include/c++/7/climits \
+  /usr/include/c++/7/fstream \
+  /usr/include/c++/7/bits/codecvt.h \
+  /usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h \
+  /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h \
+  /usr/include/c++/7/bits/fstream.tcc \
+  /usr/include/c++/7/ctime \
+  /usr/local/include/NTL/version.h \
   /usr/local/include/NTL/ZZ.h \
   /usr/local/include/NTL/lip.h \
   /usr/local/include/NTL/ctools.h \
@@ -902,11 +922,112 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
   /usr/include/c++/7/mutex \
   /usr/include/c++/7/chrono \
   /usr/include/c++/7/ratio \
-  /usr/include/c++/7/ctime \
   /usr/include/c++/7/bits/parse_numbers.h \
   /usr/include/c++/7/bits/std_mutex.h \
-  /usr/local/include/NTL/sp_arith.h
+  /usr/local/include/NTL/sp_arith.h \
+  /usr/local/include/NTL/ZZX.h \
+  /usr/local/include/NTL/vec_ZZ.h \
+  /usr/local/include/NTL/lzz_pX.h \
+  /usr/local/include/NTL/lzz_p.h \
+  /usr/local/include/NTL/FFT.h \
+  /usr/local/include/NTL/vec_long.h \
+  /usr/local/include/NTL/LazyTable.h \
+  /usr/local/include/NTL/vec_lzz_p.h \
+  /usr/local/include/NTL/Lazy.h \
+  /usr/local/include/NTL/mat_lzz_p.h \
+  /usr/local/include/NTL/matrix.h \
+  /usr/local/include/NTL/vec_vec_lzz_p.h \
+  /usr/local/include/NTL/ZZ_pX.h \
+  /usr/local/include/NTL/ZZ_p.h \
+  /usr/local/include/NTL/ZZVec.h \
+  /usr/local/include/NTL/vec_ZZ_p.h \
+  /usr/local/include/NTL/mat_ZZ_p.h \
+  /usr/local/include/NTL/vec_vec_ZZ_p.h \
+  /usr/local/include/NTL/xdouble.h \
+  /usr/local/include/NTL/mat_GF2.h \
+  /usr/local/include/NTL/vec_vec_GF2.h \
+  /usr/local/include/NTL/vec_GF2.h \
+  /usr/local/include/NTL/WordVector.h \
+  /usr/local/include/NTL/GF2.h \
+  /usr/local/include/NTL/mat_GF2E.h \
+  /usr/local/include/NTL/vec_vec_GF2E.h \
+  /usr/local/include/NTL/vec_GF2E.h \
+  /usr/local/include/NTL/GF2E.h \
+  /usr/local/include/NTL/GF2X.h \
+  /usr/local/include/NTL/GF2XFactoring.h \
+  /usr/local/include/NTL/pair_GF2X_long.h \
+  /usr/local/include/NTL/pair.h \
+  /usr/local/include/NTL/mat_lzz_pE.h \
+  /usr/local/include/NTL/vec_vec_lzz_pE.h \
+  /usr/local/include/NTL/vec_lzz_pE.h \
+  /usr/local/include/NTL/lzz_pE.h \
+  /usr/local/include/NTL/lzz_pXFactoring.h \
+  /usr/local/include/NTL/pair_lzz_pX_long.h \
+  /usr/local/include/NTL/GF2EX.h \
+  /usr/local/include/NTL/GF2XVec.h \
+  /usr/local/include/NTL/lzz_pEX.h \
+  /usr/local/include/helib/assertions.h \
+  /usr/local/include/helib/exceptions.h \
+  /usr/local/include/helib/apiAttributes.h \
+  /usr/include/c++/7/random \
+  /usr/include/c++/7/bits/random.h \
+  /usr/include/x86_64-linux-gnu/c++/7/bits/opt_random.h \
+  /usr/include/c++/7/bits/random.tcc \
+  /usr/include/c++/7/numeric \
+  /usr/include/c++/7/bits/stl_numeric.h
 
+
+/usr/local/include/helib/assertions.h:
+
+/usr/local/include/NTL/lzz_pEX.h:
+
+/usr/local/include/NTL/pair_lzz_pX_long.h:
+
+/usr/local/include/NTL/lzz_pXFactoring.h:
+
+/usr/local/include/NTL/lzz_pE.h:
+
+/usr/local/include/NTL/vec_lzz_pE.h:
+
+/usr/local/include/NTL/vec_vec_lzz_pE.h:
+
+/usr/local/include/NTL/mat_lzz_pE.h:
+
+/usr/local/include/NTL/pair.h:
+
+/usr/local/include/NTL/pair_GF2X_long.h:
+
+/usr/local/include/NTL/GF2XFactoring.h:
+
+/usr/local/include/NTL/GF2E.h:
+
+/usr/local/include/NTL/vec_GF2E.h:
+
+/usr/local/include/NTL/vec_vec_GF2E.h:
+
+/usr/local/include/NTL/WordVector.h:
+
+/usr/local/include/NTL/vec_vec_GF2.h:
+
+/usr/local/include/NTL/xdouble.h:
+
+/usr/local/include/NTL/mat_ZZ_p.h:
+
+/usr/local/include/NTL/vec_ZZ_p.h:
+
+/usr/local/include/NTL/ZZVec.h:
+
+/usr/local/include/NTL/ZZ_p.h:
+
+/usr/local/include/NTL/ZZ_pX.h:
+
+/usr/local/include/NTL/Lazy.h:
+
+/usr/local/include/NTL/vec_lzz_p.h:
+
+/usr/local/include/NTL/vec_long.h:
+
+/usr/local/include/NTL/lzz_p.h:
 
 /usr/include/c++/7/bits/parse_numbers.h:
 
@@ -923,6 +1044,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/include/NTL/HAVE_KMA.h:
 
 /usr/local/include/NTL/HAVE_AES_NI.h:
+
+/usr/local/include/NTL/vec_vec_lzz_p.h:
 
 /usr/local/include/NTL/HAVE_POSIX_TIME.h:
 
@@ -950,7 +1073,31 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/include/NTL/ZZ.h:
 
-/usr/local/include/NTL/ZZVec.h:
+/usr/local/include/NTL/version.h:
+
+/usr/include/c++/7/bits/fstream.tcc:
+
+/usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h:
+
+/usr/include/c++/7/bits/codecvt.h:
+
+/usr/include/c++/7/fstream:
+
+/usr/include/c++/7/climits:
+
+/usr/include/c++/7/sstream:
+
+/usr/include/c++/7/complex:
+
+/usr/include/c++/7/bits/stl_set.h:
+
+/usr/include/c++/7/set:
+
+/usr/include/c++/7/bits/algorithmfwd.h:
+
+/usr/include/c++/7/bits/stl_algo.h:
+
+/usr/include/c++/7/algorithm:
 
 ../dependencies/cuHElib/gpu_accel.cuh:
 
@@ -965,6 +1112,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/random/detail/xor_combine_engine.inl:
 
 /usr/local/cuda/include/thrust/random/detail/linear_feedback_shift_engine.inl:
+
+/usr/include/c++/7/random:
 
 /usr/local/cuda/include/thrust/random/detail/linear_feedback_shift_engine_wordmask.h:
 
@@ -990,6 +1139,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/system/cuda/memory_resource.h:
 
+/usr/local/include/NTL/vec_GF2.h:
+
 /usr/local/cuda/include/thrust/mr/polymorphic_adaptor.h:
 
 /usr/local/cuda/include/thrust/mr/memory_resource.h:
@@ -1005,6 +1156,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/device_ptr.h:
 
 /usr/local/cuda/include/thrust/device_allocator.h:
+
+/usr/include/c++/7/bits/random.tcc:
 
 /usr/local/cuda/include/thrust/device_vector.h:
 
@@ -1044,6 +1197,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/type_traits/logical_metafunctions.h:
 
+/usr/include/c++/7/bits/random.h:
+
 /usr/local/cuda/include/thrust/detail/functional/actor.inl:
 
 /usr/local/cuda/include/thrust/detail/functional/operators/bitwise_operators.h:
@@ -1055,6 +1210,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/detail/tuple_transform.h:
 
 /usr/include/c++/7/ext/numeric_traits.h:
+
+/usr/include/x86_64-linux-gnu/c++/7/bits/basic_file.h:
 
 /usr/local/cuda/include/thrust/detail/raw_pointer_cast.h:
 
@@ -1071,6 +1228,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/detail/temporary_buffer.h:
 
 /usr/local/cuda/include/thrust/detail/functional/composite.h:
+
+/usr/local/include/NTL/GF2XVec.h:
 
 /usr/local/cuda/include/thrust/detail/type_deduction.h:
 
@@ -1284,6 +1443,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/system_error.h:
 
+/usr/include/c++/7/bits/stl_tree.h:
+
 /usr/local/cuda/include/thrust/system/cuda/detail/error.inl:
 
 /usr/local/cuda/include/thrust/system/cuda/detail/sort.h:
@@ -1332,6 +1493,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h:
 
+/usr/include/c++/7/bits/uniform_int_dist.h:
+
 /usr/include/pthread.h:
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/gthr-default.h:
@@ -1366,6 +1529,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/include/c++/7/bits/stl_algobase.h:
 
+/usr/local/include/NTL/GF2EX.h:
+
 /usr/local/cuda/include/thrust/mismatch.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
@@ -1382,6 +1547,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/c++allocator.h:
 
+/usr/local/include/NTL/mat_GF2E.h:
+
 /usr/local/cuda/include/thrust/system/detail/sequential/temporary_buffer.h:
 
 /usr/local/cuda/include/thrust/iterator/detail/iterator_facade_category.h:
@@ -1389,6 +1556,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/include/stdlib.h:
 
 /usr/local/cuda/include/thrust/iterator/iterator_categories.h:
+
+/usr/local/include/NTL/mat_GF2.h:
 
 /usr/local/cuda/include/thrust/distance.h:
 
@@ -1444,9 +1613,13 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/include/c++/7/bits/hash_bytes.h:
 
+/usr/local/include/NTL/vec_vec_ZZ_p.h:
+
 /usr/local/cuda/include/thrust/detail/integer_traits.h:
 
 /usr/include/c++/7/bits/std_function.h:
+
+/usr/include/c++/7/bits/stl_multiset.h:
 
 /usr/local/cuda/include/thrust/detail/config/cpp_dialect.h:
 
@@ -1692,6 +1865,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/sm_30_intrinsics.h:
 
+/usr/include/c++/7/bits/stl_heap.h:
+
 /usr/include/x86_64-linux-gnu/c++/7/bits/atomic_word.h:
 
 /usr/local/cuda/include/library_types.h:
@@ -1709,6 +1884,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/replace.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/local/include/helib/NumbTh.h:
 
 /usr/local/cuda/include/thrust/system/cuda/detail/util.h:
 
@@ -1745,6 +1922,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/include/c++/7/ios:
 
 /usr/local/cuda/include/thrust/system/detail/generic/tabulate.inl:
+
+/usr/local/include/NTL/LazyTable.h:
 
 /usr/local/include/NTL/vector.h:
 
@@ -1862,6 +2041,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/tabulate.h:
 
+/usr/local/include/helib/exceptions.h:
+
 /usr/local/cuda/include/thrust/detail/type_traits/result_of_adaptable_function.h:
 
 /usr/local/cuda/include/sm_35_atomic_functions.h:
@@ -1906,9 +2087,13 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/sm_32_intrinsics.hpp:
 
+/usr/include/c++/7/bits/stl_numeric.h:
+
 /usr/local/cuda/include/thrust/system/cpp/detail/scan_by_key.h:
 
 /usr/include/c++/7/bits/atomic_base.h:
+
+/usr/local/include/NTL/ZZX.h:
 
 /usr/include/c++/7/bits/stl_iterator_base_types.h:
 
@@ -2096,7 +2281,15 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/cub/util_compiler.cuh:
 
+/usr/include/x86_64-linux-gnu/c++/7/bits/opt_random.h:
+
 /usr/local/cuda/include/cub/util_macro.cuh:
+
+/usr/local/include/NTL/GF2.h:
+
+/usr/local/include/NTL/FFT.h:
+
+/usr/local/include/NTL/vec_ZZ.h:
 
 /usr/local/cuda/include/thrust/system/detail/sequential/set_operations.h:
 
@@ -2217,6 +2410,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/iterator/detail/minimum_category.h:
 
 /usr/local/cuda/include/thrust/iterator/detail/zip_iterator.inl:
+
+/usr/local/include/NTL/matrix.h:
 
 /usr/local/cuda/include/thrust/system/cpp/detail/transform.h:
 
@@ -2474,6 +2669,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/system/cuda/detail/dispatch.h:
 
+/usr/include/c++/7/bits/sstream.tcc:
+
 /usr/local/cuda/include/cub/agent/agent_scan.cuh:
 
 /usr/local/cuda/include/cub/agent/single_pass_scan_operators.cuh:
@@ -2483,6 +2680,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/system/system_error.h:
 
 /usr/local/cuda/include/cub/warp/specializations/warp_reduce_smem.cuh:
+
+/usr/local/include/NTL/GF2X.h:
 
 /usr/local/cuda/include/thrust/system/detail/generic/transform.h:
 
@@ -2538,6 +2737,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 
 /usr/local/cuda/include/thrust/system/detail/sequential/copy_if.h:
 
+/usr/local/include/NTL/lzz_pX.h:
+
 /usr/local/cuda/include/cub/block/specializations/block_reduce_raking_commutative_only.cuh:
 
 /usr/local/cuda/include/thrust/system/cpp/detail/copy_if.h:
@@ -2559,6 +2760,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/include/c++/7/functional:
 
 /usr/local/cuda/include/thrust/system/cuda/detail/mismatch.h:
+
+/usr/local/include/NTL/mat_lzz_p.h:
 
 /usr/local/cuda/include/thrust/detail/numeric_traits.h:
 
@@ -2611,6 +2814,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/merge.h:
 
 /usr/local/cuda/include/thrust/system/detail/adl/unique.h:
+
+/usr/include/c++/7/numeric:
 
 /usr/local/cuda/include/thrust/system/detail/generic/merge.h:
 
@@ -2687,6 +2892,8 @@ dependencies/cuHElib/CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o: ../dependencies/c
 /usr/local/cuda/include/thrust/detail/allocator/default_construct_range.inl:
 
 /usr/local/cuda/include/thrust/system/cuda/detail/reduce_by_key.h:
+
+/usr/local/include/helib/apiAttributes.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 

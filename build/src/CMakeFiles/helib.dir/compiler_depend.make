@@ -7995,7 +7995,8 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o: ../src/bluestein.cpp \
   ../include/helib/zzX.h \
   ../include/helib/hypercube.h \
   ../include/helib/PGFFT.h \
-  ../include/helib/ClonedPtr.h
+  ../include/helib/ClonedPtr.h \
+  ../dependencies/cuHElib/gpu_accel.cuh
 
 src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
   /usr/include/stdc-predef.h \
