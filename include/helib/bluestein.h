@@ -41,7 +41,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::zz_pX& RbInPoly);
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec);
 
 //! @brief apply bluestein
 void BluesteinFFT(NTL::zz_pX& x,
@@ -49,7 +49,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, UNUSED const NTL::zz_pX& RbInPoly);
+                  const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec);
 
 } // namespace helib
 

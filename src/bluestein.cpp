@@ -78,7 +78,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::zz_pX& RbInPoly)
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec)
 {
   long p = NTL::zz_p::modulus();
 
@@ -107,9 +107,9 @@ void BluesteinInit(long n,
   long k2 = 1L << k; // k2 = 2^k
 
   Rb.SetSize(k);
-  RbInPoly.SetLength(k);
+  RbInVec.SetLength(k2);
 
-  // init_gpu_ntt(k2);
+  init_gpu_ntt(k2);
 
   NTL::zz_pX b(NTL::INIT_SIZE, k2);
 
@@ -132,9 +132,26 @@ void BluesteinInit(long n,
     }
   }
 
-  // std::cout<<"Rb poly: "<<b<<std::endl;
+  //Ardhi: get nth-root of unity for n=2^k and current modulus
+  NTL::zz_p rtp;
+  unsigned int k2= 1L << k; //k2 = 2^k
+  FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
+  if (rtp == 0)              // sanity check
+    throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
+  long root = NTL::rep(rtp);
+
+  //Ardhi: get psi, psi=root^(1/2)
+  long psi;
+  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
+  NTL::conv(psi, temp);
+
+  //Ardhi: get inverse psi
+  long inv_psi = NTL::InvMod(psi, p);
+        
   TofftRep(Rb, b, k);
-  RbInPoly = b;
+  gpu_ntt(RbInVec, k2, b, p,psi, inv_psi, false);
+
+  // RbInVec = b;
   // RbInPoly[0] = rep(b[0]);
   // RbInPoly[0]=1;
 }
@@ -160,7 +177,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, UNUSED const NTL::zz_pX& RbInPoly)
+                  const NTL::fftRep& Rb, const NTL::zz_pX& RbInVec)
 {
   HELIB_TIMER_START;
 
@@ -191,12 +208,52 @@ void BluesteinFFT(NTL::zz_pX& x,
 
   // std::cout<<"\nmodulus: "<<p<<"\nOmega 2nth root: "<<root<<"\nN: "<<n<<"\nk: "<<k<<std::endl;
 
+  //Ardhi: preparing parameters for gpu ntt
+  //Ardhi: get nth-root of unity for n=2^k and current modulus
+  NTL::zz_p rtp;
+  unsigned int k2= 1L << k; //k2 = 2^k
+  FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
+  if (rtp == 0)              // sanity check
+    throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
+  long root = NTL::rep(rtp);
+
+  //Ardhi: get psi, psi=root^(1/2)
+  long psi;
+  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
+  NTL::conv(psi, temp);
+
+  //Ardhi: get inverse psi
+  long inv_psi = NTL::InvMod(psi, p);
+
+  //Ardhi:
+  NTL::vec_zz_p RaInVec(NTL::INIT_SIZE, k2);
+
   if (NEW_BLUE && n % 2 != 0) {
+#if 1
     TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep in NTL
     
     mul(Ra, Ra, Rb); // multiply in FFT representation
 
     FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
+#endif
+#if 1
+    gpu_ntt(RaInVec, k2, x, p,psi, inv_psi, false); //ForwardFFT
+
+    for (size_t i = 0; i < RaInVec.length(); i++)
+    {   
+      RaInVec[i] *= RbInVec[i];
+    }
+    
+    gpu_ntt(RaInVec, k2, RaInVec,p, psi, inv_psi,true);//BackwardFFT
+
+  #if 1//check correctness
+    for(long i=0; i<= dx; i++){
+      std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<rep(RaInVec[i+n-1])<<std::endl;
+    }
+  #endif
+
+#endif
+
     dx = deg(x);
     if (dx >= n) {
       // reduce mod x^n-1
@@ -218,29 +275,13 @@ void BluesteinFFT(NTL::zz_pX& x,
     TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);     //Requirement: Input x[0...2^k]->x[0...n...2^k], Output x_ntt[2^k]// I don't know why we need parameter (3*(n-1)+1)
     // std::cout<<"RbInPoly :"<<RbInPoly<<std::endl;
 
-    //Ardhi: get nth-root of unity for n=2^k and current modulus
-    NTL::zz_p rtp;
-    unsigned int k2= 1L << k; //k2 = 2^k
-    FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
-    if (rtp == 0)              // sanity check
-      throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
-    long root = NTL::rep(rtp);
-
-    //Ardhi: get psi, psi=root^(1/2)
-    long psi;
-    NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
-    NTL::conv(psi, temp);
-
-    //Ardhi: get inverse psi
-    UNUSED long inv_psi = NTL::InvMod(psi, p);
-
     // unsigned int qbit = ceil(std::log2(p));
 
     // //Ardhi: copy x into buffer a // I am not sure this is needed or not, or we can just use *a =x.rep.data() since vector guaranteed to be contigously allocated
     // for(int i=0; i <= dx; i++)
     //   a[i] = NTL::rep(x.rep[i]);
-    unsigned long long *ntt_a = new unsigned long long[k2];
-    unsigned long long *ntt_b = new unsigned long long[k2];
+    // unsigned long long *ntt_a = new unsigned long long[k2];
+    // unsigned long long *ntt_b = new unsigned long long[k2];
     //Ardhi: call GPU NTT here
     // gpu_ntt(ntt_a, k2, x, p, psi, inv_psi, false);
 
@@ -251,13 +292,13 @@ void BluesteinFFT(NTL::zz_pX& x,
 
     // gpu_ntt(ntt_b, k2, RbInPoly, p, psi, inv_psi, false);
 
-    __extension__ unsigned __int128 buff;
+    // __extension__ unsigned __int128 buff;
 
-    for(long i=0; i<k2; i++){
-      buff = ntt_a[i];
-      buff = (buff * ntt_b[i]);
-      ntt_a[i] = myMod2(buff, p);
-    }
+    // for(long i=0; i<k2; i++){
+    //   buff = ntt_a[i];
+    //   buff = (buff * ntt_b[i]);
+    //   ntt_a[i] = myMod2(buff, p);
+    // }
     // gpu_ntt(ntt_a, k2, ntt_a, p, psi, inv_psi, true);
 
     mul(Ra, Ra, Rb); // multiply in FFT representation //Requirement: Input Ra[2^k],Rb[2^k], Output Ra[2^k]
@@ -265,9 +306,9 @@ void BluesteinFFT(NTL::zz_pX& x,
     FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back //Requirement: Input Ra[2^k], Output x[n]// I don't know why we need parameter (2*(n-1))
     // std::cout<<"x after ntt-mul-intt: "<<x<<std::endl;
 
-    for(long i=0; i<= dx; i++){
+    // for(long i=0; i<= dx; i++){
       // std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_a[i+n-1]<<std::endl;
-    }
+    // }
 
     dx = deg(x);
     for (long i = 0; i <= dx; i++) {

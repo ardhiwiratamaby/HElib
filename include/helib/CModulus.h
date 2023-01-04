@@ -79,13 +79,13 @@ private:
   CopiedPtr<NTL::zz_pX> powers;
   NTL::Vec<NTL::mulmod_precon_t> powers_aux;
   CopiedPtr<NTL::fftRep> Rb;
-  CopiedPtr<NTL::zz_pX> RbInPoly;
+  CopiedPtr<NTL::vec_zz_p> RbInVec;
 
   // tables for backward FFT
   CopiedPtr<NTL::zz_pX> ipowers;
   NTL::Vec<NTL::mulmod_precon_t> ipowers_aux;
   CopiedPtr<NTL::fftRep> iRb;
-  CopiedPtr<NTL::zz_pX> iRbInPoly;
+  CopiedPtr<NTL::vec_zz_p> iRbInVec;
 
   // PhimX modulo q, for faster division w/ remainder
   CopiedPtr<zz_pXModulus1> phimx;
