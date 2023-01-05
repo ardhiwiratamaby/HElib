@@ -7996,7 +7996,8 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o: ../src/bluestein.cpp \
   ../include/helib/hypercube.h \
   ../include/helib/PGFFT.h \
   ../include/helib/ClonedPtr.h \
-  ../dependencies/cuHElib/gpu_accel.cuh
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/include/NTL/FFT_impl.h
 
 src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
   /usr/include/stdc-predef.h \
@@ -16748,6 +16749,8 @@ src/CMakeFiles/helib.dir/zzX.cpp.o: ../src/zzX.cpp \
 ../src/extractDigits.cpp:
 
 ../src/debugging.cpp:
+
+/usr/local/include/NTL/FFT_impl.h:
 
 ../src/bluestein.cpp:
 

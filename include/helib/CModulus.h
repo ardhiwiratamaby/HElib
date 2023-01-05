@@ -75,14 +75,19 @@ private:
   //! root^{-1} mod q
   long rInv;
 
+  //2k-root^1/2 for GPU NTT// Need to store psi since we may have different psi for the same configuration //store it in zz_p to support object functionality
+  NTL::zz_p psi;
+
   // tables for forward FFT
   CopiedPtr<NTL::zz_pX> powers;
+  CopiedPtr<NTL::zz_pX> RbInPoly;
   NTL::Vec<NTL::mulmod_precon_t> powers_aux;
   CopiedPtr<NTL::fftRep> Rb;
   CopiedPtr<NTL::vec_zz_p> RbInVec;
 
   // tables for backward FFT
   CopiedPtr<NTL::zz_pX> ipowers;
+  CopiedPtr<NTL::zz_pX> iRbInPoly;
   NTL::Vec<NTL::mulmod_precon_t> ipowers_aux;
   CopiedPtr<NTL::fftRep> iRb;
   CopiedPtr<NTL::vec_zz_p> iRbInVec;

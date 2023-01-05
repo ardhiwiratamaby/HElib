@@ -19,6 +19,7 @@
 #include <helib/CModulus.h>
 #include <helib/apiAttributes.h>
 #include "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh"
+#include <NTL/FFT_impl.h>
 
 #define NEW_BLUE (1)
 
@@ -78,7 +79,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec)
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, NTL::zz_p& psi, NTL::zz_pX& RbInPoly)
 {
   long p = NTL::zz_p::modulus();
 
@@ -134,26 +135,38 @@ void BluesteinInit(long n,
 
   //Ardhi: get nth-root of unity for n=2^k and current modulus
   NTL::zz_p rtp;
-  unsigned int k2= 1L << k; //k2 = 2^k
   FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
   if (rtp == 0)              // sanity check
     throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
-  long root = NTL::rep(rtp);
+  long k2_root = NTL::rep(rtp);
 
   //Ardhi: get psi, psi=root^(1/2)
-  long psi;
-  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
+  // long psi;
+  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
   NTL::conv(psi, temp);
 
   //Ardhi: get inverse psi
-  long inv_psi = NTL::InvMod(psi, p);
-        
-  TofftRep(Rb, b, k);
-  gpu_ntt(RbInVec, k2, b, p,psi, inv_psi, false);
+  long inv_psi = NTL::InvMod(rep(psi), p);
+  RbInPoly = b;
 
-  // RbInVec = b;
-  // RbInPoly[0] = rep(b[0]);
-  // RbInPoly[0]=1;
+#if 1
+  TofftRep(Rb, b, k);
+#endif
+#if 1
+  gpu_ntt(RbInVec, k2, b, p,rep(psi), inv_psi, false); //Ardhi: convert b->RbInVec aka vec<long>
+#endif
+#if 1 //check the forward transform is correct or not
+  NTL::vec_zz_p reverse_Rb(NTL::INIT_SIZE, k2);
+  gpu_ntt(reverse_Rb, k2, RbInVec, p, rep(psi), inv_psi, true);
+  // std::cout<<"psi: "<<rep(psi)<<" RbInVec: ";
+  for (long i = 0; i < reverse_Rb.length(); i++)
+  {
+    // std::cout<<RbInVec[i]<<" ";
+    if(reverse_Rb[i] != b[i])
+          throw RuntimeError("Cmod::bluesteinInit(): b to RbInVec conversion error");
+  }
+#endif
+
 }
 
 __extension__ __int128 flooredDivision(__int128 a, long b)
@@ -177,7 +190,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, const NTL::zz_pX& RbInVec)
+                  const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, const NTL::zz_pX& RbInPoly)
 {
   HELIB_TIMER_START;
 
@@ -210,48 +223,53 @@ void BluesteinFFT(NTL::zz_pX& x,
 
   //Ardhi: preparing parameters for gpu ntt
   //Ardhi: get nth-root of unity for n=2^k and current modulus
-  NTL::zz_p rtp;
+  // NTL::zz_p rtp;
   unsigned int k2= 1L << k; //k2 = 2^k
-  FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
-  if (rtp == 0)              // sanity check
-    throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
-  long root = NTL::rep(rtp);
+  // FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
+  // if (rtp == 0)              // sanity check
+  //   throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
+  // long k2_root = NTL::rep(rtp);
 
   //Ardhi: get psi, psi=root^(1/2)
-  long psi;
-  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(root), NTL::conv<NTL::ZZ>(p));
-  NTL::conv(psi, temp);
+  // long psi;
+  // NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
+  // NTL::conv(psi, temp);
 
-  //Ardhi: get inverse psi
-  long inv_psi = NTL::InvMod(psi, p);
+  // //Ardhi: get inverse psi
+  long inv_psi = NTL::InvMod(rep(psi), p);
 
   //Ardhi:
   NTL::vec_zz_p RaInVec(NTL::INIT_SIZE, k2);
 
   if (NEW_BLUE && n % 2 != 0) {
 #if 1
-    TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep in NTL
-    
+    TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep
     mul(Ra, Ra, Rb); // multiply in FFT representation
-
-    FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
+    
 #endif
 #if 1
-    gpu_ntt(RaInVec, k2, x, p,psi, inv_psi, false); //ForwardFFT
+    gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT
 
-    for (size_t i = 0; i < RaInVec.length(); i++)
+    // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
+    for (long i = 0; i < RaInVec.length(); i++)
     {   
       RaInVec[i] *= RbInVec[i];
     }
     
-    gpu_ntt(RaInVec, k2, RaInVec,p, psi, inv_psi,true);//BackwardFFT
+    gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT
+#endif
+#if 1
+    FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
+    #if 1//check correctness
+      dx = deg(x);
+      for(long i=0; i<= dx; i++){
+        std::cout<<"cpu: "<<rep(x[i])<<std::endl;
+      }
 
-  #if 1//check correctness
-    for(long i=0; i<= dx; i++){
-      std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<rep(RaInVec[i+n-1])<<std::endl;
-    }
-  #endif
-
+      for(long i=0; i< RaInVec.length(); i++){
+        std::cout<<"gpu: "<<rep(RaInVec[i])<<std::endl;
+      }
+    #endif
 #endif
 
     dx = deg(x);
@@ -265,6 +283,12 @@ void BluesteinFFT(NTL::zz_pX& x,
       dx = deg(x);
     }
 
+#if 1 //check x after modulo
+    for(long i=0; i<= dx; i++){
+      std::cout<<"cpu after mod x^n-1: "<<rep(x[i])<<std::endl;
+    }
+#endif
+
     for (long i = 0; i <= dx; i++) {
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
@@ -277,34 +301,96 @@ void BluesteinFFT(NTL::zz_pX& x,
 
     // unsigned int qbit = ceil(std::log2(p));
 
+#if 1 //check with older code
     // //Ardhi: copy x into buffer a // I am not sure this is needed or not, or we can just use *a =x.rep.data() since vector guaranteed to be contigously allocated
     // for(int i=0; i <= dx; i++)
     //   a[i] = NTL::rep(x.rep[i]);
-    // unsigned long long *ntt_a = new unsigned long long[k2];
-    // unsigned long long *ntt_b = new unsigned long long[k2];
+    unsigned long long *ntt_a = new unsigned long long[k2];
+    unsigned long long *ntt_b = new unsigned long long[k2];
     //Ardhi: call GPU NTT here
-    // gpu_ntt(ntt_a, k2, x, p, psi, inv_psi, false);
+    gpu_ntt(ntt_a, k2, x, p, rep(psi), inv_psi, false);
 
     // //Ardhi: check the forward and backward transform
     // gpu_ntt(ntt_b, k2, ntt_a, p, psi, inv_psi, true); 
     // for(long i=0; i<= dx; i++)
     //   std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_b[i]<<std::endl;
 
-    // gpu_ntt(ntt_b, k2, RbInPoly, p, psi, inv_psi, false);
+    gpu_ntt(ntt_b, k2, RbInPoly, p, rep(psi), inv_psi, false);
 
-    // __extension__ unsigned __int128 buff;
+    #if 1 //compare ntt_b with RbInVec
+      for (long i = 0; i < RbInVec.length(); i++)
+      {
+        if(ntt_b[i] != RbInVec[i])
+              throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match ntt_b");
+      }
+    #endif
 
-    // for(long i=0; i<k2; i++){
-    //   buff = ntt_a[i];
-    //   buff = (buff * ntt_b[i]);
-    //   ntt_a[i] = myMod2(buff, p);
-    // }
-    // gpu_ntt(ntt_a, k2, ntt_a, p, psi, inv_psi, true);
+    __extension__ unsigned __int128 buff;
 
+    for(long i=0; i<k2; i++){
+      buff = ntt_a[i];
+      buff = (buff * ntt_b[i]);
+      ntt_a[i] = myMod2(buff, p);
+    }
+    gpu_ntt(ntt_a, k2, ntt_a, p, rep(psi), inv_psi, true);
+#endif
     mul(Ra, Ra, Rb); // multiply in FFT representation //Requirement: Input Ra[2^k],Rb[2^k], Output Ra[2^k]
+
+#if 1
+    gpu_ntt(RaInVec, k2, x, p, rep(psi), inv_psi, false); //ForwardFFT
+
+    #if 1 //check forward gpu ntt for RaInVec
+      NTL::vec_zz_p reverse_Ra(NTL::INIT_SIZE, k2);
+      gpu_ntt(reverse_Ra, k2, RaInVec, p, rep(psi), inv_psi, true);
+      dx = deg(x);
+      for (long i = 0; i <= dx; i++)
+      {
+        if(reverse_Ra[i] != x.rep[i])
+              throw RuntimeError("Cmod::bluesteinFFT(): x to RaInVec conversion error");
+      }
+    #endif
+
+    for (long i = 0; i < RaInVec.length(); i++)
+    { 
+      #define check_mulmod 1  
+      #if check_mulmod //check mulmod correctness
+         __extension__ unsigned __int128 buff;
+        buff = rep(RaInVec[i]);
+      #endif
+
+      RaInVec[i] *= RbInVec[i];
+
+      #if check_mulmod //check mulmod correctness
+        buff = (buff * rep(RbInVec[i]));
+        if(rep(RaInVec[i]) != myMod2(buff, p))
+          throw RuntimeError("Cmod::bluesteinFFT(): mulmod error");
+      #endif
+    }
+
+    gpu_ntt(RaInVec, k2, RaInVec, p, rep(psi), inv_psi,true);//BackwardFFT
+#endif
 
     FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back //Requirement: Input Ra[2^k], Output x[n]// I don't know why we need parameter (2*(n-1))
     // std::cout<<"x after ntt-mul-intt: "<<x<<std::endl;
+    
+  #if 1//check correctness
+    dx = deg(x);
+    // for(long i=0; i<= dx; i++){
+    //   std::cout<<"cpu: "<<rep(x[i])<<" gpu: "<<ntt_a[i+n-1]<<std::endl;
+    // }
+    
+    for(long i=0; i<= dx; i++){
+      std::cout<<"cpu: "<<rep(x[i])<<std::endl;
+    }
+
+    for(long i=0; i< RaInVec.length(); i++){
+      std::cout<<"gpu1: "<<rep(RaInVec[i])<<std::endl;
+    }
+
+    for(long i=0; i< k2; i++){
+      std::cout<<"gpu2: "<<ntt_a[i]<<std::endl;
+    }    
+  #endif
 
     // for(long i=0; i<= dx; i++){
       // std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_a[i+n-1]<<std::endl;
