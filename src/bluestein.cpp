@@ -114,6 +114,7 @@ void BluesteinInit(long n,
 
   NTL::zz_pX b(NTL::INIT_SIZE, k2);
 
+  //Ardhi: I think below codes prepare for the the chirp signal
   if (NEW_BLUE && n == e) {
     NTL::zz_p rInv = inv(root);
     for (long i = 0; i < n; i++) {
@@ -295,6 +296,8 @@ void BluesteinFFT(NTL::zz_pX& x,
     }
     x.normalize();
   } else {
+
+    //Ardhi: this section of code related to gpu ntt needs to be fixed
     //Ardhi: I want to replace below code with a call to GPU NTT//But I think I need to verify if I can replace this with the GPU call
     TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);     //Requirement: Input x[0...2^k]->x[0...n...2^k], Output x_ntt[2^k]// I don't know why we need parameter (3*(n-1)+1)
     // std::cout<<"RbInPoly :"<<RbInPoly<<std::endl;
