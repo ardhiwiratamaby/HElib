@@ -1112,6 +1112,7 @@ void gpu_ntt(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsi
 
 
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     long dx = deg(x);
     for(int i=0; i <= dx; i++)
       a[i] = NTL::rep(x.rep[i]);
@@ -1200,6 +1201,7 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned l
 
 
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     long dx = deg(x);
     for(int i=0; i <= dx; i++)
       a[i] = NTL::rep(x.rep[i]);
@@ -1290,6 +1292,7 @@ void gpu_ntt(unsigned long long res[], unsigned int n, unsigned long long x[], u
     // unsigned long long* a;
     // cudaMallocHost(&a, sizeof(unsigned long long) * n);
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     for(int i=0; i < n; i++)
       a[i] = x[i];
 
@@ -1331,7 +1334,7 @@ void gpu_ntt(unsigned long long res[], unsigned int n, unsigned long long x[], u
     // cudaFree(d_a);
 }
 
-void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, NTL::vec_zz_p& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
+void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
     int size_array = sizeof(unsigned long long) * n;
     int size = sizeof(unsigned long long);
     bool check=true;
@@ -1380,6 +1383,7 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, NTL::vec_zz_p& x, unsigned long
     // unsigned long long* a;
     // cudaMallocHost(&a, sizeof(unsigned long long) * n);
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     for(int i=0; i < n; i++)
       a[i] = rep(x[i]);
 

@@ -159,10 +159,10 @@ void BluesteinInit(long n,
 #if 1 //check the forward transform is correct or not
   NTL::vec_zz_p reverse_Rb(NTL::INIT_SIZE, k2);
   gpu_ntt(reverse_Rb, k2, RbInVec, p, rep(psi), inv_psi, true);
-  // std::cout<<"psi: "<<rep(psi)<<" RbInVec: ";
+  std::cout<<"\npsi: "<<rep(psi)<<" RbInVec: ";
   for (long i = 0; i < reverse_Rb.length(); i++)
   {
-    // std::cout<<RbInVec[i]<<" ";
+    std::cout<<RbInVec[i]<<" ";
     if(reverse_Rb[i] != b[i])
           throw RuntimeError("Cmod::bluesteinInit(): b to RbInVec conversion error");
   }
@@ -247,6 +247,23 @@ void BluesteinFFT(NTL::zz_pX& x,
     TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep
     mul(Ra, Ra, Rb); // multiply in FFT representation
     
+#endif
+#if 1 //compare ntt of RbInPoly with RbInVec
+  NTL::vec_zz_p test(NTL::INIT_SIZE, k2);
+  gpu_ntt(test, k2, RbInPoly, p,rep(psi), inv_psi, false); //ForwardFFT
+  for (long i = 0; i < RbInVec.length(); i++)
+  {
+    if(test[i] != RbInVec[i])
+          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match ntt_b");
+  }
+
+  gpu_ntt(test, k2, RbInVec, p,rep(psi), inv_psi, true); //BackwardFFT
+  long count = RbInPoly.rep.length();
+  for (long i = 0; i < count; i++)
+  {
+    if(test[i] != RbInPoly.rep[i])
+          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match ntt_b");
+  }
 #endif
 #if 1
     gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT

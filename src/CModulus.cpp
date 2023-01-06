@@ -179,10 +179,11 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   iRbInVec.reset(new NTL::vec_zz_p);
   RbInPoly.reset(new NTL::zz_pX);
   iRbInPoly.reset(new NTL::zz_pX);
-  psi = 0;
+  // psi = 0;
+  psi.reset(new NTL::zz_p);
 
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, psi, *iRbInPoly);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, *psi, *RbInPoly);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, *psi, *iRbInPoly);
 }
 
 Cmodulus& Cmodulus::operator=(const Cmodulus& other)
@@ -448,7 +449,7 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   // std::cout<<std::endl;
 
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
+  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, *psi, *RbInPoly);
 
   // std::cout<<"\nAfter BluesteinFFT\n";
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
@@ -585,7 +586,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi, *iRbInPoly); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, *psi, *iRbInPoly); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
   {
