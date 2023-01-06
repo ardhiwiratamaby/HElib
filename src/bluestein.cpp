@@ -109,7 +109,7 @@ void BluesteinInit(long n,
   Rb.SetSize(k);
   RbInPoly.SetLength(k);
 
-  // init_gpu_ntt(k2);
+  init_gpu_ntt(k2);
 
   NTL::zz_pX b(NTL::INIT_SIZE, k2);
 
@@ -160,7 +160,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, UNUSED const NTL::zz_pX& RbInPoly)
+                  const NTL::fftRep& Rb, const NTL::zz_pX& RbInPoly)
 {
   HELIB_TIMER_START;
 
@@ -242,14 +242,14 @@ void BluesteinFFT(NTL::zz_pX& x,
     unsigned long long *ntt_a = new unsigned long long[k2];
     unsigned long long *ntt_b = new unsigned long long[k2];
     //Ardhi: call GPU NTT here
-    // gpu_ntt(ntt_a, k2, x, p, psi, inv_psi, false);
+    gpu_ntt(ntt_a, k2, x, p, psi, inv_psi, false);
 
     // //Ardhi: check the forward and backward transform
     // gpu_ntt(ntt_b, k2, ntt_a, p, psi, inv_psi, true); 
     // for(long i=0; i<= dx; i++)
     //   std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_b[i]<<std::endl;
 
-    // gpu_ntt(ntt_b, k2, RbInPoly, p, psi, inv_psi, false);
+    gpu_ntt(ntt_b, k2, RbInPoly, p, psi, inv_psi, false);
 
     __extension__ unsigned __int128 buff;
 
@@ -266,7 +266,7 @@ void BluesteinFFT(NTL::zz_pX& x,
     // std::cout<<"x after ntt-mul-intt: "<<x<<std::endl;
 
     for(long i=0; i<= dx; i++){
-      // std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_a[i+n-1]<<std::endl;
+      std::cout<<"cpu: "<<rep(x[i])<<"gpu: "<<ntt_a[i+n-1]<<std::endl;
     }
 
     dx = deg(x);
