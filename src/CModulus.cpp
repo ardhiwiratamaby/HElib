@@ -179,11 +179,33 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   iRbInVec.reset(new NTL::vec_zz_p);
   RbInPoly.reset(new NTL::zz_pX);
   iRbInPoly.reset(new NTL::zz_pX);
-  // psi = 0;
-  psi.reset(new NTL::zz_p);
+  // myPsi.reset(new NTL::vec_zz_p);
 
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, *psi, *RbInPoly);
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, *psi, *iRbInPoly);
+  // psi = 0;
+  // psi.reset(new NTL::zz_p);
+  // psi_inv.reset(new NTL::zz_p);
+
+  //Ardhi: get nth-root of unity for n=2^k and current modulus
+  long k = NTL::NextPowerOfTwo(2 * mm - 1);
+  long k2 = 1L << k; // k2 = 2^k
+  NTL::zz_p rtp;
+  FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
+  if (rtp == 0)              // sanity check
+    throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
+  long k2_root = NTL::rep(rtp);
+
+  //Ardhi: get psi, psi=root^(1/2)
+  // long psi;
+  long p = NTL::zz_p::modulus();
+  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
+  NTL::conv(psi, temp);
+  // myPsi[0] = psi;
+  //Ardhi: get inverse psi
+  long inv_psi = NTL::InvMod(rep(psi), p);
+  psi_inv = inv_psi;
+
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly);
 }
 
 Cmodulus& Cmodulus::operator=(const Cmodulus& other)
@@ -224,8 +246,10 @@ Cmodulus& Cmodulus::operator=(const Cmodulus& other)
   iRbInVec = other.iRbInVec;
   phimx = other.phimx;
   psi = other.psi;
+  psi_inv = other.psi_inv;
   RbInPoly = other.RbInPoly;
   iRbInPoly = other.iRbInPoly;
+  // myPsi = other.myPsi;
 
 #ifdef HELIB_OPENCL
   altFFTInfo = other.altFFTInfo;
@@ -449,7 +473,7 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   // std::cout<<std::endl;
 
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, *psi, *RbInPoly);
+  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
 
   // std::cout<<"\nAfter BluesteinFFT\n";
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
@@ -586,7 +610,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, *psi, *iRbInPoly); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi, *iRbInPoly); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
   {

@@ -79,7 +79,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, NTL::zz_p& psi, NTL::zz_pX& RbInPoly)
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, NTL::zz_pX& RbInPoly)
 {
   long p = NTL::zz_p::modulus();
 
@@ -109,6 +109,7 @@ void BluesteinInit(long n,
 
   Rb.SetSize(k);
   RbInVec.SetLength(k2);
+  // myPsi.SetLength(1);
 
   init_gpu_ntt(k2);
 
@@ -134,26 +135,13 @@ void BluesteinInit(long n,
     }
   }
 
-  //Ardhi: get nth-root of unity for n=2^k and current modulus
-  NTL::zz_p rtp;
-  FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
-  if (rtp == 0)              // sanity check
-    throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
-  long k2_root = NTL::rep(rtp);
-
-  //Ardhi: get psi, psi=root^(1/2)
-  // long psi;
-  NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
-  NTL::conv(psi, temp);
-
-  //Ardhi: get inverse psi
-  long inv_psi = NTL::InvMod(rep(psi), p);
   RbInPoly = b;
 
 #if 1
   TofftRep(Rb, b, k);
 #endif
 #if 1
+  long inv_psi = NTL::InvMod(rep(psi), p);
   gpu_ntt(RbInVec, k2, b, p,rep(psi), inv_psi, false); //Ardhi: convert b->RbInVec aka vec<long>
 #endif
 #if 1 //check the forward transform is correct or not
@@ -236,6 +224,11 @@ void BluesteinFFT(NTL::zz_pX& x,
   // NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
   // NTL::conv(psi, temp);
 
+  //Ardhi: check psi and myPsi
+  // if(psi != myPsi[0])
+  //   throw RuntimeError("Cmod::bluesteinFFT(): psi and myPsi missmatch");
+
+
   // //Ardhi: get inverse psi
   long inv_psi = NTL::InvMod(rep(psi), p);
 
@@ -281,12 +274,17 @@ void BluesteinFFT(NTL::zz_pX& x,
     #if 1//check correctness
       dx = deg(x);
       for(long i=0; i<= dx; i++){
-        std::cout<<"cpu: "<<rep(x[i])<<std::endl;
+        if(rep(x[i]) != rep(RaInVec[i]))
+              throw RuntimeError("Cmod::bluesteinFFT(): gpu conv and cpu conv is missmatch");
       }
+      
+      // for(long i=0; i<= dx; i++){
+      //   std::cout<<"cpu: "<<rep(x[i])<<std::endl;
+      // }
 
-      for(long i=0; i< RaInVec.length(); i++){
-        std::cout<<"gpu: "<<rep(RaInVec[i])<<std::endl;
-      }
+      // for(long i=0; i< RaInVec.length(); i++){
+      //   std::cout<<"gpu: "<<rep(RaInVec[i])<<std::endl;
+      // }
     #endif
 #endif
 
@@ -301,7 +299,7 @@ void BluesteinFFT(NTL::zz_pX& x,
       dx = deg(x);
     }
 
-#if 1 //check x after modulo
+#if 0 //check x after modulo
     for(long i=0; i<= dx; i++){
       std::cout<<"cpu after mod x^n-1: "<<rep(x[i])<<std::endl;
     }

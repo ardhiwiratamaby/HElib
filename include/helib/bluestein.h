@@ -41,7 +41,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, NTL::zz_p& psi, NTL::zz_pX& RbInPoly);
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, NTL::zz_pX& RbInPoly);
 
 //! @brief apply bluestein
 void BluesteinFFT(NTL::zz_pX& x,
