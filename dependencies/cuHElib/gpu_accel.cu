@@ -15,10 +15,10 @@ long d_phim, d_n_rows;
 long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
 void InitContiguousHostMapModulus(long phim, int n_rows){
-  contiguousHostMapA = (long *)malloc(2*phim*n_rows*sizeof(long));
-  contiguousHostMapB = (long *)malloc(2*phim*n_rows*sizeof(long));
-  contiguousModulus = (long *)malloc(2*n_rows*sizeof(long));
-  scalarPerRow = (long *)malloc(2*n_rows*sizeof(long));
+  contiguousHostMapA = (long *)malloc(3*phim*n_rows*sizeof(long));
+  contiguousHostMapB = (long *)malloc(3*phim*n_rows*sizeof(long));
+  contiguousModulus = (long *)malloc(3*n_rows*sizeof(long));
+  scalarPerRow = (long *)malloc(3*n_rows*sizeof(long));
 }
 
 void setScalar(long index, long data){
@@ -67,13 +67,13 @@ void InitGPUBuffer(long phim, int n_rows){
   d_phim = phim;
   d_n_rows = n_rows;
 
-  bytes = 2*phim*n_rows*sizeof(long);
+  bytes = 3*phim*n_rows*sizeof(long);
   // Allocate memory for arrays d_A, d_B, and d_C on device
   cudaMalloc(&d_A, bytes);
   cudaMalloc(&d_B, bytes);
   cudaMalloc(&d_C, bytes);
-  cudaMalloc(&d_modulus, 2*d_n_rows*sizeof(long));
-  cudaMalloc(&d_scalar, 2*d_n_rows*sizeof(long));
+  cudaMalloc(&d_modulus, 3*d_n_rows*sizeof(long));
+  cudaMalloc(&d_scalar, 3*d_n_rows*sizeof(long));
 }
 
 void DestroyGPUBuffer(){

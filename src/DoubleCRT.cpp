@@ -543,6 +543,24 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   //cudaMemCopy+Execute Kernel
   CudaEltwiseMultMod(current_row);
 
+#if 1//Ardhi: check the correctness of the result
+  counter=0, current_row=0;
+  for (long i : s) {
+    long pi = context.ithPrime(i);
+    NTL::vec_long& row = map[i];
+    const NTL::vec_long& other_row = (*other_map)[i];
+
+    long *gpu_res = getRowMapA(counter);
+    NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
+    for (long j : range(phim)){
+      long temp = MulMod(row[j], other_row[j], pi, pi_inv);
+      if( temp != gpu_res[j])
+        throw RuntimeError("DoubleCRT::do_mul(): gpu and cpu result is missmatch");
+    }
+    counter += phim;
+  }
+#endif
+
   //copy the result in contiguousMap to map
   counter=0, current_row=0;
   for (long i : s) {
@@ -556,6 +574,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     memcpy(&row[0], source, phim*sizeof(long));
     counter += phim;
     // current_row++;
+
   }
 #endif
   return *this;
