@@ -444,61 +444,61 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   long phim = context.getPhiM();
 
 #if 0
-//   // add/sub/mul the data, element by element, modulo the respective primes
-//   for (long i : s) {
-//     long pi = context.ithPrime(i);
-//     NTL::vec_long& row = map[i];
-//     const NTL::vec_long& other_row = (*other_map)[i];
-
-// #ifdef USE_INTEL_HEXL
-//     intel::EltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
-// #elif defined(USE_CUDA_ACCEL)
-//     // std::cout<<"do_mul Accelerated on CUDA\n";
-//     CudaEltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
-//     // NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
-//     // for (long j : range(phim))
-//     //   row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
-// #else
-//     NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
-//     for (long j : range(phim))
-//       row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
-// #endif // USE_INTEL_HEXL
-  // }
-
-  //copy map to contiguousMap
-  long counter=0, current_row=0;
-  for (long i : s) {
-    NTL::vec_long& row = map[i];
-    const NTL::vec_long& other_row = (*other_map)[i];
-    setModulus(current_row, context.ithPrime(i));
-    // row[0];
-    // other_row[0];
-    // for (long j : range(phim)){
-    //   long a = row[j];
-    //   long b = other_row[j];
-
-    //   setMapA(counter, a);
-    //   setMapB(counter, b);
-    //   counter++;
-    // }
-    
-    setRowMapA(counter, &row[0]);
-    setRowMapB(counter, &other_row[0]);
-
-    counter = counter+phim;
-    current_row++;
-  }
-  
   // add/sub/mul the data, element by element, modulo the respective primes
   for (long i : s) {
     long pi = context.ithPrime(i);
     NTL::vec_long& row = map[i];
     const NTL::vec_long& other_row = (*other_map)[i];
 
+#ifdef USE_INTEL_HEXL
+    intel::EltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
+// #elif defined(USE_CUDA_ACCEL)
+//     // std::cout<<"do_mul Accelerated on CUDA\n";
+//     CudaEltwiseMultMod(row.elts(), row.elts(), other_row.elts(), phim, pi);
+//     // NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
+//     // for (long j : range(phim))
+//     //   row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
+#else
     NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
     for (long j : range(phim))
       row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
+#endif // USE_INTEL_HEXL
   }
+
+  //copy map to contiguousMap
+  // long counter=0, current_row=0;
+  // for (long i : s) {
+  //   NTL::vec_long& row = map[i];
+  //   const NTL::vec_long& other_row = (*other_map)[i];
+  //   setModulus(current_row, context.ithPrime(i));
+  //   // row[0];
+  //   // other_row[0];
+  //   // for (long j : range(phim)){
+  //   //   long a = row[j];
+  //   //   long b = other_row[j];
+
+  //   //   setMapA(counter, a);
+  //   //   setMapB(counter, b);
+  //   //   counter++;
+  //   // }
+    
+  //   setRowMapA(counter, &row[0]);
+  //   setRowMapB(counter, &other_row[0]);
+
+  //   counter = counter+phim;
+  //   current_row++;
+  // }
+  
+  // // add/sub/mul the data, element by element, modulo the respective primes
+  // for (long i : s) {
+  //   long pi = context.ithPrime(i);
+  //   NTL::vec_long& row = map[i];
+  //   const NTL::vec_long& other_row = (*other_map)[i];
+
+  //   NTL::mulmod_t pi_inv = context.ithModulus(i).getQInv();
+  //   for (long j : range(phim))
+  //     row[j] = MulMod(row[j], other_row[j], pi, pi_inv);
+  // }
 #else
   // add/sub/mul the data, element by element, modulo the respective primes
 
