@@ -136,11 +136,11 @@ option(PACKAGE_BUILD
 
 option(ENABLE_THREADS
        "Enable threads support.  Requires NTL built with NTL_THREADS=on"
-       ON)
+       ON)#Ardhi: set off to check the correctness on ifft
 
 option(HELIB_DEBUG
        "Build with HELIB_DEBUG (enables extra debugging info, but needs to be initialized)"
-       OFF)
+       OFF)#Ardhi: set on, to examine the bluestein problem
 option(ENABLE_TEST "Enable tests" OFF)
 option(USE_INTEL_HEXL "Use Intel HEXL library" OFF)
 option(USE_CUDA_ACCEL "Use CUDA accel library" ON)

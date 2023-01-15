@@ -147,7 +147,7 @@ void BluesteinInit(long n,
 #if 1 //check the forward transform is correct or not
   NTL::vec_zz_p reverse_Rb(NTL::INIT_SIZE, k2);
   gpu_ntt(reverse_Rb, k2, RbInVec, p, rep(psi), inv_psi, true);
-  std::cout<<"\npsi: "<<rep(psi)<<" RbInVec: ";
+  // std::cout<<"\npsi: "<<rep(psi)<<" RbInVec: ";
   for (long i = 0; i < reverse_Rb.length(); i++)
   {
     std::cout<<RbInVec[i]<<" ";
@@ -236,18 +236,18 @@ void BluesteinFFT(NTL::zz_pX& x,
   NTL::vec_zz_p RaInVec(NTL::INIT_SIZE, k2);
 
   if (NEW_BLUE && n % 2 != 0) {
-#if 1
+#if 0
     TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep
     mul(Ra, Ra, Rb); // multiply in FFT representation
     
 #endif
-#if 1 //compare ntt of RbInPoly with RbInVec
+#if 0 //compare ntt of RbInPoly with RbInVec
   NTL::vec_zz_p test(NTL::INIT_SIZE, k2);
   gpu_ntt(test, k2, RbInPoly, p,rep(psi), inv_psi, false); //ForwardFFT
   for (long i = 0; i < RbInVec.length(); i++)
   {
     if(test[i] != RbInVec[i])
-          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match ntt_b");
+          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
   }
 
   gpu_ntt(test, k2, RbInVec, p,rep(psi), inv_psi, true); //BackwardFFT
@@ -255,7 +255,7 @@ void BluesteinFFT(NTL::zz_pX& x,
   for (long i = 0; i < count; i++)
   {
     if(test[i] != RbInPoly.rep[i])
-          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match ntt_b");
+          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
   }
 #endif
 #if 1
@@ -270,6 +270,14 @@ void BluesteinFFT(NTL::zz_pX& x,
     gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT
 #endif
 #if 1
+    long l = 2*(n-1)+1;
+    x.rep.SetLength(l);
+    for (long i = 0; i < l; i++) {
+      x[i].LoopHole() = rep(RaInVec[i]);
+    }
+    x.normalize();
+#endif
+#if 0
     FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
     #if 1//check correctness
       dx = deg(x);
@@ -278,6 +286,19 @@ void BluesteinFFT(NTL::zz_pX& x,
               throw RuntimeError("Cmod::bluesteinFFT(): gpu conv and cpu conv is missmatch");
       }
       
+      NTL::zz_pX temp;
+      long l = 2*(n-1)+1;
+      temp.rep.SetLength(l);
+      for (long i = 0; i < l; i++) {
+        temp[i].LoopHole() = rep(RaInVec[i]);
+      }
+      temp.normalize();
+
+      long temp_d = deg(temp);
+      if(temp_d != dx){
+              printf("temp_d: %lu, dx: %lu\n", temp_d, dx);
+              throw RuntimeError("Cmod::bluesteinFFT(): temp_d and dx is missmatch");       
+      }
       // for(long i=0; i<= dx; i++){
       //   std::cout<<"cpu: "<<rep(x[i])<<std::endl;
       // }
@@ -287,12 +308,16 @@ void BluesteinFFT(NTL::zz_pX& x,
       // }
     #endif
 #endif
-
     dx = deg(x);
+    printf("dx:%lu \n", dx);
     if (dx >= n) {
       // reduce mod x^n-1
       for (long i = n; i <= dx; i++) {
-        x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
+        #if 1
+          x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
+        #else
+          x[i - n].LoopHole() = NTL::AddMod(rep(RaInVec[i - n]), rep(RaInVec[i]), p);
+        #endif
       }
       x.SetLength(n);
       x.normalize();

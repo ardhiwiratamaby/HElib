@@ -610,7 +610,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi, *iRbInPoly); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
   {

@@ -2,6 +2,7 @@
 #define GPU_ACCEL_H
 
 #include <helib/NumbTh.h>
+#define THREADS_PER_BLOCK 1024
 
 
 void InitGPUBuffer(long phim, int n_rows);

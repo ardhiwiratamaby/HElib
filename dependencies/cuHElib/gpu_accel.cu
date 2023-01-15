@@ -23,6 +23,7 @@ __device__ __forceinline__ void singleBarrett(unsigned __int128& a, unsigned lon
     a -= q * (a >= q);
 }
 
+#if 0 //CT & GS for 2048 ntt points
 __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[])
 {
     int local_tid = threadIdx.x;
@@ -144,6 +145,79 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
         a[global_tid + blockIdx.x * 2048] = shared_array[global_tid];
     }
 }
+#endif
+
+__global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[], int n, int n_of_groups)
+{
+    int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
+
+    int group_size = n/n_of_groups;
+    int n_of_thread_per_group = group_size/2; //we assume that 1 thread manages 2 coefficients
+    int step = n_of_thread_per_group;
+
+    int target_index = (global_tid/n_of_thread_per_group)*group_size+(global_tid % n_of_thread_per_group);
+
+    unsigned long long psi = psi_powers[n_of_groups + global_tid/n_of_thread_per_group];
+
+    unsigned long long first_target_value = a[target_index];
+
+    unsigned __int128 temp_storage = a[target_index + step];  // this is for eliminating the possibility of overflow
+
+    temp_storage *= psi;
+
+    singleBarrett(temp_storage, q, mu, qbit);
+    // temp_storage %= q;
+    unsigned long long second_target_value = temp_storage;
+
+    unsigned long long target_result = first_target_value + second_target_value;
+
+    target_result -= q * (target_result >= q);
+
+    a[target_index] = target_result;
+
+    first_target_value += q * (first_target_value < second_target_value);
+
+    a[target_index + step] = first_target_value - second_target_value;
+
+}
+
+__global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psiinv_powers[], int n, unsigned long long n_inv, int n_of_groups)
+{
+    int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
+
+    unsigned long q2 = (q + 1) >> 1;
+
+    int group_size = n/n_of_groups;
+    int n_of_thread_per_group = group_size/2; //we assume that 1 thread manages 2 coefficients
+    int step = n_of_thread_per_group;
+
+    int target_index = (global_tid/n_of_thread_per_group)*group_size+(global_tid % n_of_thread_per_group);
+
+    unsigned long long psiinv = psiinv_powers[n_of_groups + global_tid/n_of_thread_per_group];
+
+    unsigned long long first_target_value = a[target_index];
+
+    unsigned long long second_target_value = a[target_index + step];
+
+    unsigned long long target_result = first_target_value + second_target_value;
+
+    target_result -= q * (target_result >= q);
+
+    a[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+
+    first_target_value += q * (first_target_value < second_target_value);
+
+    unsigned __int128 temp_storage = first_target_value - second_target_value;
+
+    temp_storage *= psiinv;
+
+    singleBarrett(temp_storage, q, mu, qbit);
+
+    unsigned long long temp_storage_low = temp_storage;
+
+    a[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+        
+}
 
 #include <stdlib.h>
 #include <random>
@@ -215,6 +289,7 @@ void fillTablePsi64(unsigned long long psi, unsigned long long q, unsigned long 
 }
 
 //device variable;
+#define magicNumber 3
 long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
 size_t bytes;
 long d_phim, d_n_rows;
@@ -222,10 +297,10 @@ long d_phim, d_n_rows;
 long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
 void InitContiguousHostMapModulus(long phim, int n_rows){
-  contiguousHostMapA = (long *)malloc(2*phim*n_rows*sizeof(long));
-  contiguousHostMapB = (long *)malloc(2*phim*n_rows*sizeof(long));
-  contiguousModulus = (long *)malloc(2*n_rows*sizeof(long));
-  scalarPerRow = (long *)malloc(2*n_rows*sizeof(long));
+  contiguousHostMapA = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
+  contiguousHostMapB = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
+  contiguousModulus = (long *)malloc(magicNumber*n_rows*sizeof(long));
+  scalarPerRow = (long *)malloc(magicNumber*n_rows*sizeof(long));
 }
 
 void setScalar(long index, long data){
@@ -274,13 +349,13 @@ void InitGPUBuffer(long phim, int n_rows){
   d_phim = phim;
   d_n_rows = n_rows;
 
-  bytes = 2*phim*n_rows*sizeof(long);
+  bytes = magicNumber*phim*n_rows*sizeof(long);
   // Allocate memory for arrays d_A, d_B, and d_C on device
   cudaMalloc(&d_A, bytes);
   cudaMalloc(&d_B, bytes);
   cudaMalloc(&d_C, bytes);
-  cudaMalloc(&d_modulus, 2*d_n_rows*sizeof(long));
-  cudaMalloc(&d_scalar, 2*d_n_rows*sizeof(long));
+  cudaMalloc(&d_modulus, magicNumber*d_n_rows*sizeof(long));
+  cudaMalloc(&d_scalar, magicNumber*d_n_rows*sizeof(long));
 }
 
 void DestroyGPUBuffer(){
@@ -288,6 +363,9 @@ void DestroyGPUBuffer(){
     cudaFree(d_C);
     cudaFree(d_A);
     cudaFree(d_B);
+
+    cudaFree(d_modulus);
+    cudaFree(d_scalar);
 }
 
 
@@ -1014,8 +1092,20 @@ void gpu_ntt(unsigned int n, NTL::zz_pX& x, unsigned long long q, unsigned long 
     BEGIN
     Kernel Calls
     */
-    CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
-    GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    // CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    // GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    #pragma unroll
+    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+    { 
+        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+    }
+    #pragma unroll
+    for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+    {
+        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+    }
     /*
     END
     Kernel Calls
@@ -1134,10 +1224,27 @@ void gpu_ntt(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsi
     BEGIN
     Kernel Calls
     */
-    if(!inverse)
-      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
-    else
-      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    // if(!inverse)
+    //   CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    // else
+    //   GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    if(!inverse){
+      #pragma unroll
+      for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+      { 
+          CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+      }
+    }
+    else {
+      #pragma unroll
+      for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+    }
+    
     /*
     END
     Kernel Calls
@@ -1223,10 +1330,26 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned l
     BEGIN
     Kernel Calls
     */
-    if(!inverse)
-      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
-    else
-      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    // if(!inverse)
+    //   CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    // else
+    //   GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    if(!inverse){
+      #pragma unroll
+      for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+      { 
+          CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+      }
+    }
+    else {
+      #pragma unroll
+      for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+    }
     /*
     END
     Kernel Calls
@@ -1314,10 +1437,26 @@ void gpu_ntt(unsigned long long res[], unsigned int n, unsigned long long x[], u
     BEGIN
     Kernel Calls
     */
-    if(!inverse)
-      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
-    else
-      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    // if(!inverse)
+    //   CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    // else
+    //   GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    if(!inverse){
+      #pragma unroll
+      for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+      { 
+          CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+      }
+    }
+    else {
+      #pragma unroll
+      for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+    }
     /*
     END
     Kernel Calls
@@ -1405,10 +1544,26 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     BEGIN
     Kernel Calls
     */
-    if(!inverse)
-      CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
-    else
-      GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    // if(!inverse)
+    //   CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers);
+    // else
+    //   GSBasedINTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psiinv_powers);
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    if(!inverse){
+      #pragma unroll
+      for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+      { 
+          CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+      }
+    }
+    else {
+      #pragma unroll
+      for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+    }
     /*
     END
     Kernel Calls
