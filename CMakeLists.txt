@@ -136,7 +136,7 @@ option(PACKAGE_BUILD
 
 option(ENABLE_THREADS
        "Enable threads support.  Requires NTL built with NTL_THREADS=on"
-       ON)#Ardhi: set off to check the correctness on ifft
+       OFF)#Ardhi: set off to check the correctness on ifft
 
 option(HELIB_DEBUG
        "Build with HELIB_DEBUG (enables extra debugging info, but needs to be initialized)"

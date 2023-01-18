@@ -165,8 +165,8 @@ __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long
 
     temp_storage *= psi;
 
-    singleBarrett(temp_storage, q, mu, qbit);
-    // temp_storage %= q;
+    // singleBarrett(temp_storage, q, mu, qbit);
+    temp_storage %= q;
     unsigned long long second_target_value = temp_storage;
 
     unsigned long long target_result = first_target_value + second_target_value;
@@ -185,7 +185,7 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 {
     int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
 
-    unsigned long q2 = (q + 1) >> 1;
+    // unsigned long q2 = (q + 1) >> 1;
 
     int group_size = n/n_of_groups;
     int n_of_thread_per_group = group_size/2; //we assume that 1 thread manages 2 coefficients
@@ -203,7 +203,8 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
     target_result -= q * (target_result >= q);
 
-    a[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+    // a[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+    a[target_index] = target_result;
 
     first_target_value += q * (first_target_value < second_target_value);
 
@@ -211,11 +212,36 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
     temp_storage *= psiinv;
 
-    singleBarrett(temp_storage, q, mu, qbit);
+    // singleBarrett(temp_storage, q, mu, qbit);
+    temp_storage %= q;
 
     unsigned long long temp_storage_low = temp_storage;
 
-    a[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+    // a[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+    a[target_index + step] = temp_storage_low;
+
+    if(n_of_groups == 1){
+    //Ardhi: below code for normalization of the result i.e a[i]*(1/n)
+        group_size = n/1;
+        n_of_thread_per_group = group_size/2; //we assume that 1 thread manages 2 coefficients
+        step = n_of_thread_per_group;
+
+        target_index = (global_tid/n_of_thread_per_group)*group_size+(global_tid % n_of_thread_per_group);
+
+        // unsigned __int128 temp_storage;
+        
+        temp_storage = a[target_index];
+        temp_storage *= n_inv;
+        // singleBarrett(temp_storage, q, mu, qbit);
+        temp_storage %= q;
+        a[target_index] = temp_storage;
+
+        temp_storage = a[target_index+step];
+        temp_storage *= n_inv;
+        // singleBarrett(temp_storage, q, mu, qbit);
+        temp_storage %= q;
+        a[target_index+step] = temp_storage;
+    }
         
 }
 
@@ -1070,6 +1096,7 @@ void gpu_ntt(unsigned int n, NTL::zz_pX& x, unsigned long long q, unsigned long 
     unsigned long long* a;
     cudaMallocHost(&a, sizeof(unsigned long long) * n);
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     long dx = deg(x);
     for(int i=0; i <= dx; i++)
       a[i] = NTL::rep(x.rep[i]);
@@ -1308,17 +1335,25 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned l
 
 
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
-    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
+
+    // cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
+    // long dx = deg(x);
+    // for(int i=0; i <= dx; i++)
+    //   a[i] = NTL::rep(x.rep[i]);
+
     long dx = deg(x);
-    for(int i=0; i <= dx; i++)
-      a[i] = NTL::rep(x.rep[i]);
+    for(int i=0; i < n; i++)
+      if(i<=dx)
+        a[i] = NTL::rep(x.rep[i]);
+      else
+        a[i]=0;
 
     // unsigned long long* res_a;
     // cudaMallocHost(&res_a, sizeof(unsigned long long) * n);
 
 
 
-    cudaMemcpyAsync(d_a, a, size_array, cudaMemcpyHostToDevice, 0);
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
 
     /*
     END
@@ -1354,13 +1389,57 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned l
     END
     Kernel Calls
     ****************************************************************/
+    #if 0 //Ardhi: check for correctness//flipped from the above codes//this code is not used
+      unsigned long long* a_clone;
+      cudaMallocHost(&a_clone, sizeof(unsigned long long) * n);
+      cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 
-    cudaMemcpyAsync(a, d_a, size_array, cudaMemcpyDeviceToHost, 0);  // do this in async 
+      if(inverse){
+        #pragma unroll
+        for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+        { 
+            CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+        }
+      }
+      else {
+        #pragma unroll
+        for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+        {
+            GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+        }
+      }
+      cudaMemcpy(a_clone, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+      for (long i = 0; i < n; i++)
+      {
+        if(a_clone[i] != a[i]){
+              printf("a: %lu, a_clone: %lu, x: %lu\n", a[i], a_clone[i], rep(x.rep[i]));
+              throw std::runtime_error("a and a_clone missmatch");
+        }
+      }
+
+      if(!inverse){
+        #pragma unroll
+        for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+        { 
+            CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+        }
+      }
+      else {
+        #pragma unroll
+        for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+        {
+            GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+        }
+      }
+    #endif
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
 
     cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 
     for(long i=0; i<n; i++)
       res[i] = a[i];
+
 
     // cudaFreeHost(a);
     // cudaFree(d_a);
@@ -1415,6 +1494,7 @@ void gpu_ntt(unsigned long long res[], unsigned int n, unsigned long long x[], u
     // unsigned long long* a;
     // cudaMallocHost(&a, sizeof(unsigned long long) * n);
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
+
     cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
     for(int i=0; i < n; i++)
       a[i] = x[i];
@@ -1522,7 +1602,8 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     // unsigned long long* a;
     // cudaMallocHost(&a, sizeof(unsigned long long) * n);
     // randomArray64(a, n, q); //fill array with random numbers between 0 and q - 1
-    cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long));
+
+    // cudaMemset(a, 0, size_t(n)*sizeof(unsigned long long)); //Ardhi: this is not needed since all a's element is overrided
     for(int i=0; i < n; i++)
       a[i] = rep(x[i]);
 
@@ -1532,7 +1613,7 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     // unsigned long long* d_a;
     // cudaMalloc(&d_a, size_array);
 
-    cudaMemcpyAsync(d_a, a, size_array, cudaMemcpyHostToDevice, 0);
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
 
     /*
     END
@@ -1569,7 +1650,7 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     Kernel Calls
     ****************************************************************/
 
-    cudaMemcpyAsync(a, d_a, size_array, cudaMemcpyDeviceToHost, 0);  // do this in async 
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
 
     cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 

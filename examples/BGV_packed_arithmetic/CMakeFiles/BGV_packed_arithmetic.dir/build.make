@@ -92,6 +92,9 @@ BGV_packed_arithmetic_EXTERNAL_OBJECTS =
 
 BGV_packed_arithmetic: CMakeFiles/BGV_packed_arithmetic.dir/BGV_packed_arithmetic.cpp.o
 BGV_packed_arithmetic: CMakeFiles/BGV_packed_arithmetic.dir/build.make
+BGV_packed_arithmetic: /usr/local/lib/libhelib.a
+BGV_packed_arithmetic: /usr/local/lib/libntl.so
+BGV_packed_arithmetic: /usr/local/lib/libgmp.so
 BGV_packed_arithmetic: CMakeFiles/BGV_packed_arithmetic.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/examples/BGV_packed_arithmetic/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable BGV_packed_arithmetic"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/BGV_packed_arithmetic.dir/link.txt --verbose=$(VERBOSE)

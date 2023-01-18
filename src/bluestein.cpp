@@ -145,14 +145,18 @@ void BluesteinInit(long n,
   gpu_ntt(RbInVec, k2, b, p,rep(psi), inv_psi, false); //Ardhi: convert b->RbInVec aka vec<long>
 #endif
 #if 1 //check the forward transform is correct or not
-  NTL::vec_zz_p reverse_Rb(NTL::INIT_SIZE, k2);
-  gpu_ntt(reverse_Rb, k2, RbInVec, p, rep(psi), inv_psi, true);
+  NTL::vec_zz_p reverse_RbInVec;
+  reverse_RbInVec.SetLength(k2);
+  gpu_ntt(reverse_RbInVec, k2, RbInVec, p, rep(psi), inv_psi, true);
   // std::cout<<"\npsi: "<<rep(psi)<<" RbInVec: ";
-  for (long i = 0; i < reverse_Rb.length(); i++)
+  long dx = deg(b);
+  for (long i = 0; i <= dx; i++)
   {
-    std::cout<<RbInVec[i]<<" ";
-    if(reverse_Rb[i] != b[i])
+    // std::cout<<RbInVec[i]<<" ";
+    if(reverse_RbInVec[i] != b.rep[i]){
+          printf("b: %lu, reverseRbInVec: %lu\n", rep(b.rep[i]), rep(reverse_RbInVec[i]));
           throw RuntimeError("Cmod::bluesteinInit(): b to RbInVec conversion error");
+    }
   }
 #endif
 
@@ -279,7 +283,7 @@ void BluesteinFFT(NTL::zz_pX& x,
 #endif
 #if 0
     FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
-    #if 1//check correctness
+    #if 0//check correctness
       dx = deg(x);
       for(long i=0; i<= dx; i++){
         if(rep(x[i]) != rep(RaInVec[i]))
@@ -309,7 +313,7 @@ void BluesteinFFT(NTL::zz_pX& x,
     #endif
 #endif
     dx = deg(x);
-    printf("dx:%lu \n", dx);
+    // printf("dx:%lu \n", dx);
     if (dx >= n) {
       // reduce mod x^n-1
       for (long i = n; i <= dx; i++) {

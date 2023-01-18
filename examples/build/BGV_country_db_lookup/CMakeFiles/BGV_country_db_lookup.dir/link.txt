@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/BGV_country_db_lookup.dir/BGV_country_db_lookup.cpp.o -o ../bin/BGV_country_db_lookup  -Wl,-rpath,/usr/local/lib /usr/local/lib/libhelib.a /usr/local/lib/libntl.so /usr/local/lib/libgmp.so -lpthread 
