@@ -141,7 +141,6 @@ void BluesteinInit(long n,
   TofftRep(Rb, b, k);
 #endif
 #if 1
-  
   long inv_psi = NTL::InvMod(rep(psi), p);
 
 
