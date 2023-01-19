@@ -79,7 +79,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, NTL::zz_pX& RbInPoly)
+                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers)
 {
   long p = NTL::zz_p::modulus();
 
@@ -141,10 +141,14 @@ void BluesteinInit(long n,
   TofftRep(Rb, b, k);
 #endif
 #if 1
+  
   long inv_psi = NTL::InvMod(rep(psi), p);
-  gpu_ntt(RbInVec, k2, b, p,rep(psi), inv_psi, false); //Ardhi: convert b->RbInVec aka vec<long>
+
+
+  // gpu_ntt(RbInVec, k2, b, p,rep(psi), NTL::InvMod(rep(psi), p), false); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
+  gpu_ntt_forward(RbInVec, k2, b, p, gpu_powers, rep(psi), inv_psi); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
 #endif
-#if 1 //check the forward transform is correct or not
+#if 0 //check the forward transform is correct or not
   NTL::vec_zz_p reverse_RbInVec;
   reverse_RbInVec.SetLength(k2);
   gpu_ntt(reverse_RbInVec, k2, RbInVec, p, rep(psi), inv_psi, true);
@@ -183,7 +187,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, const NTL::zz_pX& RbInPoly)
+                  const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
 {
   HELIB_TIMER_START;
 
@@ -263,7 +267,8 @@ void BluesteinFFT(NTL::zz_pX& x,
   }
 #endif
 #if 1
-    gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT
+    // gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT // zz_pX to vec_zz_p
+    gpu_ntt_forward(RaInVec, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
 
     // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
     for (long i = 0; i < RaInVec.length(); i++)
@@ -271,7 +276,8 @@ void BluesteinFFT(NTL::zz_pX& x,
       RaInVec[i] *= RbInVec[i];
     }
     
-    gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT
+    // gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT //vec_zz_p to vec_zz_p
+    gpu_ntt_backward(RaInVec, k2, RaInVec,p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
 #endif
 #if 1
     long l = 2*(n-1)+1;

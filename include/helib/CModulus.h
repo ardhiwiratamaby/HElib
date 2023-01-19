@@ -80,6 +80,9 @@ private:
   // CopiedPtr<NTL::zz_p> psi_inv;  
   NTL::zz_p psi;
   NTL::zz_p psi_inv;
+  //Ardhi: tables for forward and backward GPU NTT
+  CopiedPtr<std::vector<unsigned long long>> gpu_powers;
+  CopiedPtr<std::vector<unsigned long long>> gpu_ipowers;
 
   // tables for forward FFT
   CopiedPtr<NTL::zz_pX> powers;

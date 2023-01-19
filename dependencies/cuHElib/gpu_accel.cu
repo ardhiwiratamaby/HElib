@@ -1660,3 +1660,159 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     // cudaFreeHost(a);
     // cudaFree(d_a);
 }
+
+void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    unsigned int q_bit = ceil(std::log2(q));
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+#if 0 //Ardhi: check psi computation
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    for(long i=0; i<n; i++){
+      if(psiTable[i] != gpu_powers[i]){
+          throw std::runtime_error("psiTable and gpu_powers missmatch");
+      }
+    }
+
+#endif
+
+    // const unsigned long long *twiddle_factors = gpu_powers.data();
+    cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    long dx = deg(x);
+    for(int i=0; i < n; i++)
+      if(i<=dx)
+        a[i] = NTL::rep(x.rep[i]);
+      else
+        a[i]=0;
+
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    #pragma unroll
+    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+    { 
+        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+    }
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+}
+
+void gpu_ntt_backward(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigned long long q, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    unsigned int q_bit = ceil(std::log2(q));
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+#if 0 //Ardhi: check psi computation
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    for(long i=0; i<n; i++){
+      if(psiinvTable[i] != gpu_ipowers[i]){
+          throw std::runtime_error("psiTable and gpu_powers missmatch");
+      }
+    }
+
+#endif
+
+    // const unsigned long long *twiddle_factors = gpu_powers.data();
+    cudaMemcpy(psiinv_powers, gpu_ipowers.data(), size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    for(int i=0; i < n; i++)
+      a[i] = rep(x[i]);
+
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    #pragma unroll
+    for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+    {
+        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+    }
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+}

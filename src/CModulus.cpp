@@ -59,6 +59,23 @@ NTL::zz_pContext BuildContext(long p, long maxroot)
     return NTL::zz_pContext(p, maxroot);
 }
 
+unsigned long long bitReverse(unsigned long long a, int bit_length)  // reverses the bits for twiddle factor calculation
+{
+    // cout<<"a: "<<a;
+    unsigned long long res = 0;
+
+    for (int i = 0; i < bit_length; i++)
+    {
+        res <<= 1;
+        res = (a & 1) | res;
+        a >>= 1;
+    }
+
+    // cout<<"\n reverse A: "<<res<<endl;
+    return res;
+}
+
+
 // Constructor: it is assumed that zms is already set with m>1
 // If q == 0, then the current context is used
 Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
@@ -179,6 +196,9 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   iRbInVec.reset(new NTL::vec_zz_p);
   RbInPoly.reset(new NTL::zz_pX);
   iRbInPoly.reset(new NTL::zz_pX);
+  gpu_powers.reset(new std::vector<unsigned long long>);
+  gpu_ipowers.reset(new std::vector<unsigned long long>);
+
   // myPsi.reset(new NTL::vec_zz_p);
 
   // psi = 0;
@@ -204,9 +224,24 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   long inv_psi = NTL::InvMod(rep(psi), p);
   psi_inv = inv_psi;
 
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly);
+  gpu_powers->reserve(k2);
+  gpu_ipowers->reserve(k2);
+  
+  //Ardhi: generate twiddle factors for gpu ntt with n=2^k
+  for (unsigned int i = 0; i < k2; i++)
+  {
+      gpu_powers->push_back(NTL::PowerMod(rep(psi), bitReverse(i, std::log2(k2)), p));
+      gpu_ipowers->push_back(NTL::PowerMod(inv_psi, bitReverse(i, std::log2(k2)), p));
+
+      // gpu_powers[i] = modpow64(rep(psi), bitReverse(i, std::log2(k2)), p);
+      // gpu_ipowers[i] = NTL::PowerMod(inv_psi, bitReverse(i, std::log2(k2)), p);
+
+  }
+
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly, *gpu_powers);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly, *gpu_ipowers);
 }
+
 
 Cmodulus& Cmodulus::operator=(const Cmodulus& other)
 {
@@ -249,6 +284,9 @@ Cmodulus& Cmodulus::operator=(const Cmodulus& other)
   psi_inv = other.psi_inv;
   RbInPoly = other.RbInPoly;
   iRbInPoly = other.iRbInPoly;
+  gpu_powers = other.gpu_powers;
+  gpu_ipowers = other.gpu_ipowers;
+
   // myPsi = other.myPsi;
 
 #ifdef HELIB_OPENCL
@@ -473,7 +511,7 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   // std::cout<<std::endl;
 
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly);
+  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, *RbInVec, psi, *RbInPoly, *gpu_powers, *gpu_ipowers);
 
   // std::cout<<"\nAfter BluesteinFFT\n";
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
@@ -610,7 +648,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, *iRbInVec, psi_inv, *iRbInPoly, *gpu_ipowers, *gpu_powers); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
   {
