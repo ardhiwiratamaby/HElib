@@ -266,19 +266,22 @@ void BluesteinFFT(NTL::zz_pX& x,
           throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
   }
 #endif
-#if 1
-    // gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT // zz_pX to vec_zz_p
-    gpu_ntt_forward(RaInVec, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
+#if 1 //Ardhi: Naive BluesteinGPU
+  // gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT // zz_pX to vec_zz_p
+  gpu_ntt_forward(RaInVec, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
 
-    // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
-    for (long i = 0; i < RaInVec.length(); i++)
-    {   
-      RaInVec[i] *= RbInVec[i];
-    }
-    
-    // gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT //vec_zz_p to vec_zz_p
-    gpu_ntt_backward(RaInVec, k2, RaInVec,p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
+  // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
+  for (long i = 0; i < RaInVec.length(); i++)
+  {   
+    RaInVec[i] *= RbInVec[i];
+  }
+  
+  // gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT //vec_zz_p to vec_zz_p
+  gpu_ntt_backward(RaInVec, k2, RaInVec,p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
+#else
+  gpu_fused_polymul(RaInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
 #endif
+
 #if 1
     long l = 2*(n-1)+1;
     x.rep.SetLength(l);

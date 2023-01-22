@@ -23,9 +23,11 @@ __device__ __forceinline__ void singleBarrett(unsigned __int128& a, unsigned lon
     a -= q * (a >= q);
 }
 
-#if 0 //CT & GS for 2048 ntt points
-__global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[])
+#if 1 //CT & GS for 2048 ntt points
+__global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[], int n_of_groups)
 {
+    // unsigned long long *a;
+    // a = &d_a[blockIdx.x * 2048];
     int local_tid = threadIdx.x;
 
     extern __shared__ unsigned long long shared_array[];
@@ -48,7 +50,9 @@ __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long
 
         psi_step = (local_tid + blockIdx.x * 1024) / step;
 
-        unsigned long long psi = psi_powers[length + psi_step];
+        // unsigned long long psi = psi_powers[length + psi_step];
+
+        unsigned long long psi = psi_powers[n_of_groups + (threadIdx.x + blockIdx.x * THREADS_PER_BLOCK)/(1024/length)];
 
         unsigned long long first_target_value = shared_array[target_index];
         // unsigned long long temp_storage = shared_array[target_index + step];  // this is for eliminating the possibility of overflow
@@ -56,8 +60,8 @@ __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long
 
         temp_storage *= psi;
 
-        singleBarrett(temp_storage, q, mu, qbit);
-        // temp_storage %= q;
+        // singleBarrett(temp_storage, q, mu, qbit);
+        temp_storage %= q;
         unsigned long long second_target_value = temp_storage;
 
         unsigned long long target_result = first_target_value + second_target_value;
@@ -70,6 +74,8 @@ __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long
 
         shared_array[target_index + step] = first_target_value - second_target_value;
 
+        n_of_groups *= 2;
+
         __syncthreads();
     }
 
@@ -79,16 +85,15 @@ __global__ void CTBasedNTTInnerSingle(unsigned long long a[], unsigned long long
         int global_tid = local_tid + iteration_num * 1024;
         a[global_tid + blockIdx.x * 2048] = shared_array[global_tid];
     }
-
 }
 
-__global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psiinv_powers[])
+__global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psiinv_powers[], int n, int n_of_groups)
 {
     int local_tid = threadIdx.x;
 
     extern __shared__ unsigned long long shared_array[];
 
-    unsigned long q2 = (q + 1) >> 1;
+    // unsigned long q2 = (q + 1) >> 1;
 
     #pragma unroll
     for (int iteration_num = 0; iteration_num < 2; iteration_num++)
@@ -99,6 +104,9 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
     __syncthreads();
 
+
+    int group_size = 2;// =n/n_of_groups
+    n_of_groups = n/2;
     #pragma unroll
     for (int length = 1024; length >= 1; length /= 2)
     {  // iterations for intt
@@ -109,7 +117,11 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
         psi_step = (local_tid + blockIdx.x * 1024) / step;
 
-        unsigned long long psiinv = psiinv_powers[length + psi_step];
+        // unsigned long long psiinv = psiinv_powers[length + psi_step];
+        int n_of_thread_per_group = (group_size/2);
+        unsigned long long psiinv = psiinv_powers[n_of_groups + (threadIdx.x + blockIdx.x * THREADS_PER_BLOCK)/n_of_thread_per_group];
+        //unsigned long long psiinv = psiinv_powers[n_of_groups + global_tid/n_of_thread_per_group];
+        // printf("n_of_groups: %d, global_tid %d, target_index: %d, psi_index: %d\n", length, (threadIdx.x + blockIdx.x * THREADS_PER_BLOCK), target_index, length + (threadIdx.x + blockIdx.x * THREADS_PER_BLOCK)/n_of_thread_per_group);
 
         unsigned long long first_target_value = shared_array[target_index];
         unsigned long long second_target_value = shared_array[target_index + step];
@@ -118,7 +130,8 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
         target_result -= q * (target_result >= q);
 
-        shared_array[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+        // shared_array[target_index] = (target_result >> 1) + q2 * (target_result & 1);
+        shared_array[target_index] =target_result;
 
         first_target_value += q * (first_target_value < second_target_value);
 
@@ -127,14 +140,17 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
         temp_storage *= psiinv;
 
-        singleBarrett(temp_storage, q, mu, qbit);
-        // temp_storage %= q;
+        // singleBarrett(temp_storage, q, mu, qbit);
+        temp_storage %= q;
         
         unsigned long long temp_storage_low = temp_storage;
 
-        shared_array[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+        // shared_array[target_index + step] = (temp_storage_low >> 1) + q2 * (temp_storage_low & 1);
+        shared_array[target_index + step] = temp_storage_low;
         
-
+        n_of_groups /= 2;
+        group_size *= 2;
+        
         __syncthreads();
     }
 
@@ -144,6 +160,7 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
         int global_tid = local_tid + iteration_num * 1024;
         a[global_tid + blockIdx.x * 2048] = shared_array[global_tid];
     }
+    
 }
 #endif
 
@@ -195,6 +212,8 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
 
     unsigned long long psiinv = psiinv_powers[n_of_groups + global_tid/n_of_thread_per_group];
 
+    // printf("n_of_groups: %d, global_tid %d, target_index: %d, psi_index: %d\n", n_of_groups, global_tid, target_index, n_of_groups + global_tid/n_of_thread_per_group);
+
     unsigned long long first_target_value = a[target_index];
 
     unsigned long long second_target_value = a[target_index + step];
@@ -243,6 +262,43 @@ __global__ void GSBasedINTTInnerSingle(unsigned long long a[], unsigned long lon
         a[target_index+step] = temp_storage;
     }
         
+}
+
+__global__ void CTBasedNTTInnerSingleAndMulMod(unsigned long long a[], unsigned long long b[], unsigned long long q, unsigned long long mu, int qbit, unsigned long long psi_powers[], int n, int n_of_groups)
+{
+    int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
+
+    int group_size = n/n_of_groups;
+    int n_of_thread_per_group = group_size/2; //we assume that 1 thread manages 2 coefficients
+    int step = n_of_thread_per_group;
+
+    int target_index = (global_tid/n_of_thread_per_group)*group_size+(global_tid % n_of_thread_per_group);
+
+    unsigned long long psi = psi_powers[n_of_groups + global_tid/n_of_thread_per_group];
+
+    unsigned long long first_target_value = a[target_index];
+
+    unsigned __int128 temp_storage = a[target_index + step];  // this is for eliminating the possibility of overflow
+
+    temp_storage *= psi;
+
+    // singleBarrett(temp_storage, q, mu, qbit);
+    temp_storage %= q;
+    unsigned long long second_target_value = temp_storage;
+
+    unsigned long long target_result = first_target_value + second_target_value;
+
+    target_result -= q * (target_result >= q);
+
+    a[target_index] = target_result;
+
+    first_target_value += q * (first_target_value < second_target_value);
+
+    a[target_index + step] = first_target_value - second_target_value;
+
+    if(n_of_groups == n/2){
+
+    }
 }
 
 #include <stdlib.h>
@@ -1169,8 +1225,10 @@ void gpu_ntt(unsigned int n, NTL::zz_pX& x, unsigned long long q, unsigned long 
 unsigned long long* psi_powers, * psiinv_powers;
 unsigned long long* a;
 unsigned long long* d_a;
+unsigned long long* d_b;
 unsigned long long* psiTable;
 unsigned long long* psiinvTable;
+cudaStream_t stream[32];
 
 void init_gpu_ntt(unsigned int n){
     int size_array = sizeof(unsigned long long) * n;
@@ -1178,8 +1236,12 @@ void init_gpu_ntt(unsigned int n){
     cudaMalloc(&psiinv_powers, size_array);
     cudaMallocHost(&a, sizeof(unsigned long long) * n);
     cudaMalloc(&d_a, size_array);
+    cudaMalloc(&d_b, size_array);
     psiTable = (unsigned long long*)malloc(size_array);
     psiinvTable = (unsigned long long*)malloc(size_array);
+
+    for (int i = 0; i < 32; ++i)
+      cudaStreamCreate(&stream[i]); 
 }
 
 void gpu_ntt(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
@@ -1722,11 +1784,23 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
 
     long n_inv = NTL::InvMod(n, q);
     int num_blocks = n/(THREADS_PER_BLOCK*2);
+    int n_of_groups=1;
     #pragma unroll
-    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
-    { 
+    // for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+    for (n_of_groups = 1; (n/n_of_groups>2048); n_of_groups *= 2) //Ardhi: do the ntt until the working size is 2048 elements
+    {
         CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
     }
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    // for(int i=0; i<32; i++){
+    //     int offset = i*2048;
+    //     CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), stream[i]>>>(d_a+offset, q, mu, bit_length, psi_powers);
+    // }
+
+    CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers, n_of_groups);
+
     /*
     END
     Kernel Calls
@@ -1798,10 +1872,107 @@ void gpu_ntt_backward(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x
 
     long n_inv = NTL::InvMod(n, q);
     int num_blocks = n/(THREADS_PER_BLOCK*2);
+
+#if 1
+    GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, psiinv_powers, n, n/2);
+
+    if(n>2048){
+      #pragma unroll
+      // for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2) 
+      for (int n_of_groups = (n/2048)/2; n_of_groups >= 1; n_of_groups /= 2) 
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+    }
+#else
+      #pragma unroll
+      for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2) 
+      {
+          GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+      }
+#endif
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+}
+
+__global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, long phim){
+  int tid = blockDim.x * blockIdx.x + threadIdx.x;
+  __int128 temp_res=0;
+  __int128 temp_a=0;
+  __int128 temp_b=0;
+
+  temp_a = a[tid];
+  temp_b = b[tid];
+
+  temp_res = temp_a * temp_b;
+  temp_res = myMod2(temp_res, d_modulus);
+
+  result[tid]=temp_res;
+}
+
+void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, NTL::vec_zz_p& b, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    unsigned int q_bit = ceil(std::log2(q));
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+    // const unsigned long long *twiddle_factors = gpu_powers.data();
+    cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b.data(), size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    long dx = deg(x);
+    for(int i=0; i < n; i++)
+      if(i<=dx)
+        a[i] = NTL::rep(x.rep[i]);
+      else
+        a[i]=0;
+
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
     #pragma unroll
-    for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
-    {
-        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+    { 
+        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
     }
     /*
     END
