@@ -137,7 +137,7 @@ void BluesteinInit(long n,
 
   RbInPoly = b;
 
-#if 1
+#if 0
   TofftRep(Rb, b, k);
 #endif
 #if 1
