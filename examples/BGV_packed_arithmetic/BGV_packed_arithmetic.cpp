@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   helib::Ctxt ctxt(public_key);
   // Encrypt the plaintext using the public_key
   public_key.Encrypt(ctxt, ptxt);
-
+  
   /********** Operations **********/
   // Ciphertext and plaintext operations are performed
   // "entry-wise".
@@ -147,7 +147,6 @@ int main(int argc, char* argv[])
   helib::Ptxt<helib::BGV> plaintext_result(context);
   // Decrypt the modified ciphertext
   secret_key.Decrypt(plaintext_result, ctxt);
-
   std::cout << "Operation: 2(a*a)/(a*a) - 2(a*a)/(a*a) = 0" << std::endl;
   // Print the decrypted plaintext
   // Should be [0] [0] [0] ... [0] [0]

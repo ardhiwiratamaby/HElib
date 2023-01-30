@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
   HELIB_NTIMER_STOP(mul0); // stops the time "mul0"
   printNamedTimer(cout, "mul0");
   // On my machine, this took about 4.6s
-
+  
   // A pre-computation is performed by "encoding" the matrix, as follows:
   HELIB_NTIMER_START(encode);
   EncodedMatMul_CKKS emat(mat);

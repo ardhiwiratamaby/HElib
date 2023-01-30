@@ -57,10 +57,10 @@ RM = /home/ardhy/anaconda2/lib/python2.7/site-packages/cmake/data/bin/cmake -E r
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/aes
+CMAKE_SOURCE_DIR = /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/aes
+CMAKE_BINARY_DIR = /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/aes/CMakeFiles /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/aes//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul/CMakeFiles /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/aes/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,89 +117,137 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named TEST_AES
+# Target rules for targets named MatMul
 
 # Build rule for target.
-TEST_AES: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TEST_AES
-.PHONY : TEST_AES
+MatMul: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 MatMul
+.PHONY : MatMul
 
 # fast build rule for target.
-TEST_AES/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/build
-.PHONY : TEST_AES/fast
+MatMul/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/build
+.PHONY : MatMul/fast
 
-Test_AES.o: Test_AES.cpp.o
-.PHONY : Test_AES.o
-
-# target to build an object file
-Test_AES.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/Test_AES.cpp.o
-.PHONY : Test_AES.cpp.o
-
-Test_AES.i: Test_AES.cpp.i
-.PHONY : Test_AES.i
-
-# target to preprocess a source file
-Test_AES.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/Test_AES.cpp.i
-.PHONY : Test_AES.cpp.i
-
-Test_AES.s: Test_AES.cpp.s
-.PHONY : Test_AES.s
-
-# target to generate assembly for a file
-Test_AES.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/Test_AES.cpp.s
-.PHONY : Test_AES.cpp.s
-
-homAES.o: homAES.cpp.o
-.PHONY : homAES.o
+Test_matmul.o: Test_matmul.cpp.o
+.PHONY : Test_matmul.o
 
 # target to build an object file
-homAES.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/homAES.cpp.o
-.PHONY : homAES.cpp.o
+Test_matmul.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/Test_matmul.cpp.o
+.PHONY : Test_matmul.cpp.o
 
-homAES.i: homAES.cpp.i
-.PHONY : homAES.i
+Test_matmul.i: Test_matmul.cpp.i
+.PHONY : Test_matmul.i
 
 # target to preprocess a source file
-homAES.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/homAES.cpp.i
-.PHONY : homAES.cpp.i
+Test_matmul.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/Test_matmul.cpp.i
+.PHONY : Test_matmul.cpp.i
 
-homAES.s: homAES.cpp.s
-.PHONY : homAES.s
+Test_matmul.s: Test_matmul.cpp.s
+.PHONY : Test_matmul.s
 
 # target to generate assembly for a file
-homAES.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/homAES.cpp.s
-.PHONY : homAES.cpp.s
+Test_matmul.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/Test_matmul.cpp.s
+.PHONY : Test_matmul.cpp.s
 
-simpleAES.o: simpleAES.cpp.o
-.PHONY : simpleAES.o
+blockMatmul.o: blockMatmul.cpp.o
+.PHONY : blockMatmul.o
 
 # target to build an object file
-simpleAES.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/simpleAES.cpp.o
-.PHONY : simpleAES.cpp.o
+blockMatmul.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul.cpp.o
+.PHONY : blockMatmul.cpp.o
 
-simpleAES.i: simpleAES.cpp.i
-.PHONY : simpleAES.i
+blockMatmul.i: blockMatmul.cpp.i
+.PHONY : blockMatmul.i
 
 # target to preprocess a source file
-simpleAES.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/simpleAES.cpp.i
-.PHONY : simpleAES.cpp.i
+blockMatmul.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul.cpp.i
+.PHONY : blockMatmul.cpp.i
 
-simpleAES.s: simpleAES.cpp.s
-.PHONY : simpleAES.s
+blockMatmul.s: blockMatmul.cpp.s
+.PHONY : blockMatmul.s
 
 # target to generate assembly for a file
-simpleAES.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TEST_AES.dir/build.make CMakeFiles/TEST_AES.dir/simpleAES.cpp.s
-.PHONY : simpleAES.cpp.s
+blockMatmul.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul.cpp.s
+.PHONY : blockMatmul.cpp.s
+
+blockMatmul1D.o: blockMatmul1D.cpp.o
+.PHONY : blockMatmul1D.o
+
+# target to build an object file
+blockMatmul1D.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul1D.cpp.o
+.PHONY : blockMatmul1D.cpp.o
+
+blockMatmul1D.i: blockMatmul1D.cpp.i
+.PHONY : blockMatmul1D.i
+
+# target to preprocess a source file
+blockMatmul1D.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul1D.cpp.i
+.PHONY : blockMatmul1D.cpp.i
+
+blockMatmul1D.s: blockMatmul1D.cpp.s
+.PHONY : blockMatmul1D.s
+
+# target to generate assembly for a file
+blockMatmul1D.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/blockMatmul1D.cpp.s
+.PHONY : blockMatmul1D.cpp.s
+
+matmul.o: matmul.cpp.o
+.PHONY : matmul.o
+
+# target to build an object file
+matmul.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul.cpp.o
+.PHONY : matmul.cpp.o
+
+matmul.i: matmul.cpp.i
+.PHONY : matmul.i
+
+# target to preprocess a source file
+matmul.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul.cpp.i
+.PHONY : matmul.cpp.i
+
+matmul.s: matmul.cpp.s
+.PHONY : matmul.s
+
+# target to generate assembly for a file
+matmul.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul.cpp.s
+.PHONY : matmul.cpp.s
+
+matmul1D.o: matmul1D.cpp.o
+.PHONY : matmul1D.o
+
+# target to build an object file
+matmul1D.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul1D.cpp.o
+.PHONY : matmul1D.cpp.o
+
+matmul1D.i: matmul1D.cpp.i
+.PHONY : matmul1D.i
+
+# target to preprocess a source file
+matmul1D.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul1D.cpp.i
+.PHONY : matmul1D.cpp.i
+
+matmul1D.s: matmul1D.cpp.s
+.PHONY : matmul1D.s
+
+# target to generate assembly for a file
+matmul1D.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MatMul.dir/build.make CMakeFiles/MatMul.dir/matmul1D.cpp.s
+.PHONY : matmul1D.cpp.s
 
 # Help Target
 help:
@@ -209,16 +257,22 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... TEST_AES"
-	@echo "... Test_AES.o"
-	@echo "... Test_AES.i"
-	@echo "... Test_AES.s"
-	@echo "... homAES.o"
-	@echo "... homAES.i"
-	@echo "... homAES.s"
-	@echo "... simpleAES.o"
-	@echo "... simpleAES.i"
-	@echo "... simpleAES.s"
+	@echo "... MatMul"
+	@echo "... Test_matmul.o"
+	@echo "... Test_matmul.i"
+	@echo "... Test_matmul.s"
+	@echo "... blockMatmul.o"
+	@echo "... blockMatmul.i"
+	@echo "... blockMatmul.s"
+	@echo "... blockMatmul1D.o"
+	@echo "... blockMatmul1D.i"
+	@echo "... blockMatmul1D.s"
+	@echo "... matmul.o"
+	@echo "... matmul.i"
+	@echo "... matmul.s"
+	@echo "... matmul1D.o"
+	@echo "... matmul1D.i"
+	@echo "... matmul1D.s"
 .PHONY : help
 
 

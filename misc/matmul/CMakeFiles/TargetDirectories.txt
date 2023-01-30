@@ -1,0 +1,3 @@
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul/CMakeFiles/MatMul.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul/CMakeFiles/edit_cache.dir
+/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/misc/matmul/CMakeFiles/rebuild_cache.dir

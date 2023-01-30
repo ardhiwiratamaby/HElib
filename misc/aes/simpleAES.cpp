@@ -55,6 +55,9 @@ http://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 // The Key input to the AES Program
 // unsigned char Key[32];
 
+//using namespace helib;
+using namespace std;
+
 int getSBoxValue(int num)
 {
   int sbox[256] =   {
