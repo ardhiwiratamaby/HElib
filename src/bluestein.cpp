@@ -164,11 +164,17 @@ void BluesteinFFT(NTL::zz_pX& x,
   // truncation in certain cases.
 
   if (NEW_BLUE && n % 2 != 0) {
+ 	HELIB_NTIMER_START(PolyMul);
     TofftRep_trunc(Ra, x, k, 2 * n - 1);
 
+	HELIB_NTIMER_START(PolyMul_mulmod);
     mul(Ra, Ra, Rb); // multiply in FFT representation
+	HELIB_NTIMER_STOP(PolyMul_mulmod);
 
     FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
+	HELIB_NTIMER_STOP(PolyMul);
+
+ 	HELIB_NTIMER_START(RestofBluestein);
     dx = deg(x);
     if (dx >= n) {
       // reduce mod x^n-1
@@ -185,6 +191,7 @@ void BluesteinFFT(NTL::zz_pX& x,
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
     x.normalize();
+ 	HELIB_NTIMER_STOP(RestofBluestein);
   } else {
     TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);
 
