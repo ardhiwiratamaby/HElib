@@ -1745,6 +1745,8 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
 
 #endif
 
+	HELIB_NTIMER_START(CudaMemCpyHD);
+
     // const unsigned long long *twiddle_factors = gpu_powers.data();
     cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
 
@@ -1771,6 +1773,7 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
 
     cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
 
+	HELIB_NTIMER_STOP(CudaMemCpyHD);
     /*
     END
     cudamalloc, memcpy, etc... for gpu
@@ -1781,7 +1784,7 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
     BEGIN
     Kernel Calls
     */
-
+	HELIB_NTIMER_START(KernelNTT);
     long n_inv = NTL::InvMod(n, q);
     int num_blocks = n/(THREADS_PER_BLOCK*2);
     int n_of_groups=1;
@@ -1800,18 +1803,22 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
     // }
 
     CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers, n_of_groups);
+	HELIB_NTIMER_STOP(KernelNTT);
 
     /*
     END
     Kernel Calls
     ****************************************************************/
-
+	HELIB_NTIMER_START(CudaMemCpyDH);
     cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+	HELIB_NTIMER_STOP(CudaMemCpyDH);
 
-    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+    // cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 
+	HELIB_NTIMER_START(BufferCopy);
     for(long i=0; i<n; i++)
-      res[i] = a[i];
+      res[i] = a[i]; //this is very expensive! around 8.5 seconds
+	HELIB_NTIMER_STOP(BufferCopy);
 
 }
 

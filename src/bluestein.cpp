@@ -187,7 +187,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
+                  UNUSED const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
 {
   HELIB_TIMER_START;
 
@@ -211,7 +211,9 @@ void BluesteinFFT(NTL::zz_pX& x,
   // std::cout<<"x after MulModPrecon: "<<x<<std::endl;
 
   long k = NTL::NextPowerOfTwo(2 * n - 1);
+#if 0
   NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
+#endif
   // Careful! we are multiplying polys of degrees 2*(n-1)
   // and (n-1) modulo x^k-1.  This gives us some
   // truncation in certain cases.
@@ -267,17 +269,21 @@ void BluesteinFFT(NTL::zz_pX& x,
   }
 #endif
 #if 1 //Ardhi: Naive BluesteinGPU
+	HELIB_NTIMER_START(PolyMul);
   // gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT // zz_pX to vec_zz_p
   gpu_ntt_forward(RaInVec, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
 
+	HELIB_NTIMER_START(PolyMul_mulmod);
   // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
   for (long i = 0; i < RaInVec.length(); i++)
   {   
     RaInVec[i] *= RbInVec[i];
   }
-  
+  HELIB_NTIMER_STOP(PolyMul_mulmod);
+
   // gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT //vec_zz_p to vec_zz_p
   gpu_ntt_backward(RaInVec, k2, RaInVec,p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
+	HELIB_NTIMER_STOP(PolyMul);
 #else
   gpu_fused_polymul(RaInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
 #endif
@@ -349,6 +355,7 @@ void BluesteinFFT(NTL::zz_pX& x,
     }
     x.normalize();
   } else {
+#if 0
 
     //Ardhi: this section of code related to gpu ntt needs to be fixed
     //Ardhi: I want to replace below code with a call to GPU NTT//But I think I need to verify if I can replace this with the GPU call
@@ -459,7 +466,7 @@ void BluesteinFFT(NTL::zz_pX& x,
     }
     x.normalize();
     // std::cout<<"x after ntt-mul-intt-mulmodprecon: "<<x<<std::endl;
-
+#endif
   }
 }
 
