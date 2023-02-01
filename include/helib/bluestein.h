@@ -49,7 +49,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers);
+                  const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers);
 
 } // namespace helib
 

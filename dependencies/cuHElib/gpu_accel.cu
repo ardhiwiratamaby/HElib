@@ -2097,7 +2097,8 @@ __global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, lo
   result[tid]=temp_res;
 }
 
-void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
+void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, const NTL::zz_pX& x, unsigned long long q, 
+const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv, int l){
     int size_array = sizeof(unsigned long long) * n;
     unsigned int q_bit = ceil(std::log2(q));
 
@@ -2126,11 +2127,13 @@ void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const uns
     unsigned long long mu = mu1/q;
 
     long dx = deg(x);
-    for(int i=0; i < n; i++)
-      if(i<=dx)
-        a[i] = NTL::rep(x.rep[i]);
-      else
-        a[i]=0;
+    memset(a,0, n*8);
+    memcpy(a, x.rep.data(), (dx+1)*sizeof(unsigned long long));
+    // for(int i=0; i < n; i++)
+    //   if(i<=dx)
+    //     a[i] = NTL::rep(x.rep[i]);
+    //   else
+    //     a[i]=0;
 
     CHECK(cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice));
 
@@ -2187,9 +2190,9 @@ void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const uns
     Kernel Calls
     ****************************************************************/
   HELIB_NTIMER_STOP(KernelNTT_inv);
-
+  res.SetLength(l);
 	HELIB_NTIMER_START(CudaMemCpyDH);
-    cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+    cudaMemcpy(res.data(), d_a, l*sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
 	HELIB_NTIMER_STOP(CudaMemCpyDH);
   #endif
 }

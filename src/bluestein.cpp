@@ -189,10 +189,10 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
 {
   HELIB_TIMER_START;
-
+HELIB_NTIMER_START(BeforePolyMul);
   if (IsZero(x))
     return;
   if (n <= 0) {
@@ -211,8 +211,8 @@ void BluesteinFFT(NTL::zz_pX& x,
   x.normalize();
 
   // std::cout<<"x after MulModPrecon: "<<x<<std::endl;
-
   long k = NTL::NextPowerOfTwo(2 * n - 1);
+
 #if 0
   NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
 #endif
@@ -240,12 +240,10 @@ void BluesteinFFT(NTL::zz_pX& x,
   // if(psi != myPsi[0])
   //   throw RuntimeError("Cmod::bluesteinFFT(): psi and myPsi missmatch");
 
-
   // //Ardhi: get inverse psi
   long inv_psi = NTL::InvMod(rep(psi), p);
 
-  //Ardhi:
-  NTL::vec_zz_p temp(NTL::INIT_SIZE, k2);
+HELIB_NTIMER_STOP(BeforePolyMul);
 
   if (NEW_BLUE && n % 2 != 0) {
 #if 0
@@ -288,47 +286,20 @@ void BluesteinFFT(NTL::zz_pX& x,
   gpu_ntt_backward_old(temp, k2, temp2, p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
 	HELIB_NTIMER_STOP(PolyMul);
 #else
-  gpu_fused_polymul(temp, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
+  long l = 2*(n-1)+1;
+  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi, l);
+  x.normalize();
 #endif
 
-#if 1
+HELIB_NTIMER_START(AfterPolyMul);
+#if 0
     long l = 2*(n-1)+1;
     x.rep.SetLength(l);
-    for (long i = 0; i < l; i++) {
-      x[i].LoopHole() = rep(temp[i]);
-    }
+    memcpy(x.rep.data(), temp, l*sizeof(unsigned long long));
+    // for (long i = 0; i < l; i++) {
+    //   x[i].LoopHole() = temp[i];
+    // }
     x.normalize();
-#endif
-#if 0
-    FromfftRep(x, Ra, 0, 2 * (n - 1)); // then convert back
-    #if 0//check correctness
-      dx = deg(x);
-      for(long i=0; i<= dx; i++){
-        if(rep(x[i]) != rep(RaInVec[i]))
-              throw RuntimeError("Cmod::bluesteinFFT(): gpu conv and cpu conv is missmatch");
-      }
-      
-      NTL::zz_pX temp;
-      long l = 2*(n-1)+1;
-      temp.rep.SetLength(l);
-      for (long i = 0; i < l; i++) {
-        temp[i].LoopHole() = rep(RaInVec[i]);
-      }
-      temp.normalize();
-
-      long temp_d = deg(temp);
-      if(temp_d != dx){
-              printf("temp_d: %lu, dx: %lu\n", temp_d, dx);
-              throw RuntimeError("Cmod::bluesteinFFT(): temp_d and dx is missmatch");       
-      }
-      // for(long i=0; i<= dx; i++){
-      //   std::cout<<"cpu: "<<rep(x[i])<<std::endl;
-      // }
-
-      // for(long i=0; i< RaInVec.length(); i++){
-      //   std::cout<<"gpu: "<<rep(RaInVec[i])<<std::endl;
-      // }
-    #endif
 #endif
     dx = deg(x);
     // printf("dx:%lu \n", dx);
@@ -338,7 +309,7 @@ void BluesteinFFT(NTL::zz_pX& x,
         #if 1
           x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
         #else
-          x[i - n].LoopHole() = NTL::AddMod(rep(RaInVec[i - n]), rep(RaInVec[i]), p);
+          x[i - n].LoopHole() = NTL::AddMod(rep(temp[i - n]), rep(temp[i]), p);
         #endif
       }
       x.SetLength(n);
@@ -346,17 +317,12 @@ void BluesteinFFT(NTL::zz_pX& x,
       dx = deg(x);
     }
 
-#if 0 //check x after modulo
-    for(long i=0; i<= dx; i++){
-      std::cout<<"cpu after mod x^n-1: "<<rep(x[i])<<std::endl;
-    }
-#endif
-
     for (long i = 0; i <= dx; i++) {
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
     x.normalize();
+HELIB_NTIMER_STOP(AfterPolyMul);
   } else {
 #if 0
 

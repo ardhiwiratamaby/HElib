@@ -656,7 +656,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
 
   BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, *iRbInPoly, *gpu_ipowers, *gpu_powers); // call the FFT routine
 
-  // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x
+  // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x 
   {
     HELIB_NTIMER_START(iFFT_division);
     rem(x, x, *phimx); // out %= (Phi_m(X),q)
