@@ -228,10 +228,13 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
 
   gpu_powers->reserve(k2);
   gpu_ipowers->reserve(k2);
+
   cudaMalloc(&RbInVec, k2 * sizeof(unsigned long long));
   cudaMalloc(&iRbInVec, k2 * sizeof(unsigned long long));  
   cudaMalloc(&RaInVec, k2 * sizeof(unsigned long long));
   cudaMalloc(&iRaInVec, k2 * sizeof(unsigned long long));
+  cudaMalloc(&gpu_powers_dev, k2 * sizeof(unsigned long long));
+  cudaMalloc(&gpu_ipowers_dev, k2 * sizeof(unsigned long long));
 
   //Ardhi: generate twiddle factors for gpu ntt with n=2^k
   for (unsigned int i = 0; i < k2; i++)
@@ -244,8 +247,11 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
 
   }
 
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, RbInVec, psi, *RbInPoly, *gpu_powers);
-  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, iRbInVec, psi_inv, *iRbInPoly, *gpu_ipowers);
+  // cudaMemcpy(gpu_powers_dev, gpu_powers->data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice);
+  // cudaMemcpy(gpu_ipowers_dev, gpu_ipowers->data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice);
+
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(root), *powers, powers_aux, *Rb, RbInVec, psi, *RbInPoly, *gpu_powers, gpu_powers_dev);
+  BluesteinInit(mm, NTL::conv<NTL::zz_p>(rInv), *ipowers, ipowers_aux, *iRb, iRbInVec, psi_inv, *iRbInPoly, *gpu_ipowers, gpu_ipowers_dev);
 }
 
 
@@ -292,7 +298,8 @@ Cmodulus& Cmodulus::operator=(const Cmodulus& other)
   iRbInPoly = other.iRbInPoly;
   gpu_powers = other.gpu_powers;
   gpu_ipowers = other.gpu_ipowers;
-
+  gpu_powers_dev = other.gpu_powers_dev;
+  gpu_ipowers_dev = other.gpu_ipowers_dev;
   // myPsi = other.myPsi;
 
 #ifdef HELIB_OPENCL
@@ -517,7 +524,7 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const
   // std::cout<<std::endl;
 
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, RbInVec, RaInVec, psi, *RbInPoly, *gpu_powers, *gpu_ipowers);
+  BluesteinFFT(tmp, getM(), rt, *powers, powers_aux, *Rb, RbInVec, RaInVec, psi, *RbInPoly, *gpu_powers, *gpu_ipowers, gpu_powers_dev, gpu_ipowers_dev);
 
   // std::cout<<"\nAfter BluesteinFFT\n";
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", "; 
@@ -654,7 +661,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, *iRbInPoly, *gpu_ipowers, *gpu_powers); // call the FFT routine
+  BluesteinFFT(x, m, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x 
   {

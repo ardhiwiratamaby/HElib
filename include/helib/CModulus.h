@@ -94,6 +94,10 @@ private:
   // CopiedPtr<NTL::vec_zz_p> RbInVec;
   unsigned long long *RbInVec;
   unsigned long long *RaInVec;
+
+  unsigned long long *gpu_powers_dev;
+  unsigned long long *gpu_ipowers_dev;
+
   // CopiedPtr<NTL::vec_zz_p> myPsi;
 
   // tables for backward FFT
