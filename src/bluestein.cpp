@@ -79,7 +79,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers)
+                   NTL::fftRep& Rb, unsigned long long RbInVec[], const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers)
 {
   long p = NTL::zz_p::modulus();
 
@@ -108,7 +108,7 @@ void BluesteinInit(long n,
   long k2 = 1L << k; // k2 = 2^k
 
   Rb.SetSize(k);
-  RbInVec.SetLength(k2);
+  // RbInVec.SetLength(k2);
   // myPsi.SetLength(1);
 
   init_gpu_ntt(k2);
@@ -137,7 +137,7 @@ void BluesteinInit(long n,
 
   RbInPoly = b;
 
-#if 0
+#if 1
   TofftRep(Rb, b, k);
 #endif
 #if 1
@@ -151,7 +151,9 @@ void BluesteinInit(long n,
 #if 0 //check the forward transform is correct or not
   NTL::vec_zz_p reverse_RbInVec;
   reverse_RbInVec.SetLength(k2);
-  gpu_ntt(reverse_RbInVec, k2, RbInVec, p, rep(psi), inv_psi, true);
+  // gpu_ntt(reverse_RbInVec, k2, RbInVec, p, rep(psi), inv_psi, true);
+  gpu_ntt_backward(reverse_RbInVec, k2, RbInVec, p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
+
   // std::cout<<"\npsi: "<<rep(psi)<<" RbInVec: ";
   long dx = deg(b);
   for (long i = 0; i <= dx; i++)
@@ -187,7 +189,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  UNUSED const NTL::fftRep& Rb, const NTL::vec_zz_p& RbInVec, const NTL::zz_p& psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers)
 {
   HELIB_TIMER_START;
 
@@ -243,7 +245,7 @@ void BluesteinFFT(NTL::zz_pX& x,
   long inv_psi = NTL::InvMod(rep(psi), p);
 
   //Ardhi:
-  NTL::vec_zz_p RaInVec(NTL::INIT_SIZE, k2);
+  NTL::vec_zz_p temp(NTL::INIT_SIZE, k2);
 
   if (NEW_BLUE && n % 2 != 0) {
 #if 0
@@ -268,31 +270,32 @@ void BluesteinFFT(NTL::zz_pX& x,
           throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
   }
 #endif
-#if 1 //Ardhi: Naive BluesteinGPU
+#if 0 //Ardhi: Naive BluesteinGPU
 	HELIB_NTIMER_START(PolyMul);
-  // gpu_ntt(RaInVec, k2, x, p,rep(psi), inv_psi, false); //ForwardFFT // zz_pX to vec_zz_p
-  gpu_ntt_forward(RaInVec, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
+  // gpu_ntt_forward_old(temp, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
+  gpu_fused_polymul(temp, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
+
+  NTL::vec_zz_p temp2(NTL::INIT_SIZE, k2);
+  cudaMemcpy(temp2.data(), RbInVec, k2 * sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
 
 	HELIB_NTIMER_START(PolyMul_mulmod);
-  // long iteration = NTL::FFTRoundUp(2 * n -1, k); // The NTL implementation only performing mult. up to len=FFTRoundUp of the NTT
-  for (long i = 0; i < RaInVec.length(); i++)
-  {   
-    RaInVec[i] *= RbInVec[i];
+  for (long i = 0; i < temp2.length(); i++)
+  {
+    temp2[i] *= temp[i];
   }
   HELIB_NTIMER_STOP(PolyMul_mulmod);
 
-  // gpu_ntt(RaInVec, k2, RaInVec,p, rep(psi), inv_psi,true);//BackwardFFT //vec_zz_p to vec_zz_p
-  gpu_ntt_backward(RaInVec, k2, RaInVec,p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
+  gpu_ntt_backward_old(temp, k2, temp2, p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
 	HELIB_NTIMER_STOP(PolyMul);
 #else
-  gpu_fused_polymul(RaInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
+  gpu_fused_polymul(temp, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
 #endif
 
 #if 1
     long l = 2*(n-1)+1;
     x.rep.SetLength(l);
     for (long i = 0; i < l; i++) {
-      x[i].LoopHole() = rep(RaInVec[i]);
+      x[i].LoopHole() = rep(temp[i]);
     }
     x.normalize();
 #endif

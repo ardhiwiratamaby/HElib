@@ -35,6 +35,8 @@
 #include <helib/PAlgebra.h>
 #include <helib/bluestein.h>
 #include <helib/ClonedPtr.h>
+#include "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh"
+#include "cuda_runtime.h"
 
 namespace helib {
 
@@ -89,7 +91,9 @@ private:
   CopiedPtr<NTL::zz_pX> RbInPoly;
   NTL::Vec<NTL::mulmod_precon_t> powers_aux;
   CopiedPtr<NTL::fftRep> Rb;
-  CopiedPtr<NTL::vec_zz_p> RbInVec;
+  // CopiedPtr<NTL::vec_zz_p> RbInVec;
+  unsigned long long *RbInVec;
+  unsigned long long *RaInVec;
   // CopiedPtr<NTL::vec_zz_p> myPsi;
 
   // tables for backward FFT
@@ -97,7 +101,9 @@ private:
   CopiedPtr<NTL::zz_pX> iRbInPoly;
   NTL::Vec<NTL::mulmod_precon_t> ipowers_aux;
   CopiedPtr<NTL::fftRep> iRb;
-  CopiedPtr<NTL::vec_zz_p> iRbInVec;
+  // CopiedPtr<NTL::vec_zz_p> iRbInVec;
+  unsigned long long *iRbInVec;
+  unsigned long long *iRaInVec;
 
   // PhimX modulo q, for faster division w/ remainder
   CopiedPtr<zz_pXModulus1> phimx;

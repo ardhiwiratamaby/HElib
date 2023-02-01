@@ -355,6 +355,23 @@ src/CMakeFiles/helib.dir/BenesNetwork.cpp.o: ../src/BenesNetwork.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -728,8 +745,25 @@ src/CMakeFiles/helib.dir/CModulus.cpp.o: ../src/CModulus.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/ClonedPtr.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
   ../include/helib/timing.h \
-  ../include/helib/multicore.h
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp
 
 src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   /usr/include/stdc-predef.h \
@@ -1103,6 +1137,25 @@ src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -1111,8 +1164,6 @@ src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   ../include/helib/powerful.h \
   ../include/helib/DoubleCRT.h \
   ../include/helib/IndexMap.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/EvalMap.h \
@@ -1142,7 +1193,6 @@ src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   ../include/helib/sample.h \
   ../include/helib/PolyModRing.h \
   ../include/helib/fhe_stats.h \
-  ../dependencies/cuHElib/gpu_accel.cuh \
   ../src/macro.h \
   ../src/PrimeGenerator.h \
   ../src/binio.h \
@@ -1532,6 +1582,23 @@ src/CMakeFiles/helib.dir/Ctxt.cpp.o: ../src/Ctxt.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
@@ -1960,6 +2027,23 @@ src/CMakeFiles/helib.dir/DoubleCRT.cpp.o: ../src/DoubleCRT.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -1980,8 +2064,7 @@ src/CMakeFiles/helib.dir/DoubleCRT.cpp.o: ../src/DoubleCRT.cpp \
   /usr/include/c++/7/bits/allocator.h \
   /usr/include/c++/7/bits/codecvt.h \
   /usr/include/c++/7/bits/unique_ptr.h \
-  /usr/include/c++/7/bits/quoted_string.h \
-  ../dependencies/cuHElib/gpu_accel.cuh
+  /usr/include/c++/7/bits/quoted_string.h
 
 src/CMakeFiles/helib.dir/EaCx.cpp.o: ../src/EaCx.cpp \
   /usr/include/stdc-predef.h \
@@ -2337,6 +2420,23 @@ src/CMakeFiles/helib.dir/EaCx.cpp.o: ../src/EaCx.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -2720,6 +2820,23 @@ src/CMakeFiles/helib.dir/EncryptedArray.cpp.o: ../src/EncryptedArray.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -3130,6 +3247,23 @@ src/CMakeFiles/helib.dir/EvalMap.cpp.o: ../src/EvalMap.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -4550,6 +4684,23 @@ src/CMakeFiles/helib.dir/OptimizePermutations.cpp.o: ../src/OptimizePermutations
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -5517,6 +5668,25 @@ src/CMakeFiles/helib.dir/PermNetwork.cpp.o: ../src/PermNetwork.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -5529,8 +5699,6 @@ src/CMakeFiles/helib.dir/PermNetwork.cpp.o: ../src/PermNetwork.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/Ctxt.h \
@@ -6563,6 +6731,25 @@ src/CMakeFiles/helib.dir/Ptxt.cpp.o: ../src/Ptxt.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -6575,8 +6762,6 @@ src/CMakeFiles/helib.dir/Ptxt.cpp.o: ../src/Ptxt.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/EncryptedArray.h \
@@ -6980,6 +7165,23 @@ src/CMakeFiles/helib.dir/binaryArith.cpp.o: ../src/binaryArith.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -7368,6 +7570,23 @@ src/CMakeFiles/helib.dir/binaryCompare.cpp.o: ../src/binaryCompare.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -7997,6 +8216,22 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o: ../src/bluestein.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/ClonedPtr.h \
   ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   /usr/local/include/NTL/FFT_impl.h
 
 src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
@@ -8343,6 +8578,25 @@ src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -8355,8 +8609,6 @@ src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/Ctxt.h \
@@ -8735,6 +8987,23 @@ src/CMakeFiles/helib.dir/eqtesting.cpp.o: ../src/eqtesting.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -9121,6 +9390,23 @@ src/CMakeFiles/helib.dir/extractDigits.cpp.o: ../src/extractDigits.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -10058,6 +10344,23 @@ src/CMakeFiles/helib.dir/intraSlot.cpp.o: ../src/intraSlot.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -10855,6 +11158,23 @@ src/CMakeFiles/helib.dir/keySwitching.cpp.o: ../src/keySwitching.cpp \
   ../include/helib/Context.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -11241,6 +11561,23 @@ src/CMakeFiles/helib.dir/keys.cpp.o: ../src/keys.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -12206,6 +12543,23 @@ src/CMakeFiles/helib.dir/matmul.cpp.o: ../src/matmul.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -12946,6 +13300,23 @@ src/CMakeFiles/helib.dir/permutations.cpp.o: ../src/permutations.cpp \
   ../include/helib/Context.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -13315,6 +13686,25 @@ src/CMakeFiles/helib.dir/polyEval.cpp.o: ../src/polyEval.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -13327,8 +13717,6 @@ src/CMakeFiles/helib.dir/polyEval.cpp.o: ../src/polyEval.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/polyEval.h \
@@ -13692,6 +14080,23 @@ src/CMakeFiles/helib.dir/powerful.cpp.o: ../src/powerful.cpp \
   ../include/helib/PAlgebra.h \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/range.h \
@@ -14043,6 +14448,25 @@ src/CMakeFiles/helib.dir/primeChain.cpp.o: ../src/primeChain.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/powerful.h \
   ../include/helib/DoubleCRT.h \
@@ -14051,8 +14475,6 @@ src/CMakeFiles/helib.dir/primeChain.cpp.o: ../src/primeChain.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/sample.h \
@@ -14457,6 +14879,23 @@ src/CMakeFiles/helib.dir/randomMatrices.cpp.o: ../src/randomMatrices.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -14847,6 +15286,23 @@ src/CMakeFiles/helib.dir/recryption.cpp.o: ../src/recryption.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
   ../include/helib/range.h \
@@ -15239,6 +15695,23 @@ src/CMakeFiles/helib.dir/replicate.cpp.o: ../src/replicate.cpp \
   ../include/helib/PGFFT.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -15616,6 +16089,25 @@ src/CMakeFiles/helib.dir/sample.cpp.o: ../src/sample.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -15628,8 +16120,6 @@ src/CMakeFiles/helib.dir/sample.cpp.o: ../src/sample.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/sample.h \
@@ -15981,6 +16471,25 @@ src/CMakeFiles/helib.dir/tableLookup.cpp.o: ../src/tableLookup.cpp \
   ../include/helib/ClonedPtr.h \
   ../include/helib/CModulus.h \
   ../include/helib/bluestein.h \
+  ../dependencies/cuHElib/gpu_accel.cuh \
+  ../include/helib/timing.h \
+  ../include/helib/multicore.h \
+  /usr/local/cuda/include/cuda_runtime.h \
+  /usr/local/cuda/include/crt/host_config.h \
+  /usr/local/cuda/include/builtin_types.h \
+  /usr/local/cuda/include/device_types.h \
+  /usr/local/cuda/include/crt/host_defines.h \
+  /usr/local/cuda/include/driver_types.h \
+  /usr/local/cuda/include/vector_types.h \
+  /usr/local/cuda/include/surface_types.h \
+  /usr/local/cuda/include/texture_types.h \
+  /usr/local/cuda/include/library_types.h \
+  /usr/local/cuda/include/channel_descriptor.h \
+  /usr/local/cuda/include/cuda_runtime_api.h \
+  /usr/local/cuda/include/cuda_device_runtime_api.h \
+  /usr/local/cuda/include/driver_functions.h \
+  /usr/local/cuda/include/vector_functions.h \
+  /usr/local/cuda/include/vector_functions.hpp \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -15993,8 +16502,6 @@ src/CMakeFiles/helib.dir/tableLookup.cpp.o: ../src/tableLookup.cpp \
   /usr/include/c++/7/bits/hashtable.h \
   /usr/include/c++/7/bits/hashtable_policy.h \
   /usr/include/c++/7/bits/unordered_map.h \
-  ../include/helib/timing.h \
-  ../include/helib/multicore.h \
   ../include/helib/range.h \
   ../include/helib/scheme.h \
   ../include/helib/EncryptedArray.h \
@@ -16762,8 +17269,6 @@ src/CMakeFiles/helib.dir/zzX.cpp.o: ../src/zzX.cpp \
 
 ../src/PolyModRing.cpp:
 
-../src/PolyMod.cpp:
-
 ../src/PermNetwork.cpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/7/include/xtestintrin.h:
@@ -16872,9 +17377,35 @@ src/version.cpp:
 
 ../include/helib/sample.h:
 
-../include/helib/matmul.h:
-
 ../include/helib/EvalMap.h:
+
+/usr/include/assert.h:
+
+/usr/include/c++/7/bits/indirect_array.h:
+
+/usr/include/c++/7/bits/mask_array.h:
+
+/usr/include/c++/7/bits/gslice_array.h:
+
+/usr/include/c++/7/bits/gslice.h:
+
+/usr/include/c++/7/bits/valarray_after.h:
+
+/usr/include/c++/7/bits/slice_array.h:
+
+../src/fhe_stats.cpp:
+
+/usr/include/c++/7/bits/valarray_before.h:
+
+/usr/include/c++/7/bits/valarray_array.tcc:
+
+/usr/include/c++/7/bits/valarray_array.h:
+
+/usr/include/c++/7/valarray:
+
+/usr/include/c++/7/bits/stl_multimap.h:
+
+/usr/include/c++/7/bits/stl_map.h:
 
 /usr/include/c++/7/bits/istream.tcc:
 
@@ -16899,8 +17430,6 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/c++/7/bits/ctype_base.h:
 
 /usr/include/c++/7/bits/allocator.h:
-
-/usr/include/c++/7/bits/streambuf.tcc:
 
 /usr/lib/gcc/x86_64-linux-gnu/7/include/tmmintrin.h:
 
@@ -16927,8 +17456,6 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/bits/sys_errlist.h:
 
 /usr/include/c++/7/system_error:
-
-/usr/include/c++/7/bits/stl_map.h:
 
 /usr/include/x86_64-linux-gnu/bits/_G_config.h:
 
@@ -17034,8 +17561,6 @@ src/version.cpp:
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/gthr-default.h:
 
-/usr/include/c++/7/bits/mask_array.h:
-
 /usr/include/c++/7/bits/ostream_insert.h:
 
 /usr/include/wchar.h:
@@ -17043,8 +17568,6 @@ src/version.cpp:
 /usr/include/c++/7/bits/ios_base.h:
 
 /usr/local/include/NTL/WordVector.h:
-
-/usr/include/c++/7/bits/gslice_array.h:
 
 /usr/include/x86_64-linux-gnu/bits/libio.h:
 
@@ -17072,11 +17595,17 @@ src/version.cpp:
 
 /usr/local/include/NTL/GF2XVec.h:
 
+../include/helib/matmul.h:
+
+/usr/local/cuda/include/channel_descriptor.h:
+
 /usr/include/endian.h:
 
 /usr/include/c++/7/bits/parse_numbers.h:
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/atomic_word.h:
+
+/usr/local/cuda/include/library_types.h:
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/c++locale.h:
 
@@ -17101,6 +17630,8 @@ src/version.cpp:
 /usr/local/include/NTL/config.h:
 
 /usr/include/c++/7/ostream:
+
+/usr/local/cuda/include/vector_types.h:
 
 /usr/include/c++/7/bits/stl_iterator_base_funcs.h:
 
@@ -17127,6 +17658,12 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/local/include/NTL/HAVE_CHRONO_TIME.h:
+
+/usr/local/cuda/include/vector_functions.h:
+
+/usr/include/c++/7/map:
+
+/usr/include/c++/7/bits/predefined_ops.h:
 
 /usr/include/time.h:
 
@@ -17208,6 +17745,8 @@ src/version.cpp:
 
 /usr/include/c++/7/bits/stl_relops.h:
 
+/usr/local/cuda/include/cuda_runtime_api.h:
+
 /usr/include/x86_64-linux-gnu/bits/timex.h:
 
 /usr/include/c++/7/atomic:
@@ -17229,6 +17768,8 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
 ../src/BenesNetwork.cpp:
+
+/usr/local/cuda/include/builtin_types.h:
 
 /usr/include/c++/7/debug/assertions.h:
 
@@ -17272,6 +17813,10 @@ src/version.cpp:
 
 /usr/include/c++/7/debug/debug.h:
 
+/usr/include/c++/7/cassert:
+
+/usr/include/c++/7/bits/nested_exception.h:
+
 /usr/include/c++/7/bits/cxxabi_forced.h:
 
 /usr/local/include/NTL/mach_desc.h:
@@ -17296,6 +17841,8 @@ src/version.cpp:
 
 /usr/local/include/NTL/GF2XFactoring.h:
 
+/usr/local/cuda/include/driver_types.h:
+
 ../include/helib/tableLookup.h:
 
 /usr/local/include/NTL/mat_lzz_pE.h:
@@ -17305,6 +17852,10 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/c++/7/bits/error_constants.h:
 
 /usr/local/include/NTL/HAVE_BUILTIN_CLZL.h:
+
+../src/PolyMod.cpp:
+
+/usr/local/cuda/include/crt/host_defines.h:
 
 ../include/helib/assertions.h:
 
@@ -17323,6 +17874,10 @@ src/version.cpp:
 /usr/include/x86_64-linux-gnu/c++/7/bits/os_defines.h:
 
 /usr/include/c++/7/utility:
+
+/usr/include/c++/7/bits/forward_list.tcc:
+
+../include/helib/Ctxt.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
@@ -17392,8 +17947,6 @@ src/version.cpp:
 
 /usr/local/include/NTL/vec_vec_GF2.h:
 
-/usr/include/c++/7/bits/valarray_array.h:
-
 /usr/lib/gcc/x86_64-linux-gnu/7/include/avx512dqintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/7/include/mmintrin.h:
@@ -17441,6 +17994,8 @@ src/helib/version.h:
 /usr/include/c++/7/tr1/special_function_util.h:
 
 /usr/local/include/NTL/HAVE_AVX.h:
+
+/usr/local/cuda/include/vector_functions.hpp:
 
 /usr/include/c++/7/tr1/bessel_function.tcc:
 
@@ -17552,7 +18107,7 @@ src/helib/version.h:
 
 /usr/include/c++/7/bits/stl_heap.h:
 
-/usr/include/assert.h:
+/usr/local/cuda/include/cuda_device_runtime_api.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/7/include/wmmintrin.h:
 
@@ -17602,8 +18157,6 @@ src/helib/version.h:
 
 /usr/include/c++/7/climits:
 
-/usr/include/c++/7/bits/stl_multimap.h:
-
 /usr/lib/gcc/x86_64-linux-gnu/7/include-fixed/syslimits.h:
 
 /usr/include/c++/7/bits/stl_tempbuf.h:
@@ -17636,17 +18189,9 @@ src/helib/version.h:
 
 /usr/include/x86_64-linux-gnu/c++/7/bits/c++io.h:
 
-/usr/include/c++/7/bits/nested_exception.h:
-
-/usr/include/c++/7/cassert:
-
 /usr/local/include/NTL/vector.h:
 
 /usr/include/c++/7/bits/stl_raw_storage_iter.h:
-
-../include/helib/Ctxt.h:
-
-/usr/include/c++/7/bits/forward_list.tcc:
 
 /usr/include/c++/7/limits:
 
@@ -17690,9 +18235,9 @@ src/helib/version.h:
 
 /usr/local/include/NTL/GF2EX.h:
 
-../dependencies/cuHElib/gpu_accel.cuh:
+/usr/include/c++/7/bits/streambuf.tcc:
 
-/usr/local/include/NTL/lzz_pEX.h:
+/usr/local/cuda/include/crt/host_config.h:
 
 ../include/helib/PGFFT.h:
 
@@ -17715,6 +18260,20 @@ src/helib/version.h:
 ../include/helib/multicore.h:
 
 ../include/helib/bluestein.h:
+
+/usr/local/include/NTL/lzz_pEX.h:
+
+../dependencies/cuHElib/gpu_accel.cuh:
+
+/usr/local/cuda/include/cuda_runtime.h:
+
+/usr/local/cuda/include/device_types.h:
+
+/usr/local/cuda/include/surface_types.h:
+
+/usr/local/cuda/include/texture_types.h:
+
+/usr/local/cuda/include/driver_functions.h:
 
 ../include/helib/scheme.h:
 
@@ -17748,8 +18307,6 @@ src/helib/version.h:
 
 /usr/include/c++/7/bits/stl_numeric.h:
 
-/usr/include/c++/7/valarray:
-
 /usr/local/include/NTL/lzz_pXFactoring.h:
 
 /usr/include/c++/7/bits/locale_conv.h:
@@ -17771,21 +18328,3 @@ src/helib/version.h:
 /usr/include/c++/7/functional:
 
 /usr/include/c++/7/iterator:
-
-/usr/include/c++/7/bits/predefined_ops.h:
-
-/usr/include/c++/7/map:
-
-/usr/include/c++/7/bits/valarray_array.tcc:
-
-../src/fhe_stats.cpp:
-
-/usr/include/c++/7/bits/valarray_before.h:
-
-/usr/include/c++/7/bits/slice_array.h:
-
-/usr/include/c++/7/bits/valarray_after.h:
-
-/usr/include/c++/7/bits/gslice.h:
-
-/usr/include/c++/7/bits/indirect_array.h:

@@ -9,6 +9,14 @@
 #include "gpu_accel.cuh"
 #include <NTL/ZZVec.h>
 
+__global__ void KernelMulMod(unsigned long long a[], const unsigned long long b[], unsigned long long q){
+  int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
+
+  __extension__ unsigned __int128 temp_storage = b[global_tid];
+  temp_storage *= a[global_tid];
+  a[global_tid] = temp_storage % q;
+}
+
 // __device__ __forceinline__ void singleBarrett(unsigned long long& a, unsigned& q, unsigned& mu, int& qbit)  // ??
 __device__ __forceinline__ void singleBarrett(unsigned __int128& a, unsigned long long& q, unsigned long long& mu, int& qbit)  // ??
 {  
@@ -1723,7 +1731,7 @@ void gpu_ntt(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigne
     // cudaFree(d_a);
 }
 
-void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, unsigned long long psi, unsigned long long psiinv){
+void gpu_ntt_forward(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, unsigned long long psi, unsigned long long psiinv){
     int size_array = sizeof(unsigned long long) * n;
     unsigned int q_bit = ceil(std::log2(q));
 
@@ -1742,7 +1750,6 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
           throw std::runtime_error("psiTable and gpu_powers missmatch");
       }
     }
-
 #endif
 
 	HELIB_NTIMER_START(CudaMemCpyHD);
@@ -1771,7 +1778,7 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
       else
         a[i]=0;
 
-    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(res, a, size_array, cudaMemcpyHostToDevice);
 
 	HELIB_NTIMER_STOP(CudaMemCpyHD);
     /*
@@ -1792,7 +1799,7 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
     // for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
     for (n_of_groups = 1; (n/n_of_groups>2048); n_of_groups *= 2) //Ardhi: do the ntt until the working size is 2048 elements
     {
-        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(res, q, mu, bit_length, psi_powers, n, n_of_groups);
     }
 
     cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
@@ -1802,13 +1809,14 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
     //     CTBasedNTTInnerSingle<<<1, 1024, 2048 * sizeof(unsigned long long), stream[i]>>>(d_a+offset, q, mu, bit_length, psi_powers);
     // }
 
-    CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long), 0>>>(d_a, q, mu, bit_length, psi_powers, n_of_groups);
+    CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long), 0>>>(res, q, mu, bit_length, psi_powers, n_of_groups);
 	HELIB_NTIMER_STOP(KernelNTT);
 
     /*
     END
     Kernel Calls
     ****************************************************************/
+#if 0
 	HELIB_NTIMER_START(CudaMemCpyDH);
     cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
 	HELIB_NTIMER_STOP(CudaMemCpyDH);
@@ -1819,6 +1827,92 @@ void gpu_ntt_forward(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, un
     for(long i=0; i<n; i++)
       res[i] = a[i]; //this is very expensive! around 8.5 seconds
 	HELIB_NTIMER_STOP(BufferCopy);
+#endif
+
+#if 0
+	HELIB_NTIMER_START(CudaMemCpyDH);
+    cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+	HELIB_NTIMER_STOP(CudaMemCpyDH);
+#endif
+}
+
+void gpu_ntt_forward_old(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    unsigned int q_bit = ceil(std::log2(q));
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+#if 0 //Ardhi: check psi computation
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    for(long i=0; i<n; i++){
+      if(psiTable[i] != gpu_powers[i]){
+          throw std::runtime_error("psiTable and gpu_powers missmatch");
+      }
+    }
+
+#endif
+
+    // const unsigned long long *twiddle_factors = gpu_powers.data();
+    cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    long dx = deg(x);
+    for(int i=0; i < n; i++)
+      if(i<=dx)
+        a[i] = NTL::rep(x.rep[i]);
+      else
+        a[i]=0;
+
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    #pragma unroll
+    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+    { 
+        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+    }
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
 
 }
 
@@ -1912,6 +2006,82 @@ void gpu_ntt_backward(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x
 
 }
 
+void gpu_ntt_backward_old(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_p& x, unsigned long long q, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
+    int size_array = sizeof(unsigned long long) * n;
+    unsigned int q_bit = ceil(std::log2(q));
+
+    /****************************************************************
+    BEGIN
+    cudamalloc, memcpy, etc... for gpu
+    */
+
+#if 0 //Ardhi: check psi computation
+    unsigned long long* psiTable = (unsigned long long*)malloc(size_array);
+    unsigned long long* psiinvTable = (unsigned long long*)malloc(size_array);
+    fillTablePsi64(psi, q, psiinv, psiTable, psiinvTable, n); //gel psi psi
+
+    for(long i=0; i<n; i++){
+      if(psiinvTable[i] != gpu_ipowers[i]){
+          throw std::runtime_error("psiTable and gpu_powers missmatch");
+      }
+    }
+
+#endif
+
+    // const unsigned long long *twiddle_factors = gpu_powers.data();
+    cudaMemcpy(psiinv_powers, gpu_ipowers.data(), size_array, cudaMemcpyHostToDevice);
+
+    // we print these because we forgot them every time :)
+    // std::cout << "n = " << n << std::endl;
+    // std::cout << "q = " << q << std::endl;
+    // std::cout << "Psi = " << psi << std::endl;
+    // std::cout << "Psi Inverse = " << psiinv << std::endl;
+
+    //generate parameters for barrett
+    unsigned int bit_length = q_bit;
+    // double mu1 = powl(2, 2 * bit_length);
+    // unsigned mu = mu1 / q;
+    unsigned __int128 mu1 = 1;
+    mu1 = mu1 << (2*bit_length);
+    unsigned long long mu = mu1/q;
+
+    for(int i=0; i < n; i++)
+      a[i] = rep(x[i]);
+
+    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+
+    /*
+    END
+    cudamalloc, memcpy, etc... for gpu
+    ****************************************************************/
+
+    
+    /****************************************************************
+    BEGIN
+    Kernel Calls
+    */
+
+    long n_inv = NTL::InvMod(n, q);
+    int num_blocks = n/(THREADS_PER_BLOCK*2);
+    #pragma unroll
+    for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2)
+    {
+        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
+    }
+    /*
+    END
+    Kernel Calls
+    ****************************************************************/
+
+    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+
+    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+    for(long i=0; i<n; i++)
+      res[i] = a[i];
+
+}
+
 __global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, long phim){
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
   __int128 temp_res=0;
@@ -1927,7 +2097,7 @@ __global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, lo
   result[tid]=temp_res;
 }
 
-void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, NTL::vec_zz_p& b, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
+void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, const NTL::zz_pX& x, unsigned long long q, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv){
     int size_array = sizeof(unsigned long long) * n;
     unsigned int q_bit = ceil(std::log2(q));
 
@@ -1935,10 +2105,11 @@ void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, 
     BEGIN
     cudamalloc, memcpy, etc... for gpu
     */
+	HELIB_NTIMER_START(CudaMemCpyHD);
 
     // const unsigned long long *twiddle_factors = gpu_powers.data();
     cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b.data(), size_array, cudaMemcpyHostToDevice);
+    cudaMemcpy(psiinv_powers, gpu_ipowers.data(), size_array, cudaMemcpyHostToDevice);
 
     // we print these because we forgot them every time :)
     // std::cout << "n = " << n << std::endl;
@@ -1961,8 +2132,9 @@ void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, 
       else
         a[i]=0;
 
-    cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice);
+    CHECK(cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice));
 
+	HELIB_NTIMER_STOP(CudaMemCpyHD);
     /*
     END
     cudamalloc, memcpy, etc... for gpu
@@ -1973,24 +2145,51 @@ void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned int n, const NTL::zz_pX& x, 
     BEGIN
     Kernel Calls
     */
+	HELIB_NTIMER_START(KernelNTT);
+  long n_inv = NTL::InvMod(n, q);
+  int num_blocks = n/(THREADS_PER_BLOCK*2);
+  int n_of_groups=1;
+  #pragma unroll
+  // for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
+  for (n_of_groups = 1; (n/n_of_groups>2048); n_of_groups *= 2) //Ardhi: do the ntt until the working size is 2048 elements
+  {
+      CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+  }
 
-    long n_inv = NTL::InvMod(n, q);
-    int num_blocks = n/(THREADS_PER_BLOCK*2);
+  cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
+
+  CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, psi_powers, n_of_groups);
+	HELIB_NTIMER_STOP(KernelNTT);
+
+#if 0 //Ardhi: for test
+      CHECK(cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost));  // do this in async 
+#endif
+
+#if 1
+	HELIB_NTIMER_START(KernelMulMod);
+  KernelMulMod<<<num_blocks*2, THREADS_PER_BLOCK>>>(d_a, b_dev, q); //a = a*b mod q
+	HELIB_NTIMER_STOP(KernelMulMod);
+
+	HELIB_NTIMER_START(KernelNTT_inv);
+
+  GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, psiinv_powers, n, n/2);
+
+  if(n>2048){
     #pragma unroll
-    for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
-    { 
-        CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psi_powers, n, n_of_groups);
+    // for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2) 
+    for (int n_of_groups = (n/2048)/2; n_of_groups >= 1; n_of_groups /= 2) 
+    {
+        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, psiinv_powers, n, n_inv, n_of_groups);
     }
+  }
     /*
     END
     Kernel Calls
     ****************************************************************/
+  HELIB_NTIMER_STOP(KernelNTT_inv);
 
-    cudaMemcpy(a, d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
-
-    cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
-
-    for(long i=0; i<n; i++)
-      res[i] = a[i];
-
+	HELIB_NTIMER_START(CudaMemCpyDH);
+    cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost);  // do this in async 
+	HELIB_NTIMER_STOP(CudaMemCpyDH);
+  #endif
 }
