@@ -108,9 +108,6 @@ void BluesteinInit(long n,
   long k2 = 1L << k; // k2 = 2^k
 
   Rb.SetSize(k);
-  // RbInVec.SetLength(k2);
-  // myPsi.SetLength(1);
-
   init_gpu_ntt(k2);
 
   NTL::zz_pX b(NTL::INIT_SIZE, k2);
@@ -146,8 +143,6 @@ void BluesteinInit(long n,
 
   // CHECK(cudaMemcpy(gpu_powers_dev, gpu_powers.data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice));
   moveTwFtoGPU(gpu_powers_dev, gpu_powers, k2);
-
-  // gpu_ntt(RbInVec, k2, b, p,rep(psi), NTL::InvMod(rep(psi), p), false); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
   gpu_ntt_forward(RbInVec, k2, b, p, gpu_powers, rep(psi), inv_psi); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
 #endif
 #if 0 //check the forward transform is correct or not
@@ -194,7 +189,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[])
 {
   HELIB_TIMER_START;
-HELIB_NTIMER_START(BeforePolyMul);
+// HELIB_NTIMER_START(BeforePolyMul);
   if (IsZero(x))
     return;
   if (n <= 0) {
@@ -204,7 +199,6 @@ HELIB_NTIMER_START(BeforePolyMul);
 
   long p = NTL::zz_p::modulus();
 
-  // std::cout<<"x: "<<x;
   long dx = deg(x);
   for (long i = 0; i <= dx; i++) {
     x[i].LoopHole() =
@@ -212,7 +206,6 @@ HELIB_NTIMER_START(BeforePolyMul);
   }
   x.normalize();
 
-  // std::cout<<"x after MulModPrecon: "<<x<<std::endl;
   long k = NTL::NextPowerOfTwo(2 * n - 1);
 
 #if 0
@@ -222,21 +215,7 @@ HELIB_NTIMER_START(BeforePolyMul);
   // and (n-1) modulo x^k-1.  This gives us some
   // truncation in certain cases.
 
-  // std::cout<<"\nmodulus: "<<p<<"\nOmega 2nth root: "<<root<<"\nN: "<<n<<"\nk: "<<k<<std::endl;
-
-  //Ardhi: preparing parameters for gpu ntt
-  //Ardhi: get nth-root of unity for n=2^k and current modulus
-  // NTL::zz_p rtp;
   unsigned int k2= 1L << k; //k2 = 2^k
-  // FindPrimitiveRoot(rtp, k2); // NTL routine, relative to current modulus
-  // if (rtp == 0)              // sanity check
-  //   throw RuntimeError("Cmod::compRoots(): no 2^k'th roots of unity mod q");
-  // long k2_root = NTL::rep(rtp);
-
-  //Ardhi: get psi, psi=root^(1/2)
-  // long psi;
-  // NTL::ZZ temp = NTL::SqrRootMod(NTL::conv<NTL::ZZ>(k2_root), NTL::conv<NTL::ZZ>(p));
-  // NTL::conv(psi, temp);
 
   //Ardhi: check psi and myPsi
   // if(psi != myPsi[0])
@@ -245,7 +224,7 @@ HELIB_NTIMER_START(BeforePolyMul);
   // //Ardhi: get inverse psi
   long inv_psi = NTL::InvMod(rep(psi), p);
 
-HELIB_NTIMER_STOP(BeforePolyMul);
+// HELIB_NTIMER_STOP(BeforePolyMul);
 
   if (NEW_BLUE && n % 2 != 0) {
 #if 0
@@ -270,7 +249,7 @@ HELIB_NTIMER_STOP(BeforePolyMul);
           throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
   }
 #endif
-#if 0 //Ardhi: Naive BluesteinGPU
+#if 0 //Ardhi: Naive GPU PolyMul 
 	HELIB_NTIMER_START(PolyMul);
   // gpu_ntt_forward_old(temp, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
   gpu_fused_polymul(temp, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
@@ -293,7 +272,7 @@ HELIB_NTIMER_STOP(BeforePolyMul);
   x.normalize();
 #endif
 
-HELIB_NTIMER_START(AfterPolyMul);
+// HELIB_NTIMER_START(AfterPolyMul);
 #if 0
     long l = 2*(n-1)+1;
     x.rep.SetLength(l);
@@ -324,7 +303,7 @@ HELIB_NTIMER_START(AfterPolyMul);
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
     x.normalize();
-HELIB_NTIMER_STOP(AfterPolyMul);
+// HELIB_NTIMER_STOP(AfterPolyMul);
   } else {
 #if 0
 

@@ -913,43 +913,49 @@ __device__ __int128 myMod2(__int128 a,long b)
 __global__ void kernel_mulMod(long *a, long *b, long *result, long size, long *d_modulus, long phim){
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
   if(tid < size){
-    __int128 temp_res=0;
-    __int128 temp_a=0;
-    __int128 temp_b=0;
+    // __int128 temp_res=0;
+    // __int128 temp_a=0;
+    // __int128 temp_b=0;
+    __int128 temp_storage= a[tid];
+    // temp_a = a[tid];
+    // temp_b = b[tid];
 
-    temp_a = a[tid];
-    temp_b = b[tid];
-
-    temp_res = temp_a * temp_b;
+    // temp_res = temp_a * temp_b;
+    temp_storage *= b[tid];
     // temp_res = temp_res%modulus;
-    temp_res = myMod2(temp_res, d_modulus[tid/phim]);
+    // temp_res = myMod2(temp_res, d_modulus[tid/phim]);
 
     // d_result[tid] = temp_res;
     // result[tid] %= modulus;
-    result[tid]=temp_res;
+    result[tid]=temp_storage % d_modulus[tid/phim];
 
     // result[tid]=mul_mod(a[tid], b[tid], modulus);
   }
 }
 
 void CudaEltwiseMultMod(long actual_nrows){
+	// HELIB_NTIMER_START(CudaEltwiseMultMod_CudaMemCpyHD);
     // Copy data from host arrays A and B to device arrays d_A and d_B
     cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_CudaMemCpyHD);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
     int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
-
+	// HELIB_NTIMER_START(CudaEltwiseMultMod_kernel);
     // Launch kernel
     kernel_mulMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, d_phim*actual_nrows, d_modulus, d_phim);
     // cudaDeviceSynchronize();
+	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_kernel);
 
+	// HELIB_NTIMER_START(CudaEltwiseMultMod_CudaMemCpyDH);
     // Copy data from device array d_C to host array result
     cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_CudaMemCpyDH);
 
 #if 0
 //HEXL Naive MulMod
@@ -2110,7 +2116,7 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     BEGIN
     cudamalloc, memcpy, etc... for gpu
     */
-	HELIB_NTIMER_START(CudaMemCpyHD);
+	// HELIB_NTIMER_START(CudaMemCpyHD);
 
     // const unsigned long long *twiddle_factors = gpu_powers.data();
     // cudaMemcpy(psi_powers, gpu_powers.data(), size_array, cudaMemcpyHostToDevice);
@@ -2141,7 +2147,7 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
 
     CHECK(cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice));
 
-	HELIB_NTIMER_STOP(CudaMemCpyHD);
+	// HELIB_NTIMER_STOP(CudaMemCpyHD);
     /*
     END
     cudamalloc, memcpy, etc... for gpu
@@ -2152,7 +2158,7 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     BEGIN
     Kernel Calls
     */
-	HELIB_NTIMER_START(KernelNTT);
+	// HELIB_NTIMER_START(KernelNTT);
   long n_inv = NTL::InvMod(n, q);
   int num_blocks = n/(THREADS_PER_BLOCK*2);
   int n_of_groups=1;
@@ -2166,18 +2172,18 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
   cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 
   CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, gpu_powers_dev, n_of_groups);
-	HELIB_NTIMER_STOP(KernelNTT);
+	// HELIB_NTIMER_STOP(KernelNTT);
 
 #if 0 //Ardhi: for test
       CHECK(cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost));  // do this in async 
 #endif
 
 #if 1
-	HELIB_NTIMER_START(KernelMulMod);
+	// HELIB_NTIMER_START(KernelMulMod);
   KernelMulMod<<<num_blocks*2, THREADS_PER_BLOCK>>>(d_a, b_dev, q); //a = a*b mod q
-	HELIB_NTIMER_STOP(KernelMulMod);
+	// HELIB_NTIMER_STOP(KernelMulMod);
 
-	HELIB_NTIMER_START(KernelNTT_inv);
+	// HELIB_NTIMER_START(KernelNTT_inv);
 
   GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, gpu_ipowers_dev, n, n/2);
 
@@ -2193,10 +2199,10 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     END
     Kernel Calls
     ****************************************************************/
-  HELIB_NTIMER_STOP(KernelNTT_inv);
+  // HELIB_NTIMER_STOP(KernelNTT_inv);
   res.SetLength(l);
-	HELIB_NTIMER_START(CudaMemCpyDH);
+	// HELIB_NTIMER_START(CudaMemCpyDH);
     cudaMemcpy(res.data(), d_a, l*sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
-	HELIB_NTIMER_STOP(CudaMemCpyDH);
+	// HELIB_NTIMER_STOP(CudaMemCpyDH);
   #endif
 }
