@@ -17,6 +17,16 @@ __global__ void KernelMulMod(unsigned long long a[], const unsigned long long b[
   a[global_tid] = temp_storage % q;
 }
 
+__global__ void KernelMulMod(unsigned long long a[], const unsigned long long b[], unsigned long long q, int n){
+  int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
+
+  if(global_tid<n){
+    __extension__ unsigned __int128 temp_storage = b[global_tid];
+    temp_storage *= a[global_tid];
+    a[global_tid] = temp_storage % q;
+  }
+}
+
 // __device__ __forceinline__ void singleBarrett(unsigned long long& a, unsigned& q, unsigned& mu, int& qbit)  // ??
 __device__ __forceinline__ void singleBarrett(unsigned __int128& a, unsigned long long& q, unsigned long long& mu, int& qbit)  // ??
 {  
@@ -1258,8 +1268,9 @@ void init_gpu_ntt(unsigned int n){
     //   cudaStreamCreate(&stream[i]); 
 }
 
-void moveTwFtoGPU(unsigned long long gpu_powers_dev[], std::vector<unsigned long long>& gpu_powers, int k2){
+void moveTwFtoGPU(unsigned long long gpu_powers_dev[], std::vector<unsigned long long>& gpu_powers, int k2, NTL::zz_pX& powers, unsigned long long gpu_powers_m_dev[]){
     CHECK(cudaMemcpy(gpu_powers_dev, gpu_powers.data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice));
+    CHECK(cudaMemcpy(gpu_powers_m_dev, powers.rep.data(), powers.rep.length() * sizeof(unsigned long long), cudaMemcpyHostToDevice));
 }
 
 void gpu_ntt(unsigned long long res[], unsigned int n, const NTL::zz_pX& x, unsigned long long q, unsigned long long psi, unsigned long long psiinv, bool inverse){
@@ -2205,4 +2216,17 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     cudaMemcpy(res.data(), d_a, l*sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
 	// HELIB_NTIMER_STOP(CudaMemCpyDH);
   #endif
+}
+
+void gpu_mulMod(NTL::zz_pX& x, unsigned long long x_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long p, int n){
+    long dx = deg(x);
+    // memset(a,0, n*8);
+    // memcpy(a, x.rep.data(), (dx+1)*sizeof(unsigned long long));
+    cudaMemset(x_dev, 0, n*8);
+    CHECK(cudaMemcpy(x_dev, x.rep.data(), (dx+1)*sizeof(unsigned long long), cudaMemcpyHostToDevice));
+
+    KernelMulMod<<<ceil(((double)dx+1)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(x_dev, gpu_powers_m_dev, p, dx+1);
+
+    // CHECK(cudaMemcpy((void *)x.rep.data(), x_dev, (dx+1)*sizeof(unsigned long long), cudaMemcpyDeviceToHost));
+
 }

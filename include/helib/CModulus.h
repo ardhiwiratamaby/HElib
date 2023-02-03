@@ -95,8 +95,13 @@ private:
   unsigned long long *RbInVec;
   unsigned long long *RaInVec;
 
+  unsigned long long *x_dev;
+
   unsigned long long *gpu_powers_dev;
   unsigned long long *gpu_ipowers_dev;
+
+  unsigned long long *gpu_powers_m_dev;
+  unsigned long long *gpu_ipowers_m_dev;
 
   // CopiedPtr<NTL::vec_zz_p> myPsi;
 

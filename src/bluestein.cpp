@@ -79,7 +79,7 @@ void BluesteinInit(long n,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, unsigned long long RbInVec[], const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers, unsigned long long gpu_powers_dev[])
+                   NTL::fftRep& Rb, unsigned long long RbInVec[], const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers, unsigned long long gpu_powers_dev[], unsigned long long gpu_powers_m_dev[])
 {
   long p = NTL::zz_p::modulus();
 
@@ -134,7 +134,7 @@ void BluesteinInit(long n,
 
   RbInPoly = b;
 
-#if 1
+#if 0
   TofftRep(Rb, b, k);
 #endif
 #if 1
@@ -142,7 +142,7 @@ void BluesteinInit(long n,
   long inv_psi = NTL::InvMod(rep(psi), p);
 
   // CHECK(cudaMemcpy(gpu_powers_dev, gpu_powers.data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice));
-  moveTwFtoGPU(gpu_powers_dev, gpu_powers, k2);
+  moveTwFtoGPU(gpu_powers_dev, gpu_powers, k2, powers, gpu_powers_m_dev);
   gpu_ntt_forward(RbInVec, k2, b, p, gpu_powers, rep(psi), inv_psi); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
 #endif
 #if 0 //check the forward transform is correct or not
@@ -186,7 +186,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   const NTL::zz_pX& powers,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[])
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[])
 {
   HELIB_TIMER_START;
 // HELIB_NTIMER_START(BeforePolyMul);
@@ -200,13 +200,19 @@ void BluesteinFFT(NTL::zz_pX& x,
   long p = NTL::zz_p::modulus();
 
   long dx = deg(x);
-  for (long i = 0; i <= dx; i++) {
-    x[i].LoopHole() =
-        NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
-  }
-  x.normalize();
+  // for (long i = 0; i <= dx; i++) {
+  //   x[i].LoopHole() =
+  //       NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
+  // }
 
   long k = NTL::NextPowerOfTwo(2 * n - 1);
+  unsigned int k2= 1L << k; //k2 = 2^k
+
+  gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2);
+
+  //Ardhi: Maybe disable the normalization is okay
+  // x.normalize();
+
 
 #if 0
   NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
@@ -215,7 +221,6 @@ void BluesteinFFT(NTL::zz_pX& x,
   // and (n-1) modulo x^k-1.  This gives us some
   // truncation in certain cases.
 
-  unsigned int k2= 1L << k; //k2 = 2^k
 
   //Ardhi: check psi and myPsi
   // if(psi != myPsi[0])
@@ -282,8 +287,8 @@ void BluesteinFFT(NTL::zz_pX& x,
     // }
     x.normalize();
 #endif
+	HELIB_NTIMER_START(AfterPolyMul_reduce);
     dx = deg(x);
-    // printf("dx:%lu \n", dx);
     if (dx >= n) {
       // reduce mod x^n-1
       for (long i = n; i <= dx; i++) {
@@ -297,12 +302,15 @@ void BluesteinFFT(NTL::zz_pX& x,
       x.normalize();
       dx = deg(x);
     }
-
+	HELIB_NTIMER_STOP(AfterPolyMul_reduce);
+	HELIB_NTIMER_START(AfterPolyMul_mulMod);
     for (long i = 0; i <= dx; i++) {
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
     x.normalize();
+	HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
+
 // HELIB_NTIMER_STOP(AfterPolyMul);
   } else {
 #if 0
