@@ -184,12 +184,12 @@ __extension__ __int128 myMod2(__int128 a,long b)
 void BluesteinFFT(NTL::zz_pX& x,
                   long n,
                   UNUSED const NTL::zz_p& root,
-                  const NTL::zz_pX& powers,
-                  const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
+                  UNUSED const NTL::zz_pX& powers,
+                  UNUSED const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
                   UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[])
 {
   HELIB_TIMER_START;
-// HELIB_NTIMER_START(BeforePolyMul);
+HELIB_NTIMER_START(gpu_mulMod);
   if (IsZero(x))
     return;
   if (n <= 0) {
@@ -199,7 +199,7 @@ void BluesteinFFT(NTL::zz_pX& x,
 
   long p = NTL::zz_p::modulus();
 
-  long dx = deg(x);
+  // long dx = deg(x);
   // for (long i = 0; i <= dx; i++) {
   //   x[i].LoopHole() =
   //       NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
@@ -210,7 +210,7 @@ void BluesteinFFT(NTL::zz_pX& x,
 
   gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2);
 
-  //Ardhi: Maybe disable the normalization is okay
+  //Ardhi: Maybe disable the normalization is dangerous
   // x.normalize();
 
 
@@ -229,7 +229,7 @@ void BluesteinFFT(NTL::zz_pX& x,
   // //Ardhi: get inverse psi
   long inv_psi = NTL::InvMod(rep(psi), p);
 
-// HELIB_NTIMER_STOP(BeforePolyMul);
+HELIB_NTIMER_STOP(gpu_mulMod);
 
   if (NEW_BLUE && n % 2 != 0) {
 #if 0
@@ -273,8 +273,8 @@ void BluesteinFFT(NTL::zz_pX& x,
 	HELIB_NTIMER_STOP(PolyMul);
 #else
   long l = 2*(n-1)+1;
-  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi, l, gpu_powers_dev, gpu_ipowers_dev);
-  x.normalize();
+  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi, l, gpu_powers_dev, gpu_ipowers_dev);
+  // x.normalize(); //Ardhi: this should be enabled but looks like it's fine for now
 #endif
 
 // HELIB_NTIMER_START(AfterPolyMul);
@@ -287,28 +287,34 @@ void BluesteinFFT(NTL::zz_pX& x,
     // }
     x.normalize();
 #endif
-	HELIB_NTIMER_START(AfterPolyMul_reduce);
+	HELIB_NTIMER_START(gpu_addMod);
+#if 0
     dx = deg(x);
     if (dx >= n) {
       // reduce mod x^n-1
       for (long i = n; i <= dx; i++) {
-        #if 1
-          x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
-        #else
-          x[i - n].LoopHole() = NTL::AddMod(rep(temp[i - n]), rep(temp[i]), p);
-        #endif
+        // #if 1
+        x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
+        // #else
+        //   x[i - n].LoopHole() = NTL::AddMod(rep(temp[i - n]), rep(temp[i]), p);
+        // #endif
       }
       x.SetLength(n);
-      x.normalize();
+      // x.normalize();
       dx = deg(x);
     }
-	HELIB_NTIMER_STOP(AfterPolyMul_reduce);
+#endif
+    gpu_addMod(x_dev, n, l, p); //Ardhi: for now just assume that dx = l, after this the polynomial degree should be n
+	HELIB_NTIMER_STOP(gpu_addMod);
 	HELIB_NTIMER_START(AfterPolyMul_mulMod);
+#if 0
     for (long i = 0; i <= dx; i++) {
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
-    x.normalize();
+#endif
+  gpu_mulMod2(x, x_dev, gpu_powers_m_dev,p, n);
+  x.normalize();
 	HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
 
 // HELIB_NTIMER_STOP(AfterPolyMul);

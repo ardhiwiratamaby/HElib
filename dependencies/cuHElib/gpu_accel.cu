@@ -2118,7 +2118,7 @@ __global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, lo
   result[tid]=temp_res;
 }
 
-void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, const NTL::zz_pX& x, unsigned long long q, 
+void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, unsigned long long x_dev[], unsigned long long q, 
 const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv, int l, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[]){
     int size_array = sizeof(unsigned long long) * n;
     unsigned int q_bit = ceil(std::log2(q));
@@ -2147,16 +2147,16 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     mu1 = mu1 << (2*bit_length);
     unsigned long long mu = mu1/q;
 
-    long dx = deg(x);
-    memset(a,0, n*8);
-    memcpy(a, x.rep.data(), (dx+1)*sizeof(unsigned long long));
+    // long dx = deg(x);
+    // memset(a,0, n*8);
+    // memcpy(a, x.rep.data(), (dx+1)*sizeof(unsigned long long));
     // for(int i=0; i < n; i++)
     //   if(i<=dx)
     //     a[i] = NTL::rep(x.rep[i]);
     //   else
     //     a[i]=0;
 
-    CHECK(cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice));
+    // CHECK(cudaMemcpy(d_a, a, size_array, cudaMemcpyHostToDevice));
 
 	// HELIB_NTIMER_STOP(CudaMemCpyHD);
     /*
@@ -2169,7 +2169,7 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
     BEGIN
     Kernel Calls
     */
-	// HELIB_NTIMER_START(KernelNTT);
+	HELIB_NTIMER_START(KernelNTT);
   long n_inv = NTL::InvMod(n, q);
   int num_blocks = n/(THREADS_PER_BLOCK*2);
   int n_of_groups=1;
@@ -2177,13 +2177,13 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
   // for (int n_of_groups = 1; n_of_groups < n; n_of_groups *= 2)
   for (n_of_groups = 1; (n/n_of_groups>2048); n_of_groups *= 2) //Ardhi: do the ntt until the working size is 2048 elements
   {
-      CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, gpu_powers_dev, n, n_of_groups);
+      CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(x_dev, q, mu, bit_length, gpu_powers_dev, n, n_of_groups);
   }
 
   cudaDeviceSynchronize();  // CPU being a gentleman, and waiting for GPU to finish it's job
 
-  CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, gpu_powers_dev, n_of_groups);
-	// HELIB_NTIMER_STOP(KernelNTT);
+  CTBasedNTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(x_dev, q, mu, bit_length, gpu_powers_dev, n_of_groups);
+	HELIB_NTIMER_STOP(KernelNTT);
 
 #if 0 //Ardhi: for test
       CHECK(cudaMemcpy(res.data(), d_a, size_array, cudaMemcpyDeviceToHost));  // do this in async 
@@ -2191,29 +2191,29 @@ const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned lo
 
 #if 1
 	// HELIB_NTIMER_START(KernelMulMod);
-  KernelMulMod<<<num_blocks*2, THREADS_PER_BLOCK>>>(d_a, b_dev, q); //a = a*b mod q
+  KernelMulMod<<<num_blocks*2, THREADS_PER_BLOCK>>>(x_dev, b_dev, q); //a = a*b mod q
 	// HELIB_NTIMER_STOP(KernelMulMod);
 
-	// HELIB_NTIMER_START(KernelNTT_inv);
+	HELIB_NTIMER_START(KernelNTT_inv);
 
-  GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(d_a, q, mu, bit_length, gpu_ipowers_dev, n, n/2);
+  GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK, 2048 * sizeof(unsigned long long)>>>(x_dev, q, mu, bit_length, gpu_ipowers_dev, n, n/2);
 
   if(n>2048){
     #pragma unroll
     // for (int n_of_groups = n/2; n_of_groups >= 1; n_of_groups /= 2) 
     for (int n_of_groups = (n/2048)/2; n_of_groups >= 1; n_of_groups /= 2) 
     {
-        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(d_a, q, mu, bit_length, gpu_ipowers_dev, n, n_inv, n_of_groups);
+        GSBasedINTTInnerSingle<<<num_blocks, THREADS_PER_BLOCK>>>(x_dev, q, mu, bit_length, gpu_ipowers_dev, n, n_inv, n_of_groups);
     }
   }
     /*
     END
     Kernel Calls
     ****************************************************************/
-  // HELIB_NTIMER_STOP(KernelNTT_inv);
-  res.SetLength(l);
+  HELIB_NTIMER_STOP(KernelNTT_inv);
+  // res.SetLength(l);
 	// HELIB_NTIMER_START(CudaMemCpyDH);
-    cudaMemcpy(res.data(), d_a, l*sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
+    // cudaMemcpy(res.data(), x_dev, l*sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
 	// HELIB_NTIMER_STOP(CudaMemCpyDH);
   #endif
 }
@@ -2228,5 +2228,34 @@ void gpu_mulMod(NTL::zz_pX& x, unsigned long long x_dev[], unsigned long long gp
     KernelMulMod<<<ceil(((double)dx+1)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(x_dev, gpu_powers_m_dev, p, dx+1);
 
     // CHECK(cudaMemcpy((void *)x.rep.data(), x_dev, (dx+1)*sizeof(unsigned long long), cudaMemcpyDeviceToHost));
+
+}
+
+__global__ void add_mod_kernel(unsigned long long x_dev[], long n, long l, unsigned long long p) {
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    if (i + n < l) {
+        // x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
+
+        x_dev[i] = x_dev[i] + x_dev[i+n];
+        if(x_dev[i] >= p)
+          x_dev[i] -= p;
+    }
+}
+
+void gpu_addMod(unsigned long long x_dev[], long n, long dx, unsigned long long p){
+      int n_blocks= ceil(((double)(dx+1) - n + 1) / 512);
+      add_mod_kernel<<<n_blocks, 512>>>(x_dev, n, dx, p);
+}
+
+void gpu_mulMod2(NTL::zz_pX& x, unsigned long long x_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long p, int n){
+    // long dx = deg(x);
+    // memset(a,0, n*8);
+    // memcpy(a, x.rep.data(), (dx+1)*sizeof(unsigned long long));
+    // cudaMemset(x_dev, 0, n*8);
+    // CHECK(cudaMemcpy(x_dev, x.rep.data(), (dx+1)*sizeof(unsigned long long), cudaMemcpyHostToDevice));
+
+    KernelMulMod<<<ceil((double)n/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(x_dev, gpu_powers_m_dev, p, n);
+    x.SetLength(n);
+    CHECK(cudaMemcpy(x.rep.data(), x_dev, n*sizeof(unsigned long long), cudaMemcpyDeviceToHost));
 
 }
