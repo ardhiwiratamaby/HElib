@@ -75,7 +75,7 @@ now I see that we don't, at least when m is odd.
 
 *************************************************************/
 
-void BluesteinInit(long n,
+void BluesteinInit(long n, long k2,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
@@ -105,7 +105,7 @@ void BluesteinInit(long n,
     powers_aux[i] = NTL::PrepMulModPrecon(rep(powers[i]), p);
 
   long k = NTL::NextPowerOfTwo(2 * n - 1);
-  long k2 = 1L << k; // k2 = 2^k
+  // long k2 = 1L << k; // k2 = 2^k
 
   Rb.SetSize(k);
   init_gpu_ntt(k2);
@@ -183,12 +183,19 @@ __extension__ __int128 myMod2(__int128 a,long b)
 
 void BluesteinFFT(NTL::zz_pX& x,
                   long n,
+                  long k2,
+                  long k2_inv,
                   UNUSED const NTL::zz_p& root,
                   UNUSED const NTL::zz_pX& powers,
                   UNUSED const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi,UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[])
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[])
 {
   HELIB_TIMER_START;
+
+HELIB_NTIMER_START(gpu_hostRegister);
+cudaHostRegister(x.rep.data(), n*sizeof(unsigned long long), cudaHostRegisterPortable);
+HELIB_NTIMER_STOP(gpu_hostRegister);
+
 HELIB_NTIMER_START(gpu_mulMod);
   if (IsZero(x))
     return;
@@ -205,88 +212,28 @@ HELIB_NTIMER_START(gpu_mulMod);
   //       NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
   // }
 
-  long k = NTL::NextPowerOfTwo(2 * n - 1);
-  unsigned int k2= 1L << k; //k2 = 2^k
+  // long k = NTL::NextPowerOfTwo(2 * n - 1);
+  // unsigned int k2= 1L << k; //k2 = 2^k
 
   gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2);
 
-  //Ardhi: Maybe disable the normalization is dangerous
+  //Ardhi: Maybe disable the normalization is okay
   // x.normalize();
 
-
-#if 0
-  NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
-#endif
   // Careful! we are multiplying polys of degrees 2*(n-1)
   // and (n-1) modulo x^k-1.  This gives us some
   // truncation in certain cases.
 
-
-  //Ardhi: check psi and myPsi
-  // if(psi != myPsi[0])
-  //   throw RuntimeError("Cmod::bluesteinFFT(): psi and myPsi missmatch");
-
-  // //Ardhi: get inverse psi
-  long inv_psi = NTL::InvMod(rep(psi), p);
-
 HELIB_NTIMER_STOP(gpu_mulMod);
 
   if (NEW_BLUE && n % 2 != 0) {
-#if 0
-    TofftRep_trunc(Ra, x, k, 2 * n - 1);    //Ardhi: I want to replace this with GPU ntt invocation but the result should be just a vector of long instead of fftRep
-    mul(Ra, Ra, Rb); // multiply in FFT representation
-    
-#endif
-#if 0 //compare ntt of RbInPoly with RbInVec
-  NTL::vec_zz_p test(NTL::INIT_SIZE, k2);
-  gpu_ntt(test, k2, RbInPoly, p,rep(psi), inv_psi, false); //ForwardFFT
-  for (long i = 0; i < RbInVec.length(); i++)
-  {
-    if(test[i] != RbInVec[i])
-          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
-  }
-
-  gpu_ntt(test, k2, RbInVec, p,rep(psi), inv_psi, true); //BackwardFFT
-  long count = RbInPoly.rep.length();
-  for (long i = 0; i < count; i++)
-  {
-    if(test[i] != RbInPoly.rep[i])
-          throw RuntimeError("Cmod::bluesteinFFT(): RbInVec does not match test");
-  }
-#endif
-#if 0 //Ardhi: Naive GPU PolyMul 
-	HELIB_NTIMER_START(PolyMul);
-  // gpu_ntt_forward_old(temp, k2, x, p, gpu_powers, rep(psi), inv_psi); //ForwardFFT // zz_pX to vec_zz_p
-  gpu_fused_polymul(temp, RaInVec, RbInVec, k2, x, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi);
-
-  NTL::vec_zz_p temp2(NTL::INIT_SIZE, k2);
-  cudaMemcpy(temp2.data(), RbInVec, k2 * sizeof(unsigned long long), cudaMemcpyDeviceToHost);  // do this in async 
-
-	HELIB_NTIMER_START(PolyMul_mulmod);
-  for (long i = 0; i < temp2.length(); i++)
-  {
-    temp2[i] *= temp[i];
-  }
-  HELIB_NTIMER_STOP(PolyMul_mulmod);
-
-  gpu_ntt_backward_old(temp, k2, temp2, p, gpu_ipowers, rep(psi), inv_psi);//BackwardFFT //vec_zz_p to vec_zz_p
-	HELIB_NTIMER_STOP(PolyMul);
-#else
   long l = 2*(n-1)+1;
-  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), inv_psi, l, gpu_powers_dev, gpu_ipowers_dev);
-  // x.normalize(); //Ardhi: this should be enabled but looks like it's fine for now
-#endif
 
-// HELIB_NTIMER_START(AfterPolyMul);
-#if 0
-    long l = 2*(n-1)+1;
-    x.rep.SetLength(l);
-    memcpy(x.rep.data(), temp, l*sizeof(unsigned long long));
-    // for (long i = 0; i < l; i++) {
-    //   x[i].LoopHole() = temp[i];
-    // }
-    x.normalize();
-#endif
+ 	HELIB_NTIMER_START(gpu_fused_polymul);
+  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, k2_inv, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), rep(inv_psi), l, gpu_powers_dev, gpu_ipowers_dev);
+  // x.normalize(); //Ardhi: this should be enabled but looks like it's fine for now
+ 	HELIB_NTIMER_STOP(gpu_fused_polymul);
+
 	HELIB_NTIMER_START(gpu_addMod);
 #if 0
     dx = deg(x);
@@ -313,7 +260,7 @@ HELIB_NTIMER_STOP(gpu_mulMod);
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
 #endif
-  gpu_mulMod2(x, x_dev, gpu_powers_m_dev,p, n);
+  gpu_mulMod2(x, x_dev, x_pinned, gpu_powers_m_dev,p, n);
   x.normalize();
 	HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
 

@@ -82,6 +82,8 @@ private:
   // CopiedPtr<NTL::zz_p> psi_inv;  
   NTL::zz_p psi;
   NTL::zz_p psi_inv;
+  long k2_inv;
+  long k2;
   //Ardhi: tables for forward and backward GPU NTT
   CopiedPtr<std::vector<unsigned long long>> gpu_powers;
   CopiedPtr<std::vector<unsigned long long>> gpu_ipowers;
@@ -96,6 +98,7 @@ private:
   unsigned long long *RaInVec;
 
   unsigned long long *x_dev;
+  unsigned long long *x_pinned;
 
   unsigned long long *gpu_powers_dev;
   unsigned long long *gpu_ipowers_dev;
