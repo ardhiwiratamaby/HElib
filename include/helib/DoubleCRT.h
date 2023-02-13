@@ -33,6 +33,7 @@
 #include <helib/NumbTh.h>
 #include <helib/IndexMap.h>
 #include <helib/timing.h>
+#include "cuda_runtime.h"
 
 namespace helib {
 
@@ -93,6 +94,7 @@ private:
   // of evaluations wrt this prime
   IndexMap<NTL::vec_long> map;
 
+  std::vector<cudaStream_t> streams;
 
 
   //! a "sanity check" method, verifies consistency of the map with

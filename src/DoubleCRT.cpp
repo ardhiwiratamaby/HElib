@@ -73,16 +73,66 @@ void DoubleCRT::FFT(const NTL::ZZX& poly, const IndexSet& s)
   if (empty(s))
     return;
 
+#if 0
   static thread_local NTL::Vec<long> tls_ivec;
   NTL::Vec<long>& ivec = tls_ivec;
 
   long icard = MakeIndexVector(s, ivec);
+
+  static thread_local NTL::Vec<NTL::zz_pX> tmps;
+  tmps.SetLength(icard);
+  for (long i : range(icard))
+    tmps[i].SetMaxLength(poly.rep.length());
+
   NTL_EXEC_RANGE(icard, first, last)
   for (long j = first; j < last; j++) {
     long i = ivec[j];
-    context.ithModulus(i).FFT(map[i], poly);
+
+    //Ardhi: I moved the below code here from Cmodulus::FFT
+    // NTL::zz_pX& tmp = Cmodulus::getScratch_zz_pX();
+    // {
+    //   HELIB_NTIMER_START(FFT_remainder);
+    //   convert(tmp, poly); // convert input to zpx format
+    // }
+
+    NTL::zz_pX& tmp = tmps[j];
+    convert(tmp, poly); // convert input to zpx format
+
+    context.ithModulus(i).FFT(map[i], tmp);
   }
   NTL_EXEC_RANGE_END
+#endif
+
+  // std::vector<NTL::zz_pX> tmps;
+
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
+  context.ithModulus(i).FFT(map[i], poly, streams[j]);
+  }
+cudaDeviceSynchronize();
+
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  cudaHostUnregister(map[i].data());
+}
+
+#if 0
+	HELIB_NTIMER_START(FFT_copyresult);
+  for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+    helib::PAlgebra zMStar = context.ithModulus(i).getZMStar();
+    if (!zMStar.getPow2()) { //Ardhi: if m is not power of two
+      // copy the result to the output vector y, keeping only the
+      // entries corresponding to primitive roots of unity
+      map[i].SetLength(zMStar.getPhiM());
+	HELIB_NTIMER_START(FFT_copyresult_loop);
+      for (long a = 0, b = 0; a < long(context.ithModulus(i).getM()); a++)
+        if (zMStar.inZmStar(a)){
+          map[i][b++] = rep(coeff(tmps[j], a));
+        }
+  HELIB_NTIMER_STOP(FFT_copyresult_loop);
+    }
+  }
+	HELIB_NTIMER_STOP(FFT_copyresult);
+#endif
 }
 
 // FIXME: "code bloat": this just replicates the above with NTL::ZZX -> zzX
@@ -93,6 +143,7 @@ void DoubleCRT::FFT(const zzX& poly, const IndexSet& s)
   if (empty(s))
     return;
 
+#if 0
   static thread_local NTL::Vec<long> tls_ivec;
   NTL::Vec<long>& ivec = tls_ivec;
 
@@ -103,6 +154,29 @@ void DoubleCRT::FFT(const zzX& poly, const IndexSet& s)
     context.ithModulus(i).FFT(map[i], poly);
   }
   NTL_EXEC_RANGE_END
+#endif
+
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  context.ithModulus(i).FFT(map[i], poly, streams[j]);
+}
+cudaDeviceSynchronize();
+
+#if 0
+  for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+    helib::PAlgebra zMStar = context.ithModulus(i).getZMStar();
+    if (!zMStar.getPow2()) { //Ardhi: if m is not power of two
+      // copy the result to the output vector y, keeping only the
+      // entries corresponding to primitive roots of unity
+      map[i].SetLength(zMStar.getPhiM());
+
+      for (long a = 0, b = 0; a < long(context.ithModulus(i).getM()); a++)
+        if (zMStar.inZmStar(a)){
+          map[i][b++] = rep(coeff(tmps[j], a));
+        }
+    }
+  }
+#endif
+
 }
 
 // a "sanity check" function, verifies consistency of matrix with current
@@ -948,6 +1022,8 @@ DoubleCRT::DoubleCRT(const NTL::ZZX& poly,
   if (isDryRun())
     return;
 
+  initializeStreams(s.card(), streams);
+  
   // convert the integer polynomial to FFT representation modulo the primes
   if (deg(poly) <= 0)       // special case for a constant polynomial
     *this = coeff(poly, 0); // no FFT is needed
@@ -1008,6 +1084,8 @@ DoubleCRT::DoubleCRT(const zzX& poly,
   if (isDryRun())
     return;
 
+  initializeStreams(s.card(), streams);
+
   // convert the integer polynomial to FFT representation modulo the primes
   if (lsize(poly) <= 1) // special case for a constant polynomial
     *this = (lsize(poly) == 1) ? poly[0] : 0; // no FFT is needed
@@ -1045,6 +1123,8 @@ DoubleCRT::DoubleCRT(const zzX& poly)
   map.insert(s);
   if (isDryRun()) return;
 
+  initializeStreams(s.card(), streams);
+
   // convert the integer polynomial to FFT representation modulo the primes
   // convert the integer polynomial to FFT representation modulo the primes
   if (lsize(poly)<=1) // special case for a constant polynomial
@@ -1065,6 +1145,8 @@ DoubleCRT::DoubleCRT(const Context& _context, const IndexSet& s) :
     return;
 
   long phim = context.getPhiM();
+
+  initializeStreams(s.card(), streams);
 
   for (long i : s) {
     NTL::vec_long& row = map[i];

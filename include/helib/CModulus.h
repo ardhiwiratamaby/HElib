@@ -105,7 +105,10 @@ private:
 
   unsigned long long *gpu_powers_m_dev;
   unsigned long long *gpu_ipowers_m_dev;
-
+  long *zMStar_dev;
+  long *zMStar_h;
+  long *target_dev;
+  long *target_h;
   // CopiedPtr<NTL::vec_zz_p> myPsi;
 
   // tables for backward FFT
@@ -124,7 +127,7 @@ private:
   void privateInit(const PAlgebra&, long rt);
 
   // auxiliary routine used by the two FFT routines
-  void FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp) const;
+  void FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp, cudaStream_t stream) const;
 
 public:
 #ifdef HELIB_OPENCL
@@ -166,11 +169,11 @@ public:
 
   // sets zp context internally
   // y = FFT(x)
-  void FFT(NTL::vec_long& y, const NTL::ZZX& x) const;
+  void FFT(NTL::vec_long& y, const NTL::ZZX& x, cudaStream_t stream) const;
   // y = FFT(x)
-  void FFT(NTL::vec_long& y, const zzX& x) const;
+  void FFT(NTL::vec_long& y, const zzX& x, cudaStream_t stream) const;
   // y = FFT(x)
-  void FFT(NTL::vec_long& y, NTL::zz_pX& x) const;
+  void FFT(NTL::vec_long& y, NTL::zz_pX& x, cudaStream_t stream) const;
 
 
   // expects zp context to be set externally

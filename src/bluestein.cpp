@@ -79,7 +79,7 @@ void BluesteinInit(long n, long k2,
                    const NTL::zz_p& root,
                    NTL::zz_pX& powers,
                    NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                   NTL::fftRep& Rb, unsigned long long RbInVec[], const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers, unsigned long long gpu_powers_dev[], unsigned long long gpu_powers_m_dev[])
+                   NTL::fftRep& Rb, unsigned long long RbInVec[], const NTL::zz_p& psi, NTL::zz_pX& RbInPoly, std::vector<unsigned long long>& gpu_powers, unsigned long long gpu_powers_dev[], unsigned long long gpu_powers_m_dev[], long zMStar_dev[], long zMStar_h[], long target_dev[], long target_h[])
 {
   long p = NTL::zz_p::modulus();
 
@@ -142,7 +142,7 @@ void BluesteinInit(long n, long k2,
   long inv_psi = NTL::InvMod(rep(psi), p);
 
   // CHECK(cudaMemcpy(gpu_powers_dev, gpu_powers.data(), k2 * sizeof(unsigned long long), cudaMemcpyHostToDevice));
-  moveTwFtoGPU(gpu_powers_dev, gpu_powers, k2, powers, gpu_powers_m_dev);
+  moveTwFtoGPU(gpu_powers_dev, gpu_powers, k2, powers, gpu_powers_m_dev, zMStar_dev, zMStar_h, n, target_dev, target_h);
   gpu_ntt_forward(RbInVec, k2, b, p, gpu_powers, rep(psi), inv_psi); //Ardhi: convert b->RbInVec aka vec<long>//zz_pX to vec_zz_p
 #endif
 #if 0 //check the forward transform is correct or not
@@ -188,7 +188,7 @@ void BluesteinFFT(NTL::zz_pX& x,
                   UNUSED const NTL::zz_p& root,
                   UNUSED const NTL::zz_pX& powers,
                   UNUSED const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
-                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[])
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[], cudaStream_t stream)
 {
   HELIB_TIMER_START;
 
@@ -215,7 +215,7 @@ HELIB_NTIMER_START(gpu_mulMod);
   // long k = NTL::NextPowerOfTwo(2 * n - 1);
   // unsigned int k2= 1L << k; //k2 = 2^k
 
-  gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2);
+  gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2, stream);
 
   //Ardhi: Maybe disable the normalization is okay
   // x.normalize();
@@ -230,7 +230,7 @@ HELIB_NTIMER_STOP(gpu_mulMod);
   long l = 2*(n-1)+1;
 
  	HELIB_NTIMER_START(gpu_fused_polymul);
-  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, k2_inv, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), rep(inv_psi), l, gpu_powers_dev, gpu_ipowers_dev);
+  gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, k2_inv, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), rep(inv_psi), l, gpu_powers_dev, gpu_ipowers_dev, stream);
   // x.normalize(); //Ardhi: this should be enabled but looks like it's fine for now
  	HELIB_NTIMER_STOP(gpu_fused_polymul);
 
@@ -251,7 +251,7 @@ HELIB_NTIMER_STOP(gpu_mulMod);
       dx = deg(x);
     }
 #endif
-    gpu_addMod(x_dev, n, l, p); //Ardhi: for now just assume that dx = l, after this the polynomial degree should be n
+    gpu_addMod(x_dev, n, l, p, stream); //Ardhi: for now just assume that dx = l, after this the polynomial degree should be n
 	HELIB_NTIMER_STOP(gpu_addMod);
 	HELIB_NTIMER_START(AfterPolyMul_mulMod);
 #if 0
@@ -260,8 +260,7 @@ HELIB_NTIMER_STOP(gpu_mulMod);
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
 #endif
-  gpu_mulMod2(x, x_dev, x_pinned, gpu_powers_m_dev,p, n);
-  x.normalize();
+  gpu_mulMod2(x, x_dev, x_pinned, gpu_powers_m_dev,p, n, stream);
 	HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
 
 // HELIB_NTIMER_STOP(AfterPolyMul);
