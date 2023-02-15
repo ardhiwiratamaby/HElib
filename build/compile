@@ -1,0 +1,4 @@
+cmake .. .
+make clean
+make -j16
+sudo make install
