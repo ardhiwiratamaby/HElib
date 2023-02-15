@@ -553,12 +553,13 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp, cudaStream_t stream) c
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", ";
   // std::cout<<std::endl;
 
+
   // call the FFT routine
   BluesteinFFT(tmp, getM(), k2, k2_inv, rt, *powers, powers_aux, *Rb, RbInVec, RaInVec, psi, psi_inv, *RbInPoly, *gpu_powers, *gpu_ipowers, gpu_powers_dev, gpu_ipowers_dev, gpu_powers_m_dev, x_dev, x_pinned, stream);
 
   // copy the result to the output vector y, keeping only the
   // entries corresponding to primitive roots of unity
-  y.SetLength(zMStar->getPhiM());
+  // y.SetLength(zMStar->getPhiM());
 
   gpu_parallel_copy(long(this->getM()), x_pinned, x_dev, zMStar_dev, y, target_dev, stream);
 
@@ -588,7 +589,8 @@ void Cmodulus::FFT(NTL::vec_long& y, const NTL::ZZX& x, cudaStream_t stream) con
   bak.save();
   context.restore();
 
-  NTL::zz_pX& tmp = Cmodulus::getScratch_zz_pX();
+  // NTL::zz_pX& tmp = Cmodulus::getScratch_zz_pX();
+  NTL::zz_pX tmp;
   {
     HELIB_NTIMER_START(FFT_remainder);
     convert(tmp, x); // convert input to zpx format
@@ -604,12 +606,22 @@ void Cmodulus::FFT(NTL::vec_long& y, const zzX& x, cudaStream_t stream) const
   bak.save();
   context.restore();
 
-  NTL::zz_pX& tmp = Cmodulus::getScratch_zz_pX();
+  // NTL::zz_pX& tmp = Cmodulus::getScratch_zz_pX();
+  NTL::zz_pX tmp;
   {
     HELIB_NTIMER_START(FFT_remainder);
     convert(tmp, x); // convert input to zpx format
   }
+
   FFT(y, tmp, stream);
+}
+
+inline void checkCudaError(cudaError_t status, const char *msg) {
+    if (status != cudaSuccess) {
+        printf("%s\n", msg);
+        printf("Error: %s\n", cudaGetErrorString(status));
+        // exit(EXIT_FAILURE);
+    }
 }
 
 void Cmodulus::FFT(NTL::vec_long& y, NTL::zz_pX& x, cudaStream_t stream) const
@@ -618,6 +630,14 @@ void Cmodulus::FFT(NTL::vec_long& y, NTL::zz_pX& x, cudaStream_t stream) const
   NTL::zz_pBak bak;
   bak.save();
   context.restore();
+  
+  
+  x.SetLength(getM());
+  // cudaHostRegister(x.rep.data(), getM()*sizeof(long), cudaHostRegisterPortable);
+
+  // cudaError_t status = cudaGetLastError();
+  // checkCudaError(status, "warning: cudaHostRegister on x failed");
+  
   FFT_aux(y, x, stream);
 }
 
@@ -701,7 +721,7 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, k2, k2_inv, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, psi, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev, gpu_ipowers_m_dev, x_dev, x_pinned, 0); // call the FFT routine
+  BluesteinFFT(x, m, k2, k2_inv, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, psi, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev, gpu_ipowers_m_dev, x_dev, x_pinned); // call the FFT routine
 
   // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x 
   {

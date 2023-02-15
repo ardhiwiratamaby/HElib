@@ -54,6 +54,15 @@ void BluesteinFFT(NTL::zz_pX& x,
                   const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
                   const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[], cudaStream_t stream);
 
+void BluesteinFFT(NTL::zz_pX& x,
+                  long n,
+                  long k2,
+                  long k2_inv,
+                  const NTL::zz_p& root,
+                  const NTL::zz_pX& powers,
+                  const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
+                  const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[]);
+
 } // namespace helib
 
 #endif // ifndef HELIB_BLUESTEIN_H

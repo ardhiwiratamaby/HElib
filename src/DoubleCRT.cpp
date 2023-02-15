@@ -103,17 +103,35 @@ void DoubleCRT::FFT(const NTL::ZZX& poly, const IndexSet& s)
   NTL_EXEC_RANGE_END
 #endif
 
-  // std::vector<NTL::zz_pX> tmps;
-
+HELIB_NTIMER_START(cudaHostRegister_1);
+// long* device_ptr;
 for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  map[i].SetLength(context.ithModulus(i).getPhiM());
+  // if (cudaHostGetDevicePointer((void**)&device_ptr, (void*)map[i].data(), 0) != cudaSuccess) {
+  //   cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
+  // } 
   cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
+
+}
+HELIB_NTIMER_STOP(cudaHostRegister_1);
+
+HELIB_NTIMER_START(streamInit_1);
+if((long)streams.size() < s.card())
+    initializeStreams(s.card(), streams);
+HELIB_NTIMER_STOP(streamInit_1);
+
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){    
   context.ithModulus(i).FFT(map[i], poly, streams[j]);
-  }
+}
+
 cudaDeviceSynchronize();
 
+HELIB_NTIMER_START(cudaHostUnRegister_1);
 for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
   cudaHostUnregister(map[i].data());
+  //Ardhi: I should unregister tmp here
 }
+HELIB_NTIMER_STOP(cudaHostUnRegister_1);
 
 #if 0
 	HELIB_NTIMER_START(FFT_copyresult);
@@ -156,10 +174,34 @@ void DoubleCRT::FFT(const zzX& poly, const IndexSet& s)
   NTL_EXEC_RANGE_END
 #endif
 
+HELIB_NTIMER_START(cudaHostRegister_2);
+// long* device_ptr;
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  map[i].SetLength(context.ithModulus(i).getPhiM());
+  // if (cudaHostGetDevicePointer((void**)&device_ptr, (void*)map[i].data(), 0) != cudaSuccess) {
+  //   cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
+  // } 
+  cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
+}
+HELIB_NTIMER_STOP(cudaHostRegister_2);
+
+HELIB_NTIMER_START(streamInit_2);
+if((long)streams.size() < s.card())
+    initializeStreams(s.card(), streams);
+HELIB_NTIMER_STOP(streamInit_2);
+
 for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
   context.ithModulus(i).FFT(map[i], poly, streams[j]);
 }
+
 cudaDeviceSynchronize();
+
+HELIB_NTIMER_START(cudaHostUnRegister_2);
+for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+  cudaHostUnregister(map[i].data());
+  //Ardhi: I should unregister tmp here
+}
+HELIB_NTIMER_STOP(cudaHostUnRegister_2);
 
 #if 0
   for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
@@ -1341,9 +1383,18 @@ void DoubleCRT::toPoly(NTL::ZZX& poly, const IndexSet& s, bool positive) const
 
     NTL::zz_pX& tmp = tmpvec[index];
 
+    // for (long j : range(first, last)) {
+    //   long i = ivec[j];
+    //   cudaHostRegister(tmp.rep.data(), context.ithModulus(i).getM()*sizeof(long), cudaHostRegisterPortable);
+    // }
+
     for (long j : range(first, last)) {
       long i = ivec[j];
+      
+      // cudaHostRegister(tmp.rep.data(), context.ithModulus(i).getM()*sizeof(long), cudaHostRegisterPortable);
+
       context.ithModulus(i).iFFT(tmp, map[i]); // inverse FFT
+      // cudaDeviceSynchronize(); //Ardhi: temporary sync here since this ifft version is still blocking
 
       long d = deg(tmp); // copy the coefficients, pad by zeros if needed
       for (long h = 0; h <= d; h++)
@@ -1351,6 +1402,12 @@ void DoubleCRT::toPoly(NTL::ZZX& poly, const IndexSet& s, bool positive) const
       for (long h = d + 1; h < phim; h++)
         remtab[h][j] = 0;
     }
+
+
+    // for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
+    //   cudaHostUnregister(tmp.rep.data());
+    // }
+
     NTL_EXEC_INDEX_END
   } // release space of local variables
 

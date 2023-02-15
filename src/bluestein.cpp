@@ -192,10 +192,6 @@ void BluesteinFFT(NTL::zz_pX& x,
 {
   HELIB_TIMER_START;
 
-HELIB_NTIMER_START(gpu_hostRegister);
-cudaHostRegister(x.rep.data(), n*sizeof(unsigned long long), cudaHostRegisterPortable);
-HELIB_NTIMER_STOP(gpu_hostRegister);
-
 HELIB_NTIMER_START(gpu_mulMod);
   if (IsZero(x))
     return;
@@ -377,6 +373,47 @@ HELIB_NTIMER_STOP(gpu_mulMod);
     x.normalize();
     // std::cout<<"x after ntt-mul-intt-mulmodprecon: "<<x<<std::endl;
 #endif
+  }
+}
+
+void BluesteinFFT(NTL::zz_pX& x,
+                  long n,
+                  long k2,
+                  long k2_inv,
+                  UNUSED const NTL::zz_p& root,
+                  UNUSED const NTL::zz_pX& powers,
+                  UNUSED const NTL::Vec<NTL::mulmod_precon_t>& powers_aux,
+                  UNUSED const NTL::fftRep& Rb, const unsigned long long RbInVec[], unsigned long long RaInVec[], const NTL::zz_p& psi, const NTL::zz_p& inv_psi, UNUSED const NTL::zz_pX& RbInPoly, const std::vector<unsigned long long>& gpu_powers, UNUSED const std::vector<unsigned long long>& gpu_ipowers, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], unsigned long long gpu_powers_m_dev[], unsigned long long x_dev[], unsigned long long x_pinned[])
+{
+HELIB_TIMER_START;
+
+  HELIB_NTIMER_START(gpu_mulMod);
+  if (IsZero(x))
+    return;
+  if (n <= 0) {
+    clear(x);
+    return;
+  }
+
+  long p = NTL::zz_p::modulus();
+
+  gpu_mulMod(x, x_dev, gpu_powers_m_dev, p, k2);
+  HELIB_NTIMER_STOP(gpu_mulMod);
+
+  if (NEW_BLUE && n % 2 != 0) {
+    long l = 2*(n-1)+1;
+
+    HELIB_NTIMER_START(gpu_fused_polymul);
+    gpu_fused_polymul(x.rep, RaInVec, RbInVec, k2, k2_inv, x_dev, p, gpu_powers, gpu_ipowers, rep(psi), rep(inv_psi), l, gpu_powers_dev, gpu_ipowers_dev);
+    HELIB_NTIMER_STOP(gpu_fused_polymul);
+
+    HELIB_NTIMER_START(gpu_addMod);
+    gpu_addMod(x_dev, n, l, p); //Ardhi: for now just assume that dx = l, after this the polynomial degree should be n
+    HELIB_NTIMER_STOP(gpu_addMod);
+
+    HELIB_NTIMER_START(AfterPolyMul_mulMod);
+    gpu_mulMod2(x, x_dev, x_pinned, gpu_powers_m_dev,p, n);
+    HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
   }
 }
 
