@@ -49,6 +49,6 @@ set_target_properties(CUDA_ACCEL PROPERTIES
 
 # find_package(helib REQUIRED)
 set(CMAKE_CXX_FLAGS "-g")
-set(CUDA_NVCC_FLAGS "-G -g -rdc=true -c ")
+set(CUDA_NVCC_FLAGS "-G -g -rdc=true -c -lcufft")
 set(CMAKE_CUDA_FLAGS ${CUDA_NVCC_FLAGS})
 set_target_properties(CUDA_ACCEL PROPERTIES CUDA_ARCHITECTURES "35;50;72")

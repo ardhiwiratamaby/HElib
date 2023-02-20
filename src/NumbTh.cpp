@@ -1764,8 +1764,12 @@ zz_pXModulus1::zz_pXModulus1(long _m, const NTL::zz_pX& _f) :
   // else { std::cout << "=== non-special\n"; }
 }
 
-void rem(NTL::zz_pX& r, const NTL::zz_pX& a, const zz_pXModulus1& ff)
+void rem(NTL::zz_pX& r, const NTL::zz_pX& a, const zz_pXModulus1& ff, const NTL::zz_pContext& context)
 {
+  NTL::zz_pBak bak;
+  bak.save();
+  context.restore();
+
   if (!ff.specialLogic) {
     rem(r, a, ff.fm);
     return;

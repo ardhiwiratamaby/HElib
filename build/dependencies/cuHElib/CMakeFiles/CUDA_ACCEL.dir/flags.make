@@ -6,5 +6,5 @@ CUDA_DEFINES =
 
 CUDA_INCLUDES = -I/usr/local/cuda/include
 
-CUDA_FLAGS = -G -g -rdc=true -c  -g --generate-code=arch=compute_35,code=[compute_35,sm_35] --generate-code=arch=compute_50,code=[compute_50,sm_50] --generate-code=arch=compute_72,code=[compute_72,sm_72] -std=c++11
+CUDA_FLAGS = -G -g -rdc=true -c -lcufft -g --generate-code=arch=compute_35,code=[compute_35,sm_35] --generate-code=arch=compute_50,code=[compute_50,sm_50] --generate-code=arch=compute_72,code=[compute_72,sm_72] -std=c++11
 

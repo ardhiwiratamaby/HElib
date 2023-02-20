@@ -8,7 +8,7 @@
 #include "device_launch_parameters.h"
 #include "gpu_accel.cuh"
 #include <NTL/ZZVec.h>
-#include <cub/cub.cuh>
+// #include <cub/cub.cuh>
 
 __global__ void KernelMulMod(unsigned long long a[], const unsigned long long b[], unsigned long long q){
   int global_tid = threadIdx.x + blockIdx.x * THREADS_PER_BLOCK;
@@ -2412,4 +2412,25 @@ void initializeStreams(long n_streams, std::vector<cudaStream_t> &streams){
     cudaStreamCreate(&stream);
     streams.push_back(stream);
   }
+}
+
+
+void initcuFFTBuffer(long m, cufftHandle plan, cufftDoubleComplex *buf_dev){
+  CHECK(cudaMalloc(&buf_dev, m*sizeof(cufftDoubleComplex)));
+}
+
+void usecuFFT(std::vector<std::complex<double>>& buf, long m, const cufftHandle& plan, cufftDoubleComplex *buf_dev){
+
+  int check1 = sizeof(cufftDoubleComplex);
+  int check2 = sizeof(std::complex<double>);
+  int check3 = buf.size();
+  
+  CHECK(cudaMalloc(&buf_dev, m*sizeof(cufftDoubleComplex)));
+
+  CHECK(cudaMemcpy(buf_dev, buf.data(), m*sizeof(std::complex<double>), cudaMemcpyHostToDevice));
+
+  CHECK_CUFFT_ERRORS(cufftExecZ2Z(plan, buf_dev, buf_dev, CUFFT_FORWARD));
+
+  CHECK(cudaMemcpy(buf.data(), buf_dev, m*sizeof(std::complex<double>), cudaMemcpyDeviceToHost));
+
 }

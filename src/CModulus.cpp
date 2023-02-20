@@ -722,17 +722,6 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   conv(rt, rInv); // convert rInv to zp format
 
   BluesteinFFT(x, m, k2, k2_inv, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, psi, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev, gpu_ipowers_m_dev, x_dev, x_pinned); // call the FFT routine
-
-  // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x 
-  {
-    HELIB_NTIMER_START(iFFT_division);
-    rem(x, x, *phimx); // out %= (Phi_m(X),q)
-  }
-
-  // normalize
-  NTL::zz_p mm_inv;
-  conv(mm_inv, m_inv);
-  x *= mm_inv;
 }
 
 NTL::zz_pX& Cmodulus::getScratch_zz_pX()

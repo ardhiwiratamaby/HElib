@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/build/dependencies/cuHElib",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler  -I/usr/local/cuda/include -G -g -rdc=true -c  -g --generate-code=arch=compute_35,code=[compute_35,sm_35] --generate-code=arch=compute_50,code=[compute_50,sm_50] --generate-code=arch=compute_72,code=[compute_72,sm_72] -std=c++11 -x cu -dc /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cu -o CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o",
+  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler  -I/usr/local/cuda/include -G -g -rdc=true -c -lcufft -g --generate-code=arch=compute_35,code=[compute_35,sm_35] --generate-code=arch=compute_50,code=[compute_50,sm_50] --generate-code=arch=compute_72,code=[compute_72,sm_72] -std=c++11 -x cu -dc /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cu -o CMakeFiles/CUDA_ACCEL.dir/gpu_accel.cu.o",
   "file": "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cu"
 },
 {

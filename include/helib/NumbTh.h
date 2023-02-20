@@ -813,7 +813,7 @@ public:
   const NTL::zz_pXModulus& upcast() const { return fm; }
 };
 
-void rem(NTL::zz_pX& r, const NTL::zz_pX& a, const zz_pXModulus1& ff);
+void rem(NTL::zz_pX& r, const NTL::zz_pX& a, const zz_pXModulus1& ff, const NTL::zz_pContext& context);
 
 //! placeholder for pXModulus ...no optimizations
 class ZZ_pXModulus1 : public NTL::ZZ_pXModulus

@@ -111,7 +111,6 @@ for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
   //   cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
   // } 
   cudaHostRegister(map[i].data(), context.ithModulus(i).getPhiM()*sizeof(long), cudaHostRegisterPortable);
-
 }
 HELIB_NTIMER_STOP(cudaHostRegister_1);
 
@@ -1390,11 +1389,24 @@ void DoubleCRT::toPoly(NTL::ZZX& poly, const IndexSet& s, bool positive) const
 
     for (long j : range(first, last)) {
       long i = ivec[j];
-      
-      // cudaHostRegister(tmp.rep.data(), context.ithModulus(i).getM()*sizeof(long), cudaHostRegisterPortable);
 
+    // for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){      
       context.ithModulus(i).iFFT(tmp, map[i]); // inverse FFT
-      // cudaDeviceSynchronize(); //Ardhi: temporary sync here since this ifft version is still blocking
+ 
+      //Ardhi: move the code from inside iFFT to be here
+      // reduce the result mod (Phi_m(X),q) and copy to the output polynomial x 
+      { 
+        HELIB_NTIMER_START(iFFT_division);
+        rem(tmp, tmp, context.ithModulus(i).getPhimX(), context.ithModulus(i).getCmodulusContext()); // out %= (Phi_m(X),q)
+      }
+
+      {
+        context.ithModulus(i).getCmodulusContext().restore();
+        // normalize
+        NTL::zz_p mm_inv;
+        conv(mm_inv, context.ithModulus(i).getMInv());
+        tmp *= mm_inv;
+      }
 
       long d = deg(tmp); // copy the coefficients, pad by zeros if needed
       for (long h = 0; h <= d; h++)
@@ -1480,6 +1492,7 @@ void DoubleCRT::toPoly(NTL::ZZX& poly, const IndexSet& s, bool positive) const
       div(prod_half, prod_half, 2);
     }
 
+    HELIB_NTIMER_START(toPoly_CRT_lastloop);
     // Compute the actual CRT reconstruction
     NTL_EXEC_INDEX(cnt1, index)
     NTL_IMPORT(icard)
@@ -1522,6 +1535,7 @@ void DoubleCRT::toPoly(NTL::ZZX& poly, const IndexSet& s, bool positive) const
       resvec[h] = tmp;
     }
     NTL_EXEC_INDEX_END
+    HELIB_NTIMER_STOP(toPoly_CRT_lastloop);
 
     poly.SetLength(phim);
     for (long j : range(phim))

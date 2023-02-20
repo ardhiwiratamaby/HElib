@@ -22,6 +22,7 @@
 #include <helib/PAlgebra.h>
 #include <helib/fhe_stats.h>
 #include <helib/range.h>
+#include "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh"
 
 namespace helib {
 
@@ -129,22 +130,29 @@ static inline cx_double MUL(cx_double a, cx_double b)
 static double basic_embeddingLargestCoeff(const std::vector<double>& f,
                                           const PAlgebra& palg)
 {
-
+HELIB_NTIMER_START(basic_embeddingLargestCoeff);
   long m = palg.getM();
   long sz = f.size();
 
   if (sz > m)
     throw LogicError("vector too big f canonicalEmbedding");
 
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_1);
   std::vector<cx_double> buf(m);
   for (long i : range(0, sz))
     buf[i] = f[i];
   for (long i : range(sz, m))
     buf[i] = 0;
-  palg.getFFTInfo().apply(&buf[0]);
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_1);
+
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_15);
+  // palg.getFFTInfo().apply(&buf[0]);
+  usecuFFT(buf, m, palg.getFFTPlan(), const_cast<helib::PAlgebra&>(palg).getDeviceBuffer());
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_15);
 
   double mx = 0;
 
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_2);
   for (long i = 1; i <= m / 2; i++) {
     if (palg.inZmStar(i)) {
       double n = std::norm(buf[i]);
@@ -152,6 +160,9 @@ static double basic_embeddingLargestCoeff(const std::vector<double>& f,
         mx = n;
     }
   }
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_2);
+
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff);
 
   return sqrt(mx);
 }
@@ -167,7 +178,7 @@ static double basic_embeddingLargestCoeff(const std::vector<double>& f,
 static double half_embeddingLargestCoeff(const std::vector<double>& f,
                                          const PAlgebra& palg)
 {
-
+HELIB_NTIMER_START(half_embeddingLargestCoeff);
   long m = palg.getM();
   long sz = f.size();
 
@@ -193,7 +204,7 @@ static double half_embeddingLargestCoeff(const std::vector<double>& f,
         mx = n;
     }
   }
-
+HELIB_NTIMER_STOP(half_embeddingLargestCoeff);
   return sqrt(mx);
 }
 
@@ -269,6 +280,7 @@ static void basic_embeddingLargestCoeff_x2(double& norm1,
                                            const std::vector<double>& f2,
                                            const PAlgebra& palg)
 {
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2);
 
   long m = palg.getM();
   long sz1 = f1.size();
@@ -280,6 +292,7 @@ static void basic_embeddingLargestCoeff_x2(double& norm1,
   long sz_max = std::max(sz1, sz2);
   long sz_min = std::min(sz1, sz2);
 
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2_1);
   std::vector<cx_double> buf(m);
   for (long i : range(0, sz_min))
     buf[i] = cx_double(f1[i], f2[i]);
@@ -289,11 +302,15 @@ static void basic_embeddingLargestCoeff_x2(double& norm1,
     buf[i] = cx_double(0, f2[i]);
   for (long i : range(sz_max, m))
     buf[i] = 0;
-
-  palg.getFFTInfo().apply(&buf[0]);
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2_1);
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2_15);
+  usecuFFT(buf, m, palg.getFFTPlan(), const_cast<helib::PAlgebra&>(palg).getDeviceBuffer());
+  // palg.getFFTInfo().apply(&buf[0]);
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2_15);
 
   double mx1 = 0, mx2 = 0;
 
+HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2_2);
   for (long i = 1; i <= m / 2; i++) {
     if (palg.inZmStar(i)) {
       cx_double x1 = 0.5 * (buf[i] + std::conj(buf[m - i]));
@@ -310,6 +327,7 @@ static void basic_embeddingLargestCoeff_x2(double& norm1,
         mx2 = n2;
     }
   }
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2_2);
 
   norm1 = sqrt(mx1);
   norm2 = sqrt(mx2);
@@ -334,6 +352,7 @@ static void basic_embeddingLargestCoeff_x2(double& norm1,
     HELIB_STATS_UPDATE("embeddingLargestCoeff_x2", relerr);
   }
 #endif
+HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2);
 }
 
 static void half_embeddingLargestCoeff_x2(double& norm1,
@@ -342,7 +361,7 @@ static void half_embeddingLargestCoeff_x2(double& norm1,
                                           const std::vector<double>& f2,
                                           const PAlgebra& palg)
 {
-
+HELIB_NTIMER_START(half_embeddingLargestCoeff_x2);
   long m = palg.getM();
   long sz1 = f1.size();
   long sz2 = f2.size();
@@ -391,6 +410,8 @@ static void half_embeddingLargestCoeff_x2(double& norm1,
 
   norm1 = sqrt(mx1);
   norm2 = sqrt(mx2);
+
+HELIB_NTIMER_STOP(half_embeddingLargestCoeff_x2);
 
 #if 0
 // debugging code

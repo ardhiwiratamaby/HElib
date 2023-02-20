@@ -4,8 +4,58 @@
 #include <helib/NumbTh.h>
 #include <helib/timing.h>
 #include "cuda_runtime.h"
+#include <cufft.h>
 
 #define THREADS_PER_BLOCK 1024
+
+static const char* _cudaGetErrorEnum(cufftResult error)
+{
+    if (error == CUFFT_SUCCESS)
+    {
+        return "CUFFT_SUCCESS";
+    }
+    else if (error == CUFFT_INVALID_PLAN)
+    {
+        return "CUFFT_INVALID_PLAN";
+    }
+    else if (error == CUFFT_ALLOC_FAILED)
+    {
+        return "CUFFT_ALLOC_FAILED";
+    }
+    else if (error == CUFFT_INVALID_TYPE)
+    {
+        return "CUFFT_INVALID_TYPE";
+    }
+    else if (error == CUFFT_INVALID_VALUE)
+    {
+        return "CUFFT_INVALID_VALUE";
+    }
+    else if (error == CUFFT_INTERNAL_ERROR)
+    {
+        return "CUFFT_INTERNAL_ERROR";
+    }
+    else if (error == CUFFT_EXEC_FAILED)
+    {
+        return "CUFFT_EXEC_FAILED";
+    }
+    else if (error == CUFFT_SETUP_FAILED)
+    {
+        return "CUFFT_SETUP_FAILED";
+    }
+    else if (error == CUFFT_INVALID_SIZE)
+    {
+        return "CUFFT_INVALID_SIZE";
+    }
+    else if (error == CUFFT_UNALIGNED_DATA)
+    {
+        return "CUFFT_UNALIGNED_DATA";
+    }
+    else
+    {
+        return "<unknown>";
+    }
+}
+
 
 #define CHECK(call)                                                            \
 {                                                                              \
@@ -17,7 +67,16 @@
                 cudaGetErrorString(error));                                    \
     }                                                                          \
 }
+static const char *cuFFTCheck(cufftResult error);
 
+#define CHECK_CUFFT_ERRORS(call) { \
+    cufftResult_t err; \
+    if ((err = (call)) != CUFFT_SUCCESS) { \
+        fprintf(stderr, "cuFFT error %d:%s at %s:%d\n", err, _cudaGetErrorEnum(err), \
+                __FILE__, __LINE__); \
+        exit(1); \
+    } \
+}
 void InitGPUBuffer(long phim, int n_rows);
 void DestroyGPUBuffer();
 unsigned long long bitReverse(unsigned long long a, int bit_length);  // reverses the bits for twiddle factor calculation
@@ -75,5 +134,7 @@ void gpu_mulMod2(NTL::zz_pX& x, unsigned long long x_dev[], unsigned long long x
 #endif
 
 void initializeStreams(long n_streams, std::vector<cudaStream_t> &streams);
+void usecuFFT(std::vector<std::complex<double>>& buf, long m, const cufftHandle& plan, cufftDoubleComplex *buf_dev);
+void initcuFFTBuffer(long m, cufftHandle plan, cufftDoubleComplex *buf_dev);
 
 #endif

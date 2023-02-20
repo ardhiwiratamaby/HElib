@@ -158,10 +158,11 @@ public:
   unsigned long getM() const { return zMStar->getM(); }
   unsigned long getPhiM() const { return zMStar->getPhiM(); }
   long getQ() const { return q; }
+  long getMInv() const {return m_inv;}
   NTL::mulmod_t getQInv() const { return qinv; }
   long getRoot() const { return root; }
   const zz_pXModulus1& getPhimX() const { return *phimx; }
-
+  const NTL::zz_pContext getCmodulusContext() const {return context;}
   //! @brief Restore NTL's current modulus
   void restoreModulus() const { context.restore(); }
 
