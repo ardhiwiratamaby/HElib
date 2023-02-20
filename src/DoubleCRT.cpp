@@ -336,7 +336,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
 
   const IndexSet& s = map.getIndexSet();
   long phim = context.getPhiM();
-
+HELIB_NTIMER_START(Op_generic);
   // add/sub/mul the data, element by element, modulo the respective primes
   for (long i : s) {
     long pi = context.ithPrime(i);
@@ -355,6 +355,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     }
 #endif
   }
+HELIB_NTIMER_STOP(Op_generic);
   return *this;
 }
 
