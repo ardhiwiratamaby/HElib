@@ -633,10 +633,6 @@ void Cmodulus::FFT(NTL::vec_long& y, NTL::zz_pX& x, cudaStream_t stream) const
   
   
   x.SetLength(getM());
-  // cudaHostRegister(x.rep.data(), getM()*sizeof(long), cudaHostRegisterPortable);
-
-  // cudaError_t status = cudaGetLastError();
-  // checkCudaError(status, "warning: cudaHostRegister on x failed");
   
   FFT_aux(y, x, stream);
 }

@@ -83,7 +83,21 @@
 			"__locale": "cpp",
 			"__bit_reference": "cpp",
 			"ios": "cpp",
-			"locale": "cpp"
+			"locale": "cpp",
+			"cassert": "cpp",
+			"cerrno": "cpp",
+			"cfloat": "cpp",
+			"ciso646": "cpp",
+			"climits": "cpp",
+			"cstdbool": "cpp",
+			"__debug": "cpp",
+			"__functional_base": "cpp",
+			"__string": "cpp",
+			"__threading_support": "cpp",
+			"__tuple": "cpp",
+			"__preprocessor": "cpp",
+			"__target_macros": "cpp",
+			"target": "cpp"
 		}
 	}
 }

@@ -77,33 +77,33 @@ static const char *cuFFTCheck(cufftResult error);
         exit(1); \
     } \
 }
-void InitGPUBuffer(long phim, int n_rows);
+void InitGPUBuffer(long phim, int n_rows, long *d_A, long *d_B, long *d_C, long *d_modulus, long *d_scalar, int bytes);
 void DestroyGPUBuffer();
 unsigned long long bitReverse(unsigned long long a, int bit_length);  // reverses the bits for twiddle factor calculation
 unsigned long long modpow64(unsigned long long a, unsigned long long b, unsigned long long mod);
 inline uint64_t Log2(uint64_t x);
 
-void setRowMapA(long offset, long *source);
-void setRowMapB(long offset, const long *source);
-long *getRowMapB(long index);
-long *getRowMapA(long index);
+void setRowMapA(long offset, long *source, long *contiguousHostMapA, long d_phim);
+void setRowMapB(long offset, const long *source, long *contiguousHostMapB, long d_phim);
+long *getRowMapB(long index, long *contiguousHostMapB);
+long *getRowMapA(long index, long *contiguousHostMapA);
 
-void setMapA(long index, long data);
-void setMapB(long index, long data);
-void setModulus(long index, long data);
-void setScalar(long index, long data);
+void setMapA(long index, long data, long *contiguousHostMapA);
+void setMapB(long index, long data, long *contiguousHostMapB);
+void setModulus(long index, long data, long *contiguousModulus, long n_rows);
+void setScalar(long index, long data, long *scalarPerRow);
 
-long getMapA(long index);
-long getMapB(long index);
+long getMapA(long index, long *contiguousHostMapA);
+long getMapB(long index, long *contiguousHostMapB);
 
-void InitContiguousHostMapModulus(long phim, int n_rows);
+void InitContiguousHostMapModulus(long phim, int n_rows, long *contiguousHostMapA, long *contiguousHostMapB, long *contiguousModulus, long *scalarPerRow);
 
-void CudaEltwiseAddMod(long n_rows);
-void CudaEltwiseAddMod(long n_rows, long scalar);
-void CudaEltwiseSubMod(long n_rows);
-void CudaEltwiseSubMod(long n_rows, long scalar);
-void CudaEltwiseMultMod(long n_rows);
-void CudaEltwiseMultMod(long n_rows, long scalar);
+void CudaEltwiseAddMod(long actual_nrows, long *contiguousHostMapA, long *contiguousHostMapB, long *contiguousModulus, long *d_A, long *d_B, long *d_C, long *d_modulus, int bytes, long d_phim);
+void CudaEltwiseAddMod(long actual_nrows, long scalar, long *contiguousHostMapA, long *scalarPerRow, long *contiguousModulus, long *d_A, long *d_C, long *d_scalar, long *d_modulus, int bytes, long d_phim);
+void CudaEltwiseSubMod(long actual_nrows, long *contiguousHostMapA, long *contiguousHostMapB, long *contiguousModulus, long *d_A, long *d_B, long *d_C, long *d_modulus, int bytes, long d_phim);
+void CudaEltwiseSubMod(long actual_nrows, long scalar, long *contiguousHostMapA, long *scalarPerRow, long *contiguousModulus, long *d_A, long *d_C, long *d_scalar, long *d_modulus, int bytes, long d_phim);
+void CudaEltwiseMultMod(long actual_nrows, long *contiguousHostMapA, long *contiguousHostMapB, long *contiguousModulus, long *d_A, long *d_B, long *d_C, long *d_modulus, int bytes, long d_phim);
+void CudaEltwiseMultMod(long actual_nrows, long scalar, long *contiguousHostMapA, long *scalarPerRow, long *contiguousModulus, long *d_A, long *d_C, long *d_scalar, long *d_modulus, int bytes, long d_phim);
 
 int cuda_add();
 void init_gpu_ntt(unsigned int n);

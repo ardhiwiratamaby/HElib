@@ -674,8 +674,8 @@ Context::Context(long m,
                                 bparams->thickFlag);
     }
 
-    InitGPUBuffer(zMStar.getPhiM(), getCtxtPrimes().card());
-    InitContiguousHostMapModulus(zMStar.getPhiM(), getCtxtPrimes().card());
+    // InitGPUBuffer(zMStar.getPhiM(), getCtxtPrimes().card());
+    // InitContiguousHostMapModulus(zMStar.getPhiM(), getCtxtPrimes().card());
   }
 }
 

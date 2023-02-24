@@ -96,6 +96,12 @@ private:
 
   std::vector<cudaStream_t> streams;
 
+  long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
+  long bytes;
+  long d_phim, d_n_rows;
+
+  long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
+  // std::unique_ptr<long> *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
   //! a "sanity check" method, verifies consistency of the map with
   //! current moduli chain, an error is raised if they are not consistent
@@ -131,6 +137,20 @@ public:
 
   // Default copy-constructor:
   DoubleCRT(const DoubleCRT& other) = default;
+
+  void deleteGPUBuffer()
+  {
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+    cudaFree(d_modulus);
+    cudaFree(d_scalar);
+
+    cudaFreeHost(contiguousHostMapA);
+    cudaFreeHost(contiguousHostMapB);
+    cudaFreeHost(contiguousModulus);
+    cudaFreeHost(scalarPerRow);
+  }
 
   //! @brief Initializing DoubleCRT from a ZZX polynomial
   //! @param poly The ring element itself, zero if not specified

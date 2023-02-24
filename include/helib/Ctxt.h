@@ -531,7 +531,13 @@ public:
   //! on the L-infty norm of the canonical embedding
   void DummyEncrypt(const NTL::ZZX& ptxt, double size = -1.0);
 
-
+  ~Ctxt()
+  {
+    for (unsigned int i  = 0; i < parts.size(); i++)
+    {
+      parts[i].deleteGPUBuffer();
+    }
+  }
 
   Ctxt& operator=(const Ctxt& other)
   { // public assignment operator
