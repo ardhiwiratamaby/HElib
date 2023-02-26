@@ -674,10 +674,59 @@ Context::Context(long m,
                                 bparams->thickFlag);
     }
 
+    int magicNumber = 3;
+    long bytes = magicNumber*zMStar.getPhiM()*getCtxtPrimes().card()*sizeof(long);
+    int n_rows = getCtxtPrimes().card();
+    int phim = getPhiM();
+
+    for(int i=0; i<n_threads; i++)
+    {
+      CPU_GPU_Buffer myBuffer;
+      myBuffer.threadIdOwner = -1;
+      myBuffer.bytes = bytes;
+      myBuffer.d_phim = phim;
+      myBuffer.d_n_rows = n_rows;
+      CHECK(cudaMalloc(&myBuffer.d_A, bytes));
+      CHECK(cudaMalloc(&myBuffer.d_B, bytes));
+      CHECK(cudaMalloc(&myBuffer.d_C, bytes));
+      CHECK(cudaMalloc(&myBuffer.d_modulus, magicNumber*n_rows*sizeof(long)));
+      CHECK(cudaMalloc(&myBuffer.d_scalar, magicNumber*n_rows*sizeof(long)));
+
+      cudaMallocHost(&myBuffer.contiguousHostMapA, magicNumber*phim*n_rows*sizeof(long));
+      cudaMallocHost(&myBuffer.contiguousHostMapB, magicNumber*phim*n_rows*sizeof(long));
+      cudaMallocHost(&myBuffer.contiguousModulus, magicNumber*n_rows*sizeof(long));
+      cudaMallocHost(&myBuffer.scalarPerRow, magicNumber*n_rows*sizeof(long));
+
+      offloadBuffer.push_back(myBuffer);
+    }
+
     // InitGPUBuffer(zMStar.getPhiM(), getCtxtPrimes().card());
     // InitContiguousHostMapModulus(zMStar.getPhiM(), getCtxtPrimes().card());
   }
 }
+
+long Context::getBufferId(std::thread::id tid)
+{
+  for(int i = 0; i < offloadBuffer.size(); i++)
+  {
+    if(offloadBuffer[i].threadIdOwner == (long) hasher(tid))
+      return i;
+
+    if(offloadBuffer[i].threadIdOwner == -1)
+    {
+      offloadBuffer[i].threadIdOwner = (long) hasher(tid);
+      return i;
+    }
+  }
+
+  return -1; //Ardhi: no buffer allocated for the requestor thread
+} 
+
+CPU_GPU_Buffer Context::getOffloadBuffer(std::thread::id tid)
+{
+  return offloadBuffer[getBufferId(tid)];
+}
+
 
 Context::Context(const SerializableContent& content) :
     Context(content.m, content.p, content.r, content.gens, content.ords)

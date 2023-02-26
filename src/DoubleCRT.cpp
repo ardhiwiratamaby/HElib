@@ -451,12 +451,14 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   // add/sub/mul the data, element by element, modulo the respective primes
 
 	HELIB_NTIMER_START(MapToContigousMap);
+  CPU_GPU_Buffer buf = context.getOffloadBuffer(std::this_thread::get_id());
+
   //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
     NTL::vec_long& row = map[i];
     const NTL::vec_long& other_row = (*other_map)[i];
-    setModulus(current_row, context.ithPrime(i), contiguousModulus, s.card());
+    setModulus(current_row, context.ithPrime(i), buf.contiguousModulus, s.card());
     // row[0];
     // other_row[0];
     // for (long j : range(phim)){
@@ -468,8 +470,8 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     //   counter++;
     // }
     
-    setRowMapA(counter, &row[0], contiguousHostMapA, phim);
-    setRowMapB(counter, &other_row[0], contiguousHostMapB, phim);
+    setRowMapA(counter, &row[0], buf.contiguousHostMapA, phim);
+    setRowMapB(counter, &other_row[0], buf.contiguousHostMapB, phim);
 
     counter = counter+phim;
     current_row++;
@@ -491,7 +493,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
   // }
 
   //cudaMemCopy+Execute Kernel
-  fun.apply(current_row, contiguousHostMapA, contiguousHostMapB, contiguousModulus, d_A, d_B, d_C, d_modulus, bytes, phim);
+  fun.apply(current_row, buf.contiguousHostMapA, buf.contiguousHostMapB, buf.contiguousModulus, buf.d_A, buf.d_B, buf.d_C, buf.d_modulus, buf.bytes, buf.phim);
 
 	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
@@ -503,7 +505,7 @@ DoubleCRT& DoubleCRT::Op(const DoubleCRT& other, Fun fun, bool matchIndexSets)
     //   counter++;
     // }
 
-    long *source = getRowMapA(counter, contiguousHostMapA);
+    long *source = getRowMapA(counter, buf.contiguousHostMapA);
     memcpy(&row[0], source, phim*sizeof(long));
     counter += phim;
     // current_row++;
@@ -622,11 +624,12 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   // add/sub/mul the data, element by element, modulo the respective primes
 	HELIB_NTIMER_START(MapToContigousMap);
   //copy map to contiguousMap
+  CPU_GPU_Buffer buf = context.getOffloadBuffer(std::this_thread::get_id());
   long counter=0, current_row=0;
   for (long i : s) {
     NTL::vec_long& row = map[i];
     const NTL::vec_long& other_row = (*other_map)[i];
-    setModulus(current_row, context.ithPrime(i), contiguousModulus, s.card());
+    setModulus(current_row, context.ithPrime(i), buf.contiguousModulus, s.card());
     // row[0];
     // other_row[0];
     // for (long j : range(phim)){
@@ -638,8 +641,8 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     //   counter++;
     // }
     
-    setRowMapA(counter, &row[0], contiguousHostMapA, phim);
-    setRowMapB(counter, &other_row[0], contiguousHostMapB, phim);
+    setRowMapA(counter, &row[0], buf.contiguousHostMapA, phim);
+    setRowMapB(counter, &other_row[0], buf.contiguousHostMapB, phim);
 
     counter = counter+phim;
     current_row++;
@@ -661,7 +664,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
   // }
 
   //cudaMemCopy+Execute Kernel
-  CudaEltwiseMultMod(current_row, contiguousHostMapA, contiguousHostMapB, contiguousModulus, d_A, d_B, d_C, d_modulus, bytes, phim);
+  CudaEltwiseMultMod(current_row, buf.contiguousHostMapA, buf.contiguousHostMapB, buf.contiguousModulus, buf.d_A, buf.d_B, buf.d_C, buf.d_modulus, buf.bytes, phim);
 
 	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
@@ -673,7 +676,7 @@ DoubleCRT& DoubleCRT::do_mul(const DoubleCRT& other, bool matchIndexSets)
     //   counter++;
     // }
 
-    long *source = getRowMapA(counter, contiguousHostMapA);
+    long *source = getRowMapA(counter, buf.contiguousHostMapA);
     memcpy(&row[0], source, phim*sizeof(long));
     counter += phim;
     // current_row++;
@@ -718,16 +721,17 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
   // add/sub/mul the data, element by element, modulo the respective primes
 
 	HELIB_NTIMER_START(MapToContigousMap);
+  CPU_GPU_Buffer buf = context.getOffloadBuffer(std::this_thread::get_id());
     //copy map to contiguousMap
   long counter=0, current_row=0;
   for (long i : s) {
     NTL::vec_long& row = map[i];
     long pi = context.ithPrime(i);
     long n = rem(num, pi); // n = num % pi 
-    setModulus(current_row, pi, contiguousModulus, s.card());
+    setModulus(current_row, pi, buf.contiguousModulus, s.card());
     setScalar(current_row, n, scalarPerRow);
     
-    setRowMapA(counter, &row[0], contiguousHostMapA, phim);
+    setRowMapA(counter, &row[0], buf.contiguousHostMapA, phim);
 
     counter = counter+phim;
     current_row++;
@@ -735,7 +739,7 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
 	HELIB_NTIMER_STOP(MapToContigousMap);
 
   //cudaMemCopy+Execute Kernel
-  fun.apply(current_row, 1, contiguousHostMapA, scalarPerRow, contiguousModulus, d_A, d_C, d_scalar, d_modulus, bytes, phim);
+  fun.apply(current_row, 1, buf.contiguousHostMapA, buf.scalarPerRow, buf.contiguousModulus, buf.d_A, buf.d_C, buf.d_scalar, buf.d_modulus, buf.bytes, phim);
 
 	HELIB_NTIMER_START(ContigousMapToMap);
   //copy the result in contiguousMap to map
@@ -747,7 +751,7 @@ DoubleCRT& DoubleCRT::Op(const NTL::ZZ& num, Fun fun)
     //   counter++;
     // }
 
-    long *source = getRowMapA(counter, contiguousHostMapA);
+    long *source = getRowMapA(counter, buf.contiguousHostMapA);
     memcpy(&row[0], source, phim*sizeof(long));
     counter += phim;
     // current_row++;
@@ -1051,7 +1055,7 @@ DoubleCRTHelper::DoubleCRTHelper(const Context& context)
 }
 
 DoubleCRT::DoubleCRT(const NTL::ZZX& poly,
-                     const Context& _context,
+                     Context& _context,
                      const IndexSet& s) :
     context(_context), map(new DoubleCRTHelper(_context))
 {
@@ -1064,26 +1068,6 @@ DoubleCRT::DoubleCRT(const NTL::ZZX& poly,
     return;
 
   initializeStreams(s.card(), streams);
-
-  // InitGPUBuffer(context.getPhiM(), context.getCtxtPrimes().card(), d_A, d_B, d_C, d_modulus, d_scalar, bytes);
-  // InitContiguousHostMapModulus(context.getPhiM(), context.getCtxtPrimes().card(), contiguousHostMapA, contiguousHostMapB, contiguousModulus, scalarPerRow);
-
-  int magicNumber = 3;
-  int n_rows = context.getCtxtPrimes().card();
-  int phim = context.getPhiM();
-  bytes = magicNumber*phim*n_rows*sizeof(long);
-
-  // Allocate memory for arrays d_A, d_B, and d_C on device
-  CHECK(cudaMalloc(&d_A, bytes));
-  CHECK(cudaMalloc(&d_B, bytes));
-  CHECK(cudaMalloc(&d_C, bytes));
-  CHECK(cudaMalloc(&d_modulus, magicNumber*n_rows*sizeof(long)));
-  CHECK(cudaMalloc(&d_scalar, magicNumber*n_rows*sizeof(long)));
-
-  cudaMallocHost(&contiguousHostMapA, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousHostMapB, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousModulus, magicNumber*n_rows*sizeof(long));
-  cudaMallocHost(&scalarPerRow, magicNumber*n_rows*sizeof(long));
   
   // convert the integer polynomial to FFT representation modulo the primes
   if (deg(poly) <= 0)       // special case for a constant polynomial
@@ -1133,7 +1117,7 @@ DoubleCRT::DoubleCRT(const NTL::ZZX& poly)
 // FIXME: "code bloat": this just replicates the above with NTL::ZZX -> zzX
 
 DoubleCRT::DoubleCRT(const zzX& poly,
-                     const Context& _context,
+                     Context& _context,
                      const IndexSet& s) :
     context(_context), map(new DoubleCRTHelper(_context))
 {
@@ -1145,28 +1129,8 @@ DoubleCRT::DoubleCRT(const zzX& poly,
   if (isDryRun())
     return;
 
-  initializeStreams(s.card(), streams);
-
-  // InitGPUBuffer(context.getPhiM(), context.getCtxtPrimes().card(), d_A, d_B, d_C, d_modulus, d_scalar, bytes);
-  // InitContiguousHostMapModulus(context.getPhiM(), context.getCtxtPrimes().card(), contiguousHostMapA, contiguousHostMapB, contiguousModulus, scalarPerRow);
-
-  int magicNumber = 3;
-  int n_rows = context.getCtxtPrimes().card();
-  int phim = context.getPhiM();
-  bytes = magicNumber*phim*n_rows*sizeof(long);
-
-  // Allocate memory for arrays d_A, d_B, and d_C on device
-  CHECK(cudaMalloc(&d_A, bytes));
-  CHECK(cudaMalloc(&d_B, bytes));
-  CHECK(cudaMalloc(&d_C, bytes));
-  CHECK(cudaMalloc(&d_modulus, magicNumber*n_rows*sizeof(long)));
-  CHECK(cudaMalloc(&d_scalar, magicNumber*n_rows*sizeof(long)));
-
-  cudaMallocHost(&contiguousHostMapA, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousHostMapB, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousModulus, magicNumber*n_rows*sizeof(long));
-  cudaMallocHost(&scalarPerRow, magicNumber*n_rows*sizeof(long));
-
+  initializeStreams(s.card(), streams);  
+  
   // convert the integer polynomial to FFT representation modulo the primes
   if (lsize(poly) <= 1) // special case for a constant polynomial
     *this = (lsize(poly) == 1) ? poly[0] : 0; // no FFT is needed
@@ -1215,7 +1179,7 @@ DoubleCRT::DoubleCRT(const zzX& poly)
 }
 #endif
 
-DoubleCRT::DoubleCRT(const Context& _context, const IndexSet& s) :
+DoubleCRT::DoubleCRT(Context& _context, const IndexSet& s) :
     context(_context), map(new DoubleCRTHelper(_context))
 {
   assertTrue(s.last() < context.numPrimes(),
@@ -1228,26 +1192,6 @@ DoubleCRT::DoubleCRT(const Context& _context, const IndexSet& s) :
   long phim = context.getPhiM();
 
   initializeStreams(s.card(), streams);
-
-  // InitGPUBuffer(context.getPhiM(), context.getCtxtPrimes().card(), d_A, d_B, d_C, d_modulus, d_scalar, bytes);
-  // InitContiguousHostMapModulus(context.getPhiM(), context.getCtxtPrimes().card(), contiguousHostMapA, contiguousHostMapB, contiguousModulus, scalarPerRow);
-  
-  int magicNumber = 3;
-  int n_rows = context.getCtxtPrimes().card();
-
-  bytes = magicNumber*phim*n_rows*sizeof(long);
-
-  // Allocate memory for arrays d_A, d_B, and d_C on device
-  CHECK(cudaMalloc(&d_A, bytes));
-  CHECK(cudaMalloc(&d_B, bytes));
-  CHECK(cudaMalloc(&d_C, bytes));
-  CHECK(cudaMalloc(&d_modulus, magicNumber*n_rows*sizeof(long)));
-  CHECK(cudaMalloc(&d_scalar, magicNumber*n_rows*sizeof(long)));
-
-  cudaMallocHost(&contiguousHostMapA, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousHostMapB, magicNumber*phim*n_rows*sizeof(long));
-  cudaMallocHost(&contiguousModulus, magicNumber*n_rows*sizeof(long));
-  cudaMallocHost(&scalarPerRow, magicNumber*n_rows*sizeof(long));
 
   for (long i : s) {
     NTL::vec_long& row = map[i];
@@ -2036,7 +1980,7 @@ void DoubleCRT::writeTo(std::ostream& str) const
   }
 }
 
-DoubleCRT DoubleCRT::readFrom(std::istream& str, const Context& context)
+DoubleCRT DoubleCRT::readFrom(std::istream& str, Context& context)
 {
   DoubleCRT ret(context, IndexSet::emptySet());
   ret.read(str);
@@ -2075,14 +2019,14 @@ JsonWrapper DoubleCRT::writeToJSON() const
   return wrap(j);
 }
 
-DoubleCRT DoubleCRT::readFromJSON(std::istream& str, const Context& context)
+DoubleCRT DoubleCRT::readFromJSON(std::istream& str, Context& context)
 {
   json j;
   str >> j;
   return DoubleCRT::readFromJSON(wrap(j), context);
 }
 
-DoubleCRT DoubleCRT::readFromJSON(const JsonWrapper& j, const Context& context)
+DoubleCRT DoubleCRT::readFromJSON(const JsonWrapper& j, Context& context)
 {
   DoubleCRT ret{context, IndexSet::emptySet()};
   ret.readJSON(j);

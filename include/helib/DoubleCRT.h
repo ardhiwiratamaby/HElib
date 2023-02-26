@@ -88,7 +88,8 @@ private:
 class DoubleCRT
 {
 private:
-  const Context& context; // the context
+  // const Context& context; // the context
+  Context& context; // the context
 
   // the data itself: if the i'th prime is in use then map[i] is the std::vector
   // of evaluations wrt this prime
@@ -96,12 +97,7 @@ private:
 
   std::vector<cudaStream_t> streams;
 
-  long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
-  long bytes;
-  long d_phim, d_n_rows;
 
-  long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
-  // std::unique_ptr<long> *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
   //! a "sanity check" method, verifies consistency of the map with
   //! current moduli chain, an error is raised if they are not consistent
@@ -140,16 +136,16 @@ public:
 
   void deleteGPUBuffer()
   {
-    cudaFree(d_A);
-    cudaFree(d_B);
-    cudaFree(d_C);
-    cudaFree(d_modulus);
-    cudaFree(d_scalar);
+    // cudaFree(d_A);
+    // cudaFree(d_B);
+    // cudaFree(d_C);
+    // cudaFree(d_modulus);
+    // cudaFree(d_scalar);
 
-    cudaFreeHost(contiguousHostMapA);
-    cudaFreeHost(contiguousHostMapB);
-    cudaFreeHost(contiguousModulus);
-    cudaFreeHost(scalarPerRow);
+    // cudaFreeHost(contiguousHostMapA);
+    // cudaFreeHost(contiguousHostMapB);
+    // cudaFreeHost(contiguousModulus);
+    // cudaFreeHost(scalarPerRow);
   }
 
   //! @brief Initializing DoubleCRT from a ZZX polynomial
@@ -161,7 +157,7 @@ public:
   // VJS-FIXME: it is not clear what the restrictions on deg(poly) are:
   // must we have deg(poly) < phi(m)? Or is it deg(poly) < m?
   DoubleCRT(const NTL::ZZX& poly,
-            const Context& _context,
+            Context& _context,
             const IndexSet& indexSet);
 
 // FIXME-IndexSet
@@ -180,7 +176,7 @@ public:
 #endif
 
   //! @brief Same as above, but with zzX's
-  DoubleCRT(const zzX& poly, const Context& _context, const IndexSet& indexSet);
+  DoubleCRT(const zzX& poly, Context& _context, const IndexSet& indexSet);
 
 // FIXME-IndexSet
 #if 0
@@ -196,7 +192,7 @@ public:
 #endif
 
   //! @brief Also specify the IndexSet explicitly
-  DoubleCRT(const Context& _context, const IndexSet& indexSet);
+  DoubleCRT(Context& _context, const IndexSet& indexSet);
 
   // Assignment operator, the following two lines are equivalent:
   //    DoubleCRT dCRT(poly, context, indexSet);
@@ -220,14 +216,14 @@ public:
   // more constructors to round out the interface
   // implemented by delegation and assignment
   DoubleCRT(const NTL::ZZ& num,
-            const Context& context,
+            Context& context,
             const IndexSet& indexSet) :
       DoubleCRT(context, indexSet)
   {
     *this = num;
   }
 
-  DoubleCRT(long num, const Context& context, const IndexSet& indexSet) :
+  DoubleCRT(long num, Context& context, const IndexSet& indexSet) :
       DoubleCRT(context, indexSet)
   {
     *this = num;
@@ -425,7 +421,7 @@ public:
    * @param str Input `std::istream`.
    * @return The deserialized `DoubleCRT` object.
    **/
-  static DoubleCRT readFrom(std::istream& str, const Context& context);
+  static DoubleCRT readFrom(std::istream& str, Context& context);
 
   /**
    * @brief In-place read from the stream the serialized `DoubleCRT` object in
@@ -454,7 +450,7 @@ public:
    * @param context The `Context` to be used.
    * @return The deserialized `Ctxt` object.
    **/
-  static DoubleCRT readFromJSON(std::istream& str, const Context& context);
+  static DoubleCRT readFromJSON(std::istream& str, Context& context);
 
   /**
    * @brief Read from the `JsonWrapper` the serialized ciphertext (`Ctxt`)
@@ -463,7 +459,7 @@ public:
    * @param context The `Context` to be used.
    * @return The deserialized `Ctxt` object.
    **/
-  static DoubleCRT readFromJSON(const JsonWrapper& j, const Context& context);
+  static DoubleCRT readFromJSON(const JsonWrapper& j, Context& context);
 
   /**
    * @brief In-place read from the `str` `std::istream` the serialized

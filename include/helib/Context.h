@@ -26,7 +26,7 @@
 #include <helib/range.h>
 #include <helib/scheme.h>
 #include <helib/JsonWrapper.h>
-
+#include <thread>
 #include <NTL/Lazy.h>
 
 namespace helib {
@@ -93,6 +93,22 @@ struct PolyModRing;
 template <typename SCHEME>
 class ContextBuilder;
 
+struct CPU_GPU_Buffer {
+    long *d_A;
+    long *d_B;
+    long *d_C;
+    long *d_modulus;
+    long *d_scalar;
+    long bytes;
+    long d_phim;
+    long d_n_rows;
+    long *contiguousHostMapA;
+    long *contiguousHostMapB;
+    long *contiguousModulus;
+    long *scalarPerRow;
+    long threadIdOwner;
+};
+
 /**
  * @class Context
  * @brief Maintaining the HE scheme parameters
@@ -116,6 +132,15 @@ private:
   // primes only grows and no prime is ever modified or removed.
   std::vector<Cmodulus> moduli;
 
+  std::vector<CPU_GPU_Buffer> offloadBuffer;
+  int n_threads = 5;
+  std::hash<std::thread::id> hasher;
+
+  // long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
+  // long bytes;
+  // long d_phim, d_n_rows;
+
+  // long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
 
   // A helper table to map required modulo-sizes to primeSets
   ModuliSizes modSizes;
@@ -308,6 +333,10 @@ public:
    * that use different `PAlgebra` objects.
    **/
   long getPPowR() const { return alMod.getPPowR(); }
+
+  long getBufferId(std::thread::id tid);
+
+  CPU_GPU_Buffer getOffloadBuffer(std::thread::id tid);
 
   // synonymn for getR().
   // this is used in various corner cases in CKKS where
