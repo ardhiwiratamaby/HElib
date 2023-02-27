@@ -26,7 +26,6 @@
 #include <cmath>
 #include <mutex> // std::mutex, std::unique_lock
 #include "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh"
-#include <cufft.h>
 
 namespace helib {
 
@@ -587,8 +586,6 @@ PAlgebra::PAlgebra(long mm,
   if (mm % 4 == 0)
     quarter_fftInfo = std::make_shared<quarter_FFT>(mm);
   
-  CHECK_CUFFT_ERRORS(cufftPlan1d(&plan, m, CUFFT_Z2Z, 1));
-  initcuFFTBuffer(m, plan, buf_dev);
 }
 
 bool comparePAlgebra(const PAlgebra& palg,

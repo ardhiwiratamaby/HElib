@@ -370,12 +370,12 @@ src/CMakeFiles/helib.dir/BenesNetwork.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -749,20 +749,17 @@ src/CMakeFiles/helib.dir/CModulus.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -772,6 +769,9 @@ src/CMakeFiles/helib.dir/CModulus.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
 
 src/CMakeFiles/helib.dir/Context.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/src/Context.cpp
@@ -1144,21 +1144,18 @@ src/CMakeFiles/helib.dir/Context.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -1168,6 +1165,9 @@ src/CMakeFiles/helib.dir/Context.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -1593,21 +1593,18 @@ src/CMakeFiles/helib.dir/Ctxt.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -1615,6 +1612,9 @@ src/CMakeFiles/helib.dir/Ctxt.cpp.o
  /usr/local/cuda/include/vector_functions.h
  /usr/local/cuda/include/vector_functions.hpp
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
@@ -2058,12 +2058,12 @@ src/CMakeFiles/helib.dir/DoubleCRT.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -2455,12 +2455,12 @@ src/CMakeFiles/helib.dir/EaCx.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -2859,12 +2859,12 @@ src/CMakeFiles/helib.dir/EncryptedArray.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -3290,12 +3290,12 @@ src/CMakeFiles/helib.dir/EvalMap.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -4734,12 +4734,12 @@ src/CMakeFiles/helib.dir/OptimizePermutations.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -5110,13 +5110,6 @@ src/CMakeFiles/helib.dir/PAlgebra.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/range.h
@@ -5134,14 +5127,21 @@ src/CMakeFiles/helib.dir/PAlgebra.cpp.o
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
  /usr/local/cuda/include/driver_functions.h
  /usr/local/cuda/include/vector_functions.h
  /usr/local/cuda/include/vector_functions.hpp
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
 
 src/CMakeFiles/helib.dir/PGFFT.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/src/PGFFT.cpp
@@ -5728,21 +5728,18 @@ src/CMakeFiles/helib.dir/PermNetwork.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -5752,6 +5749,9 @@ src/CMakeFiles/helib.dir/PermNetwork.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -6797,21 +6797,18 @@ src/CMakeFiles/helib.dir/Ptxt.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -6821,6 +6818,9 @@ src/CMakeFiles/helib.dir/Ptxt.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -7251,12 +7251,12 @@ src/CMakeFiles/helib.dir/binaryArith.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -7660,12 +7660,12 @@ src/CMakeFiles/helib.dir/binaryCompare.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -8312,10 +8312,10 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
+ /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /usr/local/cuda/include/cufft.h
  /usr/local/cuda/include/cuComplex.h
  /usr/include/c++/7/math.h
- /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /usr/local/include/NTL/FFT_impl.h
 
 src/CMakeFiles/helib.dir/debugging.cpp.o
@@ -8661,21 +8661,18 @@ src/CMakeFiles/helib.dir/debugging.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -8685,6 +8682,9 @@ src/CMakeFiles/helib.dir/debugging.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -9090,12 +9090,12 @@ src/CMakeFiles/helib.dir/eqtesting.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -9497,12 +9497,12 @@ src/CMakeFiles/helib.dir/extractDigits.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -10458,12 +10458,12 @@ src/CMakeFiles/helib.dir/intraSlot.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -11220,13 +11220,6 @@ src/CMakeFiles/helib.dir/keySwitching.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/matching.h
  /usr/include/c++/7/unordered_map
  /usr/include/c++/7/bits/unordered_map.h
@@ -11271,8 +11264,12 @@ src/CMakeFiles/helib.dir/keySwitching.cpp.o
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -11283,6 +11280,9 @@ src/CMakeFiles/helib.dir/keySwitching.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -11684,12 +11684,12 @@ src/CMakeFiles/helib.dir/keys.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -12672,12 +12672,12 @@ src/CMakeFiles/helib.dir/matmul.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -13076,12 +13076,12 @@ src/CMakeFiles/helib.dir/norms.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/fhe_stats.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/range.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
 
 src/CMakeFiles/helib.dir/permutations.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/src/permutations.cpp
@@ -13424,13 +13424,6 @@ src/CMakeFiles/helib.dir/permutations.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/matching.h
  /usr/include/c++/7/unordered_map
  /usr/include/c++/7/bits/hashtable.h
@@ -13448,8 +13441,12 @@ src/CMakeFiles/helib.dir/permutations.cpp.o
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -13460,6 +13457,9 @@ src/CMakeFiles/helib.dir/permutations.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -13828,21 +13828,18 @@ src/CMakeFiles/helib.dir/polyEval.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -13852,6 +13849,9 @@ src/CMakeFiles/helib.dir/polyEval.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -14243,11 +14243,11 @@ src/CMakeFiles/helib.dir/powerful.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/Context.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
+ /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
+ /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /usr/local/cuda/include/cufft.h
  /usr/local/cuda/include/cuComplex.h
  /usr/include/c++/7/math.h
- /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
- /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/range.h
@@ -14598,21 +14598,18 @@ src/CMakeFiles/helib.dir/primeChain.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -14622,6 +14619,9 @@ src/CMakeFiles/helib.dir/primeChain.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/DoubleCRT.h
@@ -15049,12 +15049,12 @@ src/CMakeFiles/helib.dir/randomMatrices.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -15460,12 +15460,12 @@ src/CMakeFiles/helib.dir/recryption.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/range.h
@@ -15873,12 +15873,12 @@ src/CMakeFiles/helib.dir/replicate.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PAlgebra.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/recryption.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/primeChain.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/powerful.h
@@ -16255,21 +16255,18 @@ src/CMakeFiles/helib.dir/sample.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -16279,6 +16276,9 @@ src/CMakeFiles/helib.dir/sample.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -16641,21 +16641,18 @@ src/CMakeFiles/helib.dir/tableLookup.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/CModulus.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/bluestein.h
  /usr/local/cuda/include/cuda_runtime.h
  /usr/local/cuda/include/crt/host_config.h
  /usr/local/cuda/include/builtin_types.h
  /usr/local/cuda/include/device_types.h
+ /usr/local/cuda/include/crt/host_defines.h
+ /usr/local/cuda/include/driver_types.h
+ /usr/local/cuda/include/vector_types.h
  /usr/local/cuda/include/surface_types.h
  /usr/local/cuda/include/texture_types.h
+ /usr/local/cuda/include/library_types.h
  /usr/local/cuda/include/channel_descriptor.h
  /usr/local/cuda/include/cuda_runtime_api.h
  /usr/local/cuda/include/cuda_device_runtime_api.h
@@ -16665,6 +16662,9 @@ src/CMakeFiles/helib.dir/tableLookup.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
+ /usr/local/cuda/include/cufft.h
+ /usr/local/cuda/include/cuComplex.h
+ /usr/include/c++/7/math.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/IndexSet.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/JsonWrapper.h
  /usr/include/c++/7/any
@@ -17394,13 +17394,6 @@ src/CMakeFiles/helib.dir/zzX.cpp.o
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/hypercube.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/PGFFT.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/ClonedPtr.h
- /usr/local/cuda/include/cufft.h
- /usr/local/cuda/include/cuComplex.h
- /usr/include/c++/7/math.h
- /usr/local/cuda/include/vector_types.h
- /usr/local/cuda/include/crt/host_defines.h
- /usr/local/cuda/include/driver_types.h
- /usr/local/cuda/include/library_types.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/timing.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/multicore.h
  /home/ardhy/Documents/research/new_project/bgv-comparison/HElib/include/helib/range.h

@@ -77,7 +77,7 @@ static const char *cuFFTCheck(cufftResult error);
         exit(1); \
     } \
 }
-void InitGPUBuffer(long phim, int n_rows);
+void InitGPUBuffer(long phim, int n_rows, long m);
 void DestroyGPUBuffer();
 unsigned long long bitReverse(unsigned long long a, int bit_length);  // reverses the bits for twiddle factor calculation
 unsigned long long modpow64(unsigned long long a, unsigned long long b, unsigned long long mod);
@@ -134,7 +134,8 @@ void gpu_mulMod2(NTL::zz_pX& x, unsigned long long x_dev[], unsigned long long x
 #endif
 
 void initializeStreams(long n_streams, std::vector<cudaStream_t> &streams);
-void usecuFFT(std::vector<std::complex<double>>& buf, long m, const cufftHandle& plan, cufftDoubleComplex *buf_dev);
+void usecuFFT(std::vector<std::complex<double>>& buf, long m);
 void initcuFFTBuffer(long m, cufftHandle plan, cufftDoubleComplex *buf_dev);
+std::vector<cudaStream_t> getThreadStreams();
 
 #endif

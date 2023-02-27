@@ -147,7 +147,7 @@ HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_1);
 
 HELIB_NTIMER_START(basic_embeddingLargestCoeff_15);
   // palg.getFFTInfo().apply(&buf[0]);
-  usecuFFT(buf, m, palg.getFFTPlan(), const_cast<helib::PAlgebra&>(palg).getDeviceBuffer());
+  usecuFFT(buf, m);
 HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_15);
 
   double mx = 0;
@@ -304,8 +304,7 @@ HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2_1);
     buf[i] = 0;
 HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2_1);
 HELIB_NTIMER_START(basic_embeddingLargestCoeff_x2_15);
-  usecuFFT(buf, m, palg.getFFTPlan(), const_cast<helib::PAlgebra&>(palg).getDeviceBuffer());
-  // palg.getFFTInfo().apply(&buf[0]);
+  usecuFFT(buf, m);
 HELIB_NTIMER_STOP(basic_embeddingLargestCoeff_x2_15);
 
   double mx1 = 0, mx2 = 0;

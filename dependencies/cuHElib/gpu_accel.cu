@@ -8,6 +8,7 @@
 #include "device_launch_parameters.h"
 #include "gpu_accel.cuh"
 #include <NTL/ZZVec.h>
+#include <thread>
 // #include <cub/cub.cuh>
 
 __global__ void KernelMulMod(unsigned long long a[], const unsigned long long b[], unsigned long long q){
@@ -391,82 +392,143 @@ void fillTablePsi64(unsigned long long psi, unsigned long long q, unsigned long 
 
 //device variable;
 #define magicNumber 3
-long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
-size_t bytes;
-long d_phim, d_n_rows;
+#define n_threads 5
+// long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
+// size_t bytes;
+// long d_phim, d_n_rows;
 
-long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
+// long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
+
+struct CPU_GPU_Buffer {
+    long *d_A;
+    long *d_B;
+    long *d_C;
+    long *d_modulus;
+    long *d_scalar;
+    long bytes;
+    long d_phim;
+    long d_n_rows;
+    long *contiguousHostMapA;
+    long *contiguousHostMapB;
+    long *contiguousModulus;
+    long *scalarPerRow;
+    long ownerThreadId;
+
+    cufftHandle plan;
+    cufftDoubleComplex *buf_dev;
+    std::vector<cudaStream_t> streams;
+};
+
+CPU_GPU_Buffer buf[n_threads];
 
 void InitContiguousHostMapModulus(long phim, int n_rows){
-  contiguousHostMapA = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
-  contiguousHostMapB = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
-  contiguousModulus = (long *)malloc(magicNumber*n_rows*sizeof(long));
-  scalarPerRow = (long *)malloc(magicNumber*n_rows*sizeof(long));
+  for(int i = 0; i < n_threads; i++)
+  {
+    buf[i].contiguousHostMapA = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
+    buf[i].contiguousHostMapB = (long *)malloc(magicNumber*phim*n_rows*sizeof(long));
+    buf[i].contiguousModulus = (long *)malloc(magicNumber*n_rows*sizeof(long));
+    buf[i].scalarPerRow = (long *)malloc(magicNumber*n_rows*sizeof(long));
+  }
+}
+
+std::hash<std::thread::id> hasher;
+
+int getBufferIndex()
+{
+  auto tid = std::this_thread::get_id();
+
+  for(int i = 0; i < n_threads; i++)
+  {
+    if(buf[i].ownerThreadId == (long) hasher(tid))
+      return i;
+
+    if(buf[i].ownerThreadId == -1)
+    {
+      buf[i].ownerThreadId = (long) hasher(tid);
+      return i;
+    }
+  }
+
+  return -1; //Ardhi: no buffer allocated for the requestor thread
+}
+
+std::vector<cudaStream_t> getThreadStreams()
+{
+  return buf[getBufferIndex()].streams;
 }
 
 void setScalar(long index, long data){
-  scalarPerRow[index] = data;
+  buf[getBufferIndex()].scalarPerRow[index] = data;
 }
 
 void setMapA(long index, long data){
-  contiguousHostMapA[index] = data;
+  buf[getBufferIndex()].contiguousHostMapA[index] = data;
 }
 
 void setMapB(long index, long data){
-  contiguousHostMapB[index] = data;
+  buf[getBufferIndex()].contiguousHostMapB[index] = data;
 }
 
 void setRowMapA(long offset, long *source)
 {
-  memcpy(contiguousHostMapA+offset, source, d_phim*sizeof(long));
+  memcpy(buf[getBufferIndex()].contiguousHostMapA+offset, source, buf[getBufferIndex()].d_phim*sizeof(long));
 }
 
 void setRowMapB(long offset, const long *source)
 {
-  memcpy(contiguousHostMapB+offset, source, d_phim*sizeof(long));
+  memcpy(buf[getBufferIndex()].contiguousHostMapB+offset, source, buf[getBufferIndex()].d_phim*sizeof(long));
 }
 
 long *getRowMapB(long index){
-  return &contiguousHostMapB[index];
+  return &buf[getBufferIndex()].contiguousHostMapB[index];
 }
 
 long *getRowMapA(long index){
-  return &contiguousHostMapA[index];
+  return &buf[getBufferIndex()].contiguousHostMapA[index];
 }
 
 long getMapA(long index){
-  return contiguousHostMapA[index];
+  return buf[getBufferIndex()].contiguousHostMapA[index];
 }
 
 long getMapB(long index){
-  return contiguousHostMapB[index];
+  return buf[getBufferIndex()].contiguousHostMapB[index];
 }
 
 void setModulus(long index, long data){
-  contiguousModulus[index] = data;
+  buf[getBufferIndex()].contiguousModulus[index] = data;
 }
 
-void InitGPUBuffer(long phim, int n_rows){
-  d_phim = phim;
-  d_n_rows = n_rows;
+void InitGPUBuffer(long phim, int n_rows, long m){
+  for(int i = 0; i < n_threads; i++)
+  {
+    buf[i].d_phim = phim;
+    buf[i].d_n_rows = n_rows;
+    long bytes = magicNumber*phim*n_rows*sizeof(long);
+    buf[i].bytes = bytes;
+    buf[i].ownerThreadId = -1;
+    // Allocate memory for arrays d_A, d_B, and d_C on device
+    cudaMalloc(&buf[i].d_A, bytes);
+    cudaMalloc(&buf[i].d_B, bytes);
+    cudaMalloc(&buf[i].d_C, bytes);
+    cudaMalloc(&buf[i].d_modulus, magicNumber*n_rows*sizeof(long));
+    cudaMalloc(&buf[i].d_scalar, magicNumber*n_rows*sizeof(long));
 
-  bytes = magicNumber*phim*n_rows*sizeof(long);
-  // Allocate memory for arrays d_A, d_B, and d_C on device
-  cudaMalloc(&d_A, bytes);
-  cudaMalloc(&d_B, bytes);
-  cudaMalloc(&d_C, bytes);
-  cudaMalloc(&d_modulus, magicNumber*d_n_rows*sizeof(long));
-  cudaMalloc(&d_scalar, magicNumber*d_n_rows*sizeof(long));
+    CHECK_CUFFT_ERRORS(cufftPlan1d(&buf[i].plan, m, CUFFT_Z2Z, 1));
+    CHECK(cudaMalloc(&buf[i].buf_dev, m*sizeof(cufftDoubleComplex)));
+    initializeStreams(n_rows * magicNumber, buf[i].streams);
+  }
 }
 
 void DestroyGPUBuffer(){
+    int idx = getBufferIndex();
     // Free GPU memory
-    cudaFree(d_C);
-    cudaFree(d_A);
-    cudaFree(d_B);
+    cudaFree(buf[idx].d_C);
+    cudaFree(buf[idx].d_A);
+    cudaFree(buf[idx].d_B);
 
-    cudaFree(d_modulus);
-    cudaFree(d_scalar);
+    cudaFree(buf[idx].d_modulus);
+    cudaFree(buf[idx].d_scalar);
 }
 
 
@@ -483,23 +545,24 @@ __global__ void kernel_addMod(long *a, long *b, long *result, long size, long *d
 
 #define debug_impl 0
 void CudaEltwiseAddMod(long actual_nrows){
+    int idx = getBufferIndex();
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_B, buf[idx].contiguousHostMapB, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 
     // Launch kernel
-    kernel_addMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_addMod<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_B, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 
 
   // //allocate data in device memory
@@ -566,23 +629,24 @@ __global__ void kernel_addModScalar(long *a, long *scalar, long *result, long si
 }
 
 void CudaEltwiseAddMod(long actual_nrows, long scalar){
+    int idx = getBufferIndex();
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_scalar, scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_scalar, buf[idx].scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 
     // Launch kernel
-    kernel_addModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, d_scalar, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_addModScalar<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_scalar, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 
 #if 0
   //allocate data in device memory
@@ -621,23 +685,25 @@ __global__ void kernel_subMod(long *a, long *b, long *result, long size, long *d
 }
 
 void CudaEltwiseSubMod(long actual_nrows){
+    int idx = getBufferIndex();
+
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_B, buf[idx].contiguousHostMapB, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 
     // Launch kernel
-    kernel_subMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_subMod<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_B, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 
 #if 0
   //allocate data in device memory
@@ -676,23 +742,24 @@ __global__ void kernel_subModScalar(long *a, long *scalar, long *result, long si
 }
 
 void CudaEltwiseSubMod(long actual_nrows, long scalar){
+    int idx = getBufferIndex();
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_scalar, scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_scalar, buf[idx].scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 
     // Launch kernel
-    kernel_subModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, d_scalar, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_subModScalar<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_scalar, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 
 #if 0
   //allocate data in device memory
@@ -946,26 +1013,27 @@ __global__ void kernel_mulMod(long *a, long *b, long *result, long size, long *d
 
 void CudaEltwiseMultMod(long actual_nrows){
 	// HELIB_NTIMER_START(CudaEltwiseMultMod_CudaMemCpyHD);
+    int idx = getBufferIndex();
     // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, contiguousHostMapB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_B, buf[idx].contiguousHostMapB, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_CudaMemCpyHD);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 	// HELIB_NTIMER_START(CudaEltwiseMultMod_kernel);
     // Launch kernel
-    kernel_mulMod<<< blk_in_grid, thr_per_blk >>>(d_A, d_B, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_mulMod<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_B, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_kernel);
 
 	// HELIB_NTIMER_START(CudaEltwiseMultMod_CudaMemCpyDH);
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 	// HELIB_NTIMER_STOP(CudaEltwiseMultMod_CudaMemCpyDH);
 
 #if 0
@@ -1068,22 +1136,24 @@ __global__ void kernel_mulModScalar(long *a, long *scalar, long *result, long si
 
 void CudaEltwiseMultMod(long actual_nrows, long scalar){
    // Copy data from host arrays A and B to device arrays d_A and d_B
-    cudaMemcpy(d_A, contiguousHostMapA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_scalar, scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_modulus, contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    int idx = getBufferIndex();
+
+    cudaMemcpy(buf[idx].d_A, buf[idx].contiguousHostMapA, buf[idx].bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_scalar, buf[idx].scalarPerRow, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(buf[idx].d_modulus, buf[idx].contiguousModulus, actual_nrows*sizeof(long), cudaMemcpyHostToDevice);
 
     // Set execution configuration parameters
     //      thr_per_blk: number of CUDA threads per grid block
     //      blk_in_grid: number of blocks in grid
     int thr_per_blk = 256;
-    int blk_in_grid = ceil( float(d_phim*actual_nrows) / thr_per_blk );
+    int blk_in_grid = ceil( float(buf[idx].d_phim*actual_nrows) / thr_per_blk );
 
     // Launch kernel
-    kernel_mulModScalar<<< blk_in_grid, thr_per_blk >>>(d_A, d_scalar, d_C, d_phim*actual_nrows, d_modulus, d_phim);
+    kernel_mulModScalar<<< blk_in_grid, thr_per_blk >>>(buf[idx].d_A, buf[idx].d_scalar, buf[idx].d_C, buf[idx].d_phim*actual_nrows, buf[idx].d_modulus, buf[idx].d_phim);
     // cudaDeviceSynchronize();
 
     // Copy data from device array d_C to host array result
-    cudaMemcpy(contiguousHostMapA, d_C, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(buf[idx].contiguousHostMapA, buf[idx].d_C, buf[idx].bytes, cudaMemcpyDeviceToHost);
 
 #if 0
   //allocate data in device memory
@@ -2414,23 +2484,15 @@ void initializeStreams(long n_streams, std::vector<cudaStream_t> &streams){
   }
 }
 
+void usecuFFT(std::vector<std::complex<double>>& input_buf, long m){
+  int idx = getBufferIndex();
 
-void initcuFFTBuffer(long m, cufftHandle plan, cufftDoubleComplex *buf_dev){
-  CHECK(cudaMalloc(&buf_dev, m*sizeof(cufftDoubleComplex)));
-}
+  CHECK(cudaMalloc(&buf[idx].buf_dev, m*sizeof(cufftDoubleComplex)));
 
-void usecuFFT(std::vector<std::complex<double>>& buf, long m, const cufftHandle& plan, cufftDoubleComplex *buf_dev){
+  CHECK(cudaMemcpy(buf[idx].buf_dev, input_buf.data(), m*sizeof(std::complex<double>), cudaMemcpyHostToDevice));
 
-  int check1 = sizeof(cufftDoubleComplex);
-  int check2 = sizeof(std::complex<double>);
-  int check3 = buf.size();
-  
-  CHECK(cudaMalloc(&buf_dev, m*sizeof(cufftDoubleComplex)));
+  CHECK_CUFFT_ERRORS(cufftExecZ2Z(buf[idx].plan, buf[idx].buf_dev, buf[idx].buf_dev, CUFFT_FORWARD));
 
-  CHECK(cudaMemcpy(buf_dev, buf.data(), m*sizeof(std::complex<double>), cudaMemcpyHostToDevice));
-
-  CHECK_CUFFT_ERRORS(cufftExecZ2Z(plan, buf_dev, buf_dev, CUFFT_FORWARD));
-
-  CHECK(cudaMemcpy(buf.data(), buf_dev, m*sizeof(std::complex<double>), cudaMemcpyDeviceToHost));
+  CHECK(cudaMemcpy(input_buf.data(), buf[idx].buf_dev, m*sizeof(std::complex<double>), cudaMemcpyDeviceToHost));
 
 }

@@ -94,7 +94,7 @@ private:
   // of evaluations wrt this prime
   IndexMap<NTL::vec_long> map;
 
-  std::vector<cudaStream_t> streams;
+  // std::vector<cudaStream_t> streams;
 
 
   //! a "sanity check" method, verifies consistency of the map with

@@ -114,11 +114,11 @@ for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
 }
 HELIB_NTIMER_STOP(cudaHostRegister_1);
 
-HELIB_NTIMER_START(streamInit_1);
-if((long)streams.size() < s.card())
-    initializeStreams(s.card(), streams);
-HELIB_NTIMER_STOP(streamInit_1);
-
+// HELIB_NTIMER_START(streamInit_1);
+// if((long)streams.size() < s.card())
+//     initializeStreams(s.card(), streams);
+// HELIB_NTIMER_STOP(streamInit_1);
+std::vector<cudaStream_t> streams = getThreadStreams();
 for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){    
   context.ithModulus(i).FFT(map[i], poly, streams[j]);
 }
@@ -184,10 +184,11 @@ for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
 }
 HELIB_NTIMER_STOP(cudaHostRegister_2);
 
-HELIB_NTIMER_START(streamInit_2);
-if((long)streams.size() < s.card())
-    initializeStreams(s.card(), streams);
-HELIB_NTIMER_STOP(streamInit_2);
+// HELIB_NTIMER_START(streamInit_2);
+// if((long)streams.size() < s.card())
+//     initializeStreams(s.card(), streams);
+// HELIB_NTIMER_STOP(streamInit_2);
+std::vector<cudaStream_t> streams = getThreadStreams();
 
 for (long i = s.first(), j = 0; i <= s.last(); i = s.next(i), j++){
   context.ithModulus(i).FFT(map[i], poly, streams[j]);
@@ -1063,7 +1064,6 @@ DoubleCRT::DoubleCRT(const NTL::ZZX& poly,
   if (isDryRun())
     return;
 
-  initializeStreams(s.card(), streams);
   
   // convert the integer polynomial to FFT representation modulo the primes
   if (deg(poly) <= 0)       // special case for a constant polynomial
@@ -1125,8 +1125,6 @@ DoubleCRT::DoubleCRT(const zzX& poly,
   if (isDryRun())
     return;
 
-  initializeStreams(s.card(), streams);
-
   // convert the integer polynomial to FFT representation modulo the primes
   if (lsize(poly) <= 1) // special case for a constant polynomial
     *this = (lsize(poly) == 1) ? poly[0] : 0; // no FFT is needed
@@ -1186,8 +1184,6 @@ DoubleCRT::DoubleCRT(const Context& _context, const IndexSet& s) :
     return;
 
   long phim = context.getPhiM();
-
-  initializeStreams(s.card(), streams);
 
   for (long i : s) {
     NTL::vec_long& row = map[i];

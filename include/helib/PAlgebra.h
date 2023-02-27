@@ -26,7 +26,6 @@
 #include <helib/PGFFT.h>
 #include <helib/ClonedPtr.h>
 #include <helib/apiAttributes.h>
-#include <cufft.h>
 
 namespace helib {
 
@@ -141,8 +140,7 @@ class PAlgebra
   std::shared_ptr<quarter_FFT> quarter_fftInfo;
   // an optimization for FFT's with m = 0 (mod 4)
 
-  cufftHandle plan;
-  cufftDoubleComplex *buf_dev;
+
 
 public:
   PAlgebra& operator=(const PAlgebra&) = delete;
@@ -297,8 +295,7 @@ public:
   const PGFFT& getFFTInfo() const { return *fftInfo; }
   const half_FFT& getHalfFFTInfo() const { return *half_fftInfo; }
   const quarter_FFT& getQuarterFFTInfo() const { return *quarter_fftInfo; }
-  cufftHandle getFFTPlan() const {return plan; }
-  cufftDoubleComplex* getDeviceBuffer() {return buf_dev;}
+
 };
 
 enum PA_tag
