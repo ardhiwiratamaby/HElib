@@ -83,7 +83,9 @@
 			"__locale": "cpp",
 			"__bit_reference": "cpp",
 			"ios": "cpp",
-			"locale": "cpp"
+			"locale": "cpp",
+			"bit": "cpp",
+			"version": "cpp"
 		}
 	}
 }

@@ -230,6 +230,15 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
   gpu_powers->reserve(k2);
   gpu_ipowers->reserve(k2);
 
+  // int idx = getBufferIndex(const_cast<GPU_Buffer*>(myBuf));
+
+  for(int j = 0; j < n_threads; j++)
+  {
+    CHECK(cudaMalloc(&myBuf[j].x_dev, k2 * sizeof(unsigned long long)));
+    CHECK(cudaMalloc(&myBuf[j].x_pinned, mm * sizeof(unsigned long long)));
+    myBuf[j].ownerThreadId = -1;
+  }
+
   cudaMalloc(&RbInVec, k2 * sizeof(unsigned long long));
   cudaMalloc(&iRbInVec, k2 * sizeof(unsigned long long));  
   cudaMalloc(&RaInVec, k2 * sizeof(unsigned long long));
@@ -241,9 +250,7 @@ Cmodulus::Cmodulus(const PAlgebra& zms, long qq, long rt) :
 
   CHECK(cudaMalloc(&gpu_powers_m_dev, mm * sizeof(unsigned long long)));
   CHECK(cudaMalloc(&gpu_ipowers_m_dev, mm * sizeof(unsigned long long)));
-  CHECK(cudaMalloc(&x_dev, k2 * sizeof(unsigned long long)));
-  // CHECK(cudaMallocHost(&x_pinned, mm * sizeof(unsigned long long)));
-  CHECK(cudaMalloc(&x_pinned, mm * sizeof(unsigned long long)));
+
 
   //Ardhi: generate twiddle factors for gpu ntt with n=2^k
   for (unsigned int i = 0; i < k2; i++)
@@ -322,8 +329,13 @@ Cmodulus& Cmodulus::operator=(const Cmodulus& other)
   gpu_ipowers_dev = other.gpu_ipowers_dev;
   gpu_powers_m_dev = other.gpu_powers_m_dev;
   gpu_ipowers_m_dev = other.gpu_ipowers_m_dev;
-  x_dev = other.x_dev;
-  x_pinned = other.x_pinned;
+
+  // int idx = getBufferIndex(const_cast<GPU_Buffer*>(myBuf));
+  for(int j = 0; j < n_threads; j++)
+  {
+    myBuf[j] = other.myBuf[j];
+  }
+
   k2 = other.k2;
   k2_inv = other.k2_inv;
   zMStar_dev = other.zMStar_dev;
@@ -553,15 +565,16 @@ void Cmodulus::FFT_aux(NTL::vec_long& y, NTL::zz_pX& tmp, cudaStream_t stream) c
   // for (int i = 0; i <= deg(tmp); ++i) std::cout<<tmp[i]<<", ";
   // std::cout<<std::endl;
 
-
+  // CPU_GPU_Buffer myBuf = getCPU_GPU_Buffer();
   // call the FFT routine
-  BluesteinFFT(tmp, getM(), k2, k2_inv, rt, *powers, powers_aux, *Rb, RbInVec, RaInVec, psi, psi_inv, *RbInPoly, *gpu_powers, *gpu_ipowers, gpu_powers_dev, gpu_ipowers_dev, gpu_powers_m_dev, x_dev, x_pinned, stream);
+  int idx = getBufferIndex(const_cast<GPU_Buffer*>(myBuf));
+  BluesteinFFT(tmp, getM(), k2, k2_inv, rt, *powers, powers_aux, *Rb, RbInVec, RaInVec, psi, psi_inv, *RbInPoly, *gpu_powers, *gpu_ipowers, gpu_powers_dev, gpu_ipowers_dev, gpu_powers_m_dev, myBuf[idx].x_dev, myBuf[idx].x_pinned, stream);
 
   // copy the result to the output vector y, keeping only the
   // entries corresponding to primitive roots of unity
   // y.SetLength(zMStar->getPhiM());
 
-  gpu_parallel_copy(long(this->getM()), x_pinned, x_dev, zMStar_dev, y, target_dev, stream);
+  gpu_parallel_copy(long(this->getM()), myBuf[idx].x_pinned, myBuf[idx].x_dev, zMStar_dev, y, target_dev, stream);
 
 #if 0
 	HELIB_NTIMER_START(FFT_aux_copyresult);
@@ -721,7 +734,10 @@ void Cmodulus::iFFT(NTL::zz_pX& x, const NTL::vec_long& y) const
   x.normalize();
   conv(rt, rInv); // convert rInv to zp format
 
-  BluesteinFFT(x, m, k2, k2_inv, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, psi, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev, gpu_ipowers_m_dev, x_dev, x_pinned); // call the FFT routine
+  int idx = getBufferIndex(const_cast<GPU_Buffer*>(myBuf));
+
+  // CPU_GPU_Buffer myBuf = getCPU_GPU_Buffer();
+  BluesteinFFT(x, m, k2, k2_inv, rt, *ipowers, ipowers_aux, *iRb, iRbInVec, iRaInVec, psi_inv, psi, *iRbInPoly, *gpu_ipowers, *gpu_powers, gpu_ipowers_dev, gpu_powers_dev, gpu_ipowers_m_dev, myBuf[idx].x_dev, myBuf[idx].x_pinned); // call the FFT routine
 }
 
 NTL::zz_pX& Cmodulus::getScratch_zz_pX()

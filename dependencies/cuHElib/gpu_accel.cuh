@@ -7,6 +7,7 @@
 #include <cufft.h>
 
 #define THREADS_PER_BLOCK 1024
+#define n_threads 5
 
 static const char* _cudaGetErrorEnum(cufftResult error)
 {
@@ -77,6 +78,37 @@ static const char *cuFFTCheck(cufftResult error);
         exit(1); \
     } \
 }
+
+struct CPU_GPU_Buffer {
+    long *d_A;
+    long *d_B;
+    long *d_C;
+    long *d_modulus;
+    long *d_scalar;
+    long bytes;
+    long d_phim;
+    long d_n_rows;
+    long *contiguousHostMapA;
+    long *contiguousHostMapB;
+    long *contiguousModulus;
+    long *scalarPerRow;
+    long ownerThreadId;
+
+    cufftHandle plan;
+    cufftDoubleComplex *buf_dev;
+    std::vector<cudaStream_t> streams;
+
+    // unsigned long long *x_dev;
+    // unsigned long long *x_pinned;
+};
+
+struct GPU_Buffer {
+    unsigned long long *x_dev;
+    unsigned long long *x_pinned;
+    long ownerThreadId;
+};
+
+int getBufferIndex(GPU_Buffer myBuf[]);
 void InitGPUBuffer(long phim, int n_rows, long m);
 void DestroyGPUBuffer();
 unsigned long long bitReverse(unsigned long long a, int bit_length);  // reverses the bits for twiddle factor calculation
@@ -137,5 +169,6 @@ void initializeStreams(long n_streams, std::vector<cudaStream_t> &streams);
 void usecuFFT(std::vector<std::complex<double>>& buf, long m);
 void initcuFFTBuffer(long m, cufftHandle plan, cufftDoubleComplex *buf_dev);
 std::vector<cudaStream_t> getThreadStreams();
+CPU_GPU_Buffer getCPU_GPU_Buffer();
 
 #endif

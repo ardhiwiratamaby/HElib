@@ -375,6 +375,7 @@ src/CMakeFiles/helib.dir/BenesNetwork.cpp.o: ../src/BenesNetwork.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -769,7 +770,8 @@ src/CMakeFiles/helib.dir/CModulus.cpp.o: ../src/CModulus.cpp \
   ../include/helib/multicore.h \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
-  /usr/include/c++/7/math.h
+  /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread
 
 src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   /usr/include/stdc-predef.h \
@@ -1165,6 +1167,7 @@ src/CMakeFiles/helib.dir/Context.cpp.o: ../src/Context.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -2455,6 +2458,7 @@ src/CMakeFiles/helib.dir/EaCx.cpp.o: ../src/EaCx.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -2858,6 +2862,7 @@ src/CMakeFiles/helib.dir/EncryptedArray.cpp.o: ../src/EncryptedArray.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -3288,6 +3293,7 @@ src/CMakeFiles/helib.dir/EvalMap.cpp.o: ../src/EvalMap.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -4728,6 +4734,7 @@ src/CMakeFiles/helib.dir/OptimizePermutations.cpp.o: ../src/OptimizePermutations
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -5737,6 +5744,7 @@ src/CMakeFiles/helib.dir/PermNetwork.cpp.o: ../src/PermNetwork.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -6803,6 +6811,7 @@ src/CMakeFiles/helib.dir/Ptxt.cpp.o: ../src/Ptxt.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -8294,6 +8303,7 @@ src/CMakeFiles/helib.dir/bluestein.cpp.o: ../src/bluestein.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   /usr/local/include/NTL/FFT_impl.h
 
 src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
@@ -8662,6 +8672,7 @@ src/CMakeFiles/helib.dir/debugging.cpp.o: ../src/debugging.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -9072,6 +9083,7 @@ src/CMakeFiles/helib.dir/eqtesting.cpp.o: ../src/eqtesting.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -9478,6 +9490,7 @@ src/CMakeFiles/helib.dir/extractDigits.cpp.o: ../src/extractDigits.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -10435,6 +10448,7 @@ src/CMakeFiles/helib.dir/intraSlot.cpp.o: ../src/intraSlot.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -10468,7 +10482,6 @@ src/CMakeFiles/helib.dir/intraSlot.cpp.o: ../src/intraSlot.cpp \
   ../include/helib/PolyModRing.h \
   ../include/helib/intraSlot.h \
   /usr/local/include/NTL/BasicThreadPool.h \
-  /usr/include/c++/7/thread \
   /usr/include/c++/7/condition_variable \
   ../include/helib/CtPtrs.h \
   ../include/helib/PtrVector.h \
@@ -11252,6 +11265,7 @@ src/CMakeFiles/helib.dir/keySwitching.cpp.o: ../src/keySwitching.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -11658,6 +11672,7 @@ src/CMakeFiles/helib.dir/keys.cpp.o: ../src/keys.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -13423,6 +13438,7 @@ src/CMakeFiles/helib.dir/permutations.cpp.o: ../src/permutations.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -13814,6 +13830,7 @@ src/CMakeFiles/helib.dir/polyEval.cpp.o: ../src/polyEval.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/IndexSet.h \
   ../include/helib/JsonWrapper.h \
   /usr/include/c++/7/any \
@@ -14209,6 +14226,7 @@ src/CMakeFiles/helib.dir/powerful.cpp.o: ../src/powerful.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/range.h \
@@ -14582,6 +14600,7 @@ src/CMakeFiles/helib.dir/primeChain.cpp.o: ../src/primeChain.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/powerful.h \
   ../include/helib/DoubleCRT.h \
@@ -15014,6 +15033,7 @@ src/CMakeFiles/helib.dir/randomMatrices.cpp.o: ../src/randomMatrices.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -15043,7 +15063,6 @@ src/CMakeFiles/helib.dir/randomMatrices.cpp.o: ../src/randomMatrices.cpp \
   /usr/include/c++/7/functional \
   /usr/include/c++/7/bits/std_function.h \
   /usr/local/include/NTL/BasicThreadPool.h \
-  /usr/include/c++/7/thread \
   /usr/include/c++/7/condition_variable
 
 src/CMakeFiles/helib.dir/recryption.cpp.o: ../src/recryption.cpp \
@@ -15836,6 +15855,7 @@ src/CMakeFiles/helib.dir/replicate.cpp.o: ../src/replicate.cpp \
   /usr/local/cuda/include/cufft.h \
   /usr/local/cuda/include/cuComplex.h \
   /usr/include/c++/7/math.h \
+  /usr/include/c++/7/thread \
   ../include/helib/recryption.h \
   ../include/helib/primeChain.h \
   ../include/helib/powerful.h \
@@ -17491,12 +17511,6 @@ src/version.cpp:
 
 /usr/include/c++/7/condition_variable:
 
-../src/polyEval.cpp:
-
-/usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h:
-
-/usr/include/c++/7/thread:
-
 ../src/PrimeGenerator.h:
 
 ../src/macro.h:
@@ -17538,6 +17552,8 @@ src/version.cpp:
 /usr/include/c++/7/bits/stl_map.h:
 
 /usr/include/c++/7/bits/stl_numeric.h:
+
+/usr/include/c++/7/bits/stream_iterator.h:
 
 /usr/include/c++/7/bits/istream.tcc:
 
@@ -17940,8 +17956,6 @@ src/version.cpp:
 /usr/local/include/NTL/HAVE_COPY_TRAITS2.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/7/include/float.h:
-
-/usr/include/c++/7/bits/stream_iterator.h:
 
 ../include/helib/powerful.h:
 
@@ -18413,6 +18427,16 @@ src/helib/version.h:
 
 /usr/include/c++/7/math.h:
 
+../src/polyEval.cpp:
+
+/usr/lib/gcc/x86_64-linux-gnu/7/include/pmmintrin.h:
+
+/usr/include/c++/7/thread:
+
+../include/helib/range.h:
+
+/usr/include/c++/7/bits/stl_list.h:
+
 ../include/helib/scheme.h:
 
 /usr/include/x86_64-linux-gnu/bits/select.h:
@@ -18446,10 +18470,6 @@ src/helib/version.h:
 /usr/local/include/NTL/lzz_pXFactoring.h:
 
 /usr/include/c++/7/bits/locale_conv.h:
-
-../include/helib/range.h:
-
-/usr/include/c++/7/bits/stl_list.h:
 
 /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
 

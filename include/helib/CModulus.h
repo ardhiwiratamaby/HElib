@@ -37,8 +37,10 @@
 #include <helib/ClonedPtr.h>
 #include "/home/ardhy/Documents/research/new_project/bgv-comparison/HElib/dependencies/cuHElib/gpu_accel.cuh"
 #include "cuda_runtime.h"
-
+#include <thread>
 namespace helib {
+
+
 
 /**
  * @class Cmodulus
@@ -97,8 +99,6 @@ private:
   unsigned long long *RbInVec;
   unsigned long long *RaInVec;
 
-  unsigned long long *x_dev;
-  unsigned long long *x_pinned;
 
   unsigned long long *gpu_powers_dev;
   unsigned long long *gpu_ipowers_dev;
@@ -167,6 +167,7 @@ public:
   void restoreModulus() const { context.restore(); }
 
   // FFT routines
+  GPU_Buffer myBuf[n_threads];
 
   // sets zp context internally
   // y = FFT(x)

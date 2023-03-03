@@ -392,32 +392,11 @@ void fillTablePsi64(unsigned long long psi, unsigned long long q, unsigned long 
 
 //device variable;
 #define magicNumber 3
-#define n_threads 5
 // long *d_A, *d_B, *d_C, *d_modulus, *d_scalar;
 // size_t bytes;
 // long d_phim, d_n_rows;
 
 // long *contiguousHostMapA, *contiguousHostMapB, *contiguousModulus, *scalarPerRow;
-
-struct CPU_GPU_Buffer {
-    long *d_A;
-    long *d_B;
-    long *d_C;
-    long *d_modulus;
-    long *d_scalar;
-    long bytes;
-    long d_phim;
-    long d_n_rows;
-    long *contiguousHostMapA;
-    long *contiguousHostMapB;
-    long *contiguousModulus;
-    long *scalarPerRow;
-    long ownerThreadId;
-
-    cufftHandle plan;
-    cufftDoubleComplex *buf_dev;
-    std::vector<cudaStream_t> streams;
-};
 
 CPU_GPU_Buffer buf[n_threads];
 
@@ -450,6 +429,30 @@ int getBufferIndex()
   }
 
   return -1; //Ardhi: no buffer allocated for the requestor thread
+}
+
+int getBufferIndex(GPU_Buffer myBuf[])
+{
+  auto tid = std::this_thread::get_id();
+
+  for(int i = 0; i < n_threads; i++)
+  {
+    if(myBuf[i].ownerThreadId == (long) hasher(tid))
+      return i;
+
+    if(myBuf[i].ownerThreadId == -1)
+    {
+      myBuf[i].ownerThreadId = (long) hasher(tid);
+      return i;
+    }
+  }
+
+  return -1; //Ardhi: no buffer allocated for the requestor thread
+}
+
+CPU_GPU_Buffer getCPU_GPU_Buffer()
+{
+  return buf[getBufferIndex()];
 }
 
 std::vector<cudaStream_t> getThreadStreams()
@@ -500,6 +503,9 @@ void setModulus(long index, long data){
 }
 
 void InitGPUBuffer(long phim, int n_rows, long m){
+  // long k = NTL::NextPowerOfTwo(2 * m - 1);
+  // long k2 = 1L << k; // k2 = 2^k
+
   for(int i = 0; i < n_threads; i++)
   {
     buf[i].d_phim = phim;
@@ -517,8 +523,14 @@ void InitGPUBuffer(long phim, int n_rows, long m){
     CHECK_CUFFT_ERRORS(cufftPlan1d(&buf[i].plan, m, CUFFT_Z2Z, 1));
     CHECK(cudaMalloc(&buf[i].buf_dev, m*sizeof(cufftDoubleComplex)));
     initializeStreams(n_rows * magicNumber, buf[i].streams);
+
+    // CHECK(cudaMalloc(&buf[i].x_dev, k2 * sizeof(unsigned long long)));
+    // CHECK(cudaMalloc(&buf[i].x_pinned, m * sizeof(unsigned long long)));
+
   }
 }
+
+
 
 void DestroyGPUBuffer(){
     int idx = getBufferIndex();
