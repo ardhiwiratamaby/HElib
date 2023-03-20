@@ -261,6 +261,28 @@ HELIB_NTIMER_STOP(gpu_mulMod);
 
 // HELIB_NTIMER_STOP(AfterPolyMul);
   } else {
+    long dx = deg(x);
+    for (long i = 0; i <= dx; i++) {
+      x[i].LoopHole() =
+         NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
+      }
+    x.normalize();
+
+    long k = NTL::NextPowerOfTwo(2 * n - 1);
+    NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
+
+    TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);
+
+    mul(Ra, Ra, Rb); // multiply in FFT representation
+
+    FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back
+    dx = deg(x);
+    for (long i = 0; i <= dx; i++) {
+      x[i].LoopHole() =
+          NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
+    }
+    x.normalize();
+
 #if 0
 
     //Ardhi: this section of code related to gpu ntt needs to be fixed
