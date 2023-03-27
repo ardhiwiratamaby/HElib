@@ -154,7 +154,7 @@ void BluesteinFFT(NTL::zz_pX& x,
     x[i].LoopHole() =
         NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
   }
-  x.normalize();
+  // x.normalize();
 
   long k = NTL::NextPowerOfTwo(2 * n - 1);
   NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
@@ -182,7 +182,7 @@ void BluesteinFFT(NTL::zz_pX& x,
         x[i - n].LoopHole() = NTL::AddMod(rep(x[i - n]), rep(x[i]), p);
       }
       x.SetLength(n);
-      x.normalize();
+      // x.normalize();
       dx = deg(x);
     }
 
@@ -190,7 +190,7 @@ void BluesteinFFT(NTL::zz_pX& x,
       x[i].LoopHole() =
           NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
     }
-    x.normalize();
+    // x.normalize();
  	HELIB_NTIMER_STOP(RestofBluestein);
   } else {
     TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);
