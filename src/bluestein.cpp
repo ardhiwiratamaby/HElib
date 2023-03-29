@@ -436,6 +436,28 @@ HELIB_TIMER_START;
     HELIB_NTIMER_START(AfterPolyMul_mulMod);
     gpu_mulMod2(x, x_dev, x_pinned, gpu_powers_m_dev,p, n);
     HELIB_NTIMER_STOP(AfterPolyMul_mulMod);
+  } else {
+    long dx = deg(x);
+    for (long i = 0; i <= dx; i++) {
+      x[i].LoopHole() =
+         NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
+      }
+    x.normalize();
+
+    long k = NTL::NextPowerOfTwo(2 * n - 1);
+    NTL::fftRep& Ra = Cmodulus::getScratch_fftRep(k);
+
+    TofftRep_trunc(Ra, x, k, 3 * (n - 1) + 1);
+
+    mul(Ra, Ra, Rb); // multiply in FFT representation
+
+    FromfftRep(x, Ra, n - 1, 2 * (n - 1)); // then convert back
+    dx = deg(x);
+    for (long i = 0; i <= dx; i++) {
+      x[i].LoopHole() =
+          NTL::MulModPrecon(rep(x[i]), rep(powers[i]), p, powers_aux[i]);
+    }
+    x.normalize();
   }
 }
 
