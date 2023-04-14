@@ -995,10 +995,10 @@ __device__ __int128 flooredDivision(__int128 a, long b)
       return (a/b)-1;
 
 }
-__device__ __int128 myMod2(__int128 a,long b)
-{
-    return a - b * flooredDivision(a, b);
-}
+// __device__ __int128 myMod2(__int128 a,long b)
+// {
+//     return a - b * flooredDivision(a, b);
+// }
 
 __global__ void kernel_mulMod(long *a, long *b, long *result, long size, long *d_modulus, long phim){
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
@@ -1127,20 +1127,21 @@ void CudaEltwiseMultMod(long actual_nrows){
 __global__ void kernel_mulModScalar(long *a, long *scalar, long *result, long size, long *d_modulus, long phim){
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
   if(tid < size){
-    __int128 temp_res=0;
-    __int128 temp_a=0;
-    __int128 temp_b=0;
+    // __int128 temp_res=0;
+    // __int128 temp_a=0;
+    // __int128 temp_b=0;
 
-    temp_a = a[tid];
-    temp_b = scalar[tid/phim];
+    __int128 temp_storage = a[tid];
+    // temp_b = scalar[tid/phim];
 
-    temp_res = temp_a * temp_b;
+    // temp_res = temp_a * temp_b;
     // temp_res = temp_res%modulus;
-    temp_res = myMod2(temp_res, d_modulus[tid/phim]);
+    // temp_res = myMod2(temp_res, d_modulus[tid/phim]);
 
+    temp_storage *= scalar[tid/phim];
     // d_result[tid] = temp_res;
     // result[tid] %= modulus;
-    result[tid]=temp_res;
+    result[tid]= temp_storage % d_modulus[tid/phim];
 
     // result[tid]=mul_mod(a[tid], b[tid], modulus);
   }
@@ -2188,20 +2189,20 @@ void gpu_ntt_backward_old(NTL::vec_zz_p& res, unsigned int n, const NTL::vec_zz_
 
 }
 
-__global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, long phim){
-  int tid = blockDim.x * blockIdx.x + threadIdx.x;
-  __int128 temp_res=0;
-  __int128 temp_a=0;
-  __int128 temp_b=0;
+// __global__ void kernel_mulMod(long *a, long *b, long *result, long d_modulus, long phim){
+//   int tid = blockDim.x * blockIdx.x + threadIdx.x;
+//   __int128 temp_res=0;
+//   __int128 temp_a=0;
+//   __int128 temp_b=0;
 
-  temp_a = a[tid];
-  temp_b = b[tid];
+//   temp_a = a[tid];
+//   temp_b = b[tid];
 
-  temp_res = temp_a * temp_b;
-  temp_res = myMod2(temp_res, d_modulus);
+//   temp_res = temp_a * temp_b;
+//   temp_res = myMod2(temp_res, d_modulus);
 
-  result[tid]=temp_res;
-}
+//   result[tid]=temp_res;
+// }
 
 void gpu_fused_polymul(NTL::vec_zz_p& res, unsigned long long a_dev[], const unsigned long long b_dev[], int n, unsigned long long n_inv, unsigned long long x_dev[], unsigned long long q, 
 const std::vector<unsigned long long>& gpu_powers, const std::vector<unsigned long long>& gpu_ipowers, unsigned long long psi, unsigned long long psiinv, int l, unsigned long long gpu_powers_dev[], unsigned long long gpu_ipowers_dev[], cudaStream_t stream){
