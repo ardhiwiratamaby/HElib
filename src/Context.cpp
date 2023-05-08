@@ -607,7 +607,7 @@ Context::Context(unsigned long m,
                  const std::vector<long>& ords) :
     zMStar(m, p, gens, ords),
     alMod(zMStar, r),
-
+    
     // VJS-FIXME: I'm not sure this makes sense.
     // This constrictor was provided mainly for bootstrapping.
     // Most BGV applications will *not* use fully packed slots
